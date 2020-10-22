@@ -1,0 +1,1039 @@
+#include "declare.h"
+#include "def_gtype.h"
+#include "def_flt.h"
+#include <math.h>
+
+int flt_det_cap[MAXCAP];
+
+pi_valset(pivalset) int pivalset[];
+{
+  FIN_NODE *finnode;
+  L_NODE *fnode;
+  unsigned int val;
+  int line, cnt, ni;
+
+  finnode = pinode.next;
+  for (ni = 1; finnode != NULL; finnode = finnode->next, ni++)
+  {
+    fnode = finnode->node;
+    line = fnode->line;
+
+    val = pivalset[ni];
+
+    if (val == 1)
+    {
+      fnode->gdval1 = ALL_F;
+      // fnode->gdval0 = ALL_F;
+    }
+    else if (val == 0)
+    {
+      fnode->gdval1 = 0;
+      //fnode->gdval0 = 0;
+    }
+    else if (val == X)
+    {
+      printf("error: Not support X value\n");
+      exit(1);
+    }
+    else
+      printf(" error 3982\n"), exit(1);
+    fnode->ftval1 = fnode->gdval1;
+    //  fnode->ftval0 = fnode->gdval0 ;
+    //printf("%x %d %d\n", fnode->ftval1, fnode->line, ni);
+  }
+#if PRNT_PIVAL
+  finnode = pinode.next;
+  printf(" INPUT VECTOR ");
+  for (cnt = 1; finnode != NULL; finnode = finnode->next, cnt++)
+  {
+    fnode = finnode->node;
+    if (fnode->gdval1 == 0)
+      printf("0");
+    else
+      printf("1");
+    if (cnt % 30 == 0)
+      printf("\n");
+    else if (cnt % 10 == 0)
+      printf(" ");
+    else if (cnt % 5 == 0)
+      printf(" ");
+  }
+  printf("\n");
+#endif
+}
+
+update_nextstate(capture) int capture;
+{
+  FIN_NODE *finnode;
+  L_NODE *fnode;
+  int ia;
+  unsigned int tmp[ffnum];
+  unsigned int val1;
+
+  finnode = ffnode.next;
+  for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
+  {
+    fnode = finnode->node;
+    tmp[ia] = fnode->finlst->node->gdval1;
+  }
+  finnode = ffnode.next;
+
+  for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
+  {
+    fnode = finnode->node;
+    /*#if WSA_REC
+ if(capture==1) MaxWSA+=(1+fnode->outnum);
+#endif
+*/
+
+    if (fnode->gdval1 != tmp[ia])
+    {
+      fnode->gdval1 = tmp[ia];
+#if POWEREVA //トグル回数を数える                                                    \
+             //printf("%d\n",ia); //iaがFF番号を示す hamada 2014_09_22                  \
+             //printf("%d\n",capture);//2014_09_30 hamada                                     \
+             //printf("aaa\n");                                                               \
+             //toggle_cnt[ia]++;//個々のFFのトグル回数を数える hamada 2014_09_22 \
+             //printf("toggle[%d] = %d\n",ia,toggle_cnt[ia]);//hamada 2014_09_22
+      toggle_cap[capture]++;
+      toggle_cap_perpat[capture]++;
+#if FF_CAP
+      fnode->toggle_cap[capture]++;
+#endif
+
+#endif
+      /*#if WSA_REC
+	WSA[capture]+=(1+fnode->outnum);
+#endif*/
+    }
+    else
+    {
+
+      if (MODE_TOOL == 4)
+      {
+
+        if (TGL_GATE_MODE == 2)
+        {
+
+          //if (capture >= SKIP_CYCLE - 1)
+          if (capture >= SKIP_CYCLE - 1 && capture < cap_freq)
+          {
+            if (capture % INTERVAL_CYCLE == 0)
+            {
+              if (fnode->toggle_flog == 1)
+              {
+                //if(fnode->gdval0==fnode->gdval1)
+                fnode->gdval1 = ~fnode->gdval1;
+
+                //fnode->gdval1= ~fnode->gdval1;
+              }
+            }
+          }
+        }
+      }
+    }
+
+#if TRANSITIONFAULT
+    if (capture == SLOW_CK)
+      fnode->gdval_slow = fnode->gdval1;
+#endif
+  }
+
+#if DEBUG
+  //for(ia=1;ia<=capture;ia++)
+  printf("toggle_cap %d = %.0f %.0f\n", capture, toggle_cap[capture], toggle_cap_perpat[capture]);
+#endif
+}
+
+tpi_ff_state_load(capture) int capture;
+{
+  FIN_NODE *finnode;
+  L_NODE *fnode;
+  int ia, tpi_cnt;
+  //FF_TPI_by LFSR
+  finnode = ffnode.next;
+  tpi_cnt = 0;
+  for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
+  {
+    fnode = finnode->node;
+    if (fnode->toggle_flog == 1)
+    {
+      //  printf(" %d: %x %x\n", fnode->line, fnode->gdval0, fnode->gdval1);
+      if (tgl_tpi[tpi_cnt][capture] == 1)
+        fnode->gdval1 = ALL_F;
+      else if (tgl_tpi[tpi_cnt][capture] == 0)
+        fnode->gdval1 = 0;
+      else if (tgl_tpi[tpi_cnt][capture] == X)
+        printf("error: Not support X value\n"), exit(1);
+      tpi_cnt++; //printf("herer?%d %d \n",tpi_cnt,capture);
+    }
+    //printf("out%d %d \n",tpi_cnt,capture);
+  }
+
+  //printf("out%d %d \n",tpi_cnt,capture);
+}
+
+tpi_ff_state_load_ft(capture) int capture;
+{
+  FIN_NODE *finnode;
+  L_NODE *fnode;
+  int ia, tpi_cnt;
+  //FF_TPI_by LFSR
+  finnode = ffnode.next;
+  tpi_cnt = 0;
+  for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
+  {
+    fnode = finnode->node;
+    if (fnode->toggle_flog != 1)
+      continue;
+    if (tgl_tpi[tpi_cnt][capture] == 1)
+      fnode->ftval1 = ALL_F;
+    else if (tgl_tpi[tpi_cnt][capture] == 0)
+      fnode->ftval1 = 0;
+    else if (tgl_tpi[tpi_cnt][capture] == X)
+      printf("error: Not support X value\n"), exit(1);
+    tpi_cnt++;
+  }
+}
+
+update_nextstate_ft(capture) int capture;
+{
+  FIN_NODE *finnode;
+  L_NODE *fnode;
+  int ia;
+  unsigned int tmp[ffnum], tgl_val;
+  int count = 0;
+  finnode = ffnode.next;
+  for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
+  {
+    fnode = finnode->node;
+    tmp[ia] = fnode->finlst->node->ftval1;
+  }
+
+  finnode = ffnode.next;
+  for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
+  {
+    fnode = finnode->node;
+    if (MODE_TOOL == 4)
+    {
+      if (TGL_GATE_MODE == 2)
+      {
+        if (capture < SKIP_CYCLE - 1 || capture == cap_freq)
+        {
+          fnode->ftval1 = tmp[ia];
+        }
+        else
+        {
+          if (capture % INTERVAL_CYCLE == 0)
+          {
+            tgl_val = fnode->ftval1 ^ tmp[ia];
+            if (fnode->toggle_flog == 1)
+            {
+              //if(fnode->gdval0==fnode->gdval1)
+              fnode->ftval1 = ~(tmp[ia] ^ tgl_val); //printf(" %d: %x %x\n",fnode->line,fnode->gdval0,fnode->gdval1);
+                                                    //fnode->gdval1= ~fnode->gdval1;
+            }
+            else
+              fnode->ftval1 = tmp[ia];
+          }
+          else
+            fnode->ftval1 = tmp[ia];
+        }
+      }
+      else
+        fnode->ftval1 = tmp[ia];
+    }
+    else
+      fnode->ftval1 = tmp[ia];
+  }
+}
+
+initial_state(int ff_state[])
+{
+  L_NODE *fnode;
+  FIN_NODE *finnode;
+  int inval1;
+#if INITIAL_ST == 0
+  /** assume all 0 value **/
+#if DEBUG3
+  printf(" Assume initial all 0 state\n");
+#endif
+  finnode = ffnode.next;
+  for (; finnode != NULL; finnode = finnode->next)
+  {
+    fnode = finnode->node;
+    fnode->gdval1 = 0;
+  }
+#endif
+#if INITIAL_ST == 1
+  /** assume LFSR value **/
+#if DEBUG3
+  printf(" Assume initial RANDOM state\n");
+#endif
+
+  finnode = ffnode.next;
+  int ia = 0;
+  for (; finnode != NULL; finnode = finnode->next, ia++)
+  {
+    fnode = finnode->node;
+    if (ff_state[ia] == 1)
+    {
+      fnode->gdval1 = ALL_F;
+    }
+    else
+    {
+      fnode->gdval1 = 0;
+    }
+    //printf("%x %d\n", fnode->gdval1, fnode->line);
+  }
+#endif
+}
+
+initial_state_ft(int ff_state[])
+{
+  L_NODE *fnode;
+  FIN_NODE *finnode;
+  int inval1;
+#if INITIAL_ST == 0
+  /** assume all 0 value **/
+#if DEBUG3
+  printf(" Assume initial all 0 state\n");
+#endif
+  finnode = ffnode.next;
+  for (; finnode != NULL; finnode = finnode->next)
+  {
+    fnode = finnode->node;
+    fnode->ftval1 = 0;
+  }
+#endif
+#if INITIAL_ST == 1
+  /** assume LFSR value **/
+#if DEBUG3
+  printf(" Assume initial RANDOM state\n");
+#endif
+
+  finnode = ffnode.next;
+  int ia = 0;
+  for (; finnode != NULL; finnode = finnode->next, ia++)
+  {
+    fnode = finnode->node;
+    if (ff_state[ia] == 1)
+    {
+      fnode->ftval1 = ALL_F;
+    }
+    else
+    {
+      fnode->ftval1 = 0;
+    }
+  }
+#endif
+}
+
+prn_allvalue(node_head)
+    L_NODE *node_head;
+{
+  L_NODE *fnode;
+  unsigned int val1;
+  int numg;
+
+  printf(" === LINES VALUES ===\n");
+  fnode = node_head;
+  numg = 0;
+  for (; fnode != NULL; fnode = fnode->next)
+  {
+    numg++;
+
+    val1 = fnode->gdval1;
+    printf(" L[%d]= ", fnode->line);
+    if (val1 == 0)
+      printf("0");
+    else if (val1 == ALL_F)
+      printf("1");
+    else
+      printf(" error -28329-\n"), exit(1);
+    /*     if(numg%5==0) */
+    printf("\n");
+  }
+  printf("\t\t (good)\n");
+}
+
+prn_out_value(po_observe, ia)
+    T_NODE po_observe[numout][cap_freq];
+int ia;
+{
+  unsigned int val1;
+  int ib;
+
+  printf(" OUTPUT ");
+  for (ib = 0; ib < numout; ib++)
+  {
+    val1 = po_observe[ib][ia - 1].gdval1;
+
+    if (val1 == 0)
+      printf("0");
+    else if (val1 == ALL_F)
+      printf("1");
+    else
+      printf("E");
+    //printf(" error -28329-\n"),exit(1);
+  }
+  printf("\n");
+}
+
+prn_state(finnode)
+    FIN_NODE *finnode;
+{
+  L_NODE *fnode;
+  unsigned int val1;
+  int numg = 0, cnt;
+  //#if DEBUG1 || PRNT_FF
+  printf(" FF ");
+  for (; finnode != NULL; finnode = finnode->next)
+  {
+    fnode = finnode->node;
+    val1 = fnode->gdval1;
+    if (val1 == 0)
+      printf("0");
+    else if (val1 == ALL_F)
+      printf("1");
+    else
+      printf(" error -28329-\n"), exit(1);
+  }
+//#endif
+#if DEBUG1
+  printf(" STATE ");
+  for (cnt = 1; finnode != NULL; finnode = finnode->next, cnt++)
+  {
+    fnode = finnode->node;
+    if (fnode->gdval1 == 0)
+      printf("0");
+    else
+      printf("1");
+    if (cnt % 30 == 0)
+      printf("\n\t");
+    else if (cnt % 5 == 0)
+      printf(" ");
+  }
+//exit(1);
+#endif
+  printf("\n");
+}
+
+prn_state_ao(fp, time)
+    FILE *fp;
+int time;
+{
+  L_NODE *fnode;
+  unsigned int val1;
+  int numg = 0, cnt;
+  FIN_NODE *finnode;
+
+  finnode = pinode.next;
+  //printf("%d ", fnode1->line);
+  for (; finnode != NULL; finnode = finnode->next)
+  {
+    fnode = finnode->node;
+    //fprintf(fp, "%d ", fnode->line);
+    if (fnode->gdval1 == ALL_F)
+    {
+      test_val[time][fnode->line] = 1;
+      // fnode->gdval0 = ALL_F;
+    }
+    else if (fnode->gdval1 == 0)
+    {
+      test_val[time][fnode->line] = 0;
+    }
+  }
+  finnode = ffnode.next;
+  for (; finnode != NULL; finnode = finnode->next)
+  {
+    fnode = finnode->node;
+    //fprintf(fp, "%d ", fnode->line);
+    if (fnode->gdval1 == ALL_F)
+    {
+      test_val[time][fnode->line] = 1;
+    }
+    else if (fnode->gdval1 == 0)
+    {
+      test_val[time][fnode->line] = 0;
+    }
+  }
+  fnode = gnode.next;
+  for (; fnode != NULL; fnode = fnode->next)
+  {
+    //fprintf(fp, "%d ", fnode->line);
+    if (fnode->gdval1 == ALL_F)
+    {
+      test_val[time][fnode->line] = 1;
+    }
+    else if (fnode->gdval1 == 0)
+    {
+      test_val[time][fnode->line] = 0;
+    }
+  }
+}
+
+prn_state_ao3(fp, time)
+    FILE *fp;
+int time;
+{
+  L_NODE *fnode;
+  unsigned int val1;
+  int numg = 0, cnt;
+  FIN_NODE *finnode;
+
+  finnode = pinode.next;
+  //printf("%d ", fnode1->line);
+  for (; finnode != NULL; finnode = finnode->next)
+  {
+    fnode = finnode->node;
+    //fprintf(fp, "%d ", fnode->line);
+    if (fnode->gdval1 == ALL_F)
+    {
+      fprintf(fp, "1,");
+      // fnode->gdval0 = ALL_F;
+    }
+    else if (fnode->gdval1 == 0)
+    {
+      fprintf(fp, "0,");
+    }
+  }
+  finnode = ffnode.next;
+  for (; finnode != NULL; finnode = finnode->next)
+  {
+    fnode = finnode->node;
+    //fprintf(fp, "%d ", fnode->line);
+    if (fnode->gdval1 == ALL_F)
+    {
+      fprintf(fp, "1,");
+    }
+    else if (fnode->gdval1 == 0)
+    {
+      fprintf(fp, "0,");
+    }
+  }
+  fprintf(fp, "\n");
+}
+
+prn_state_ao_ft(fp, time)
+    FILE *fp;
+int time;
+{
+  L_NODE *fnode;
+  unsigned int val1;
+  int numg = 0, cnt;
+  FIN_NODE *finnode;
+
+  finnode = pinode.next;
+  //printf("%d ", fnode1->line);
+  for (; finnode != NULL; finnode = finnode->next)
+  {
+    fnode = finnode->node;
+    //fprintf(fp, "%d ", fnode->line);
+    if (fnode->ftval1 == ALL_F)
+    {
+      fprintf(fp, "%d  1,", test_val[time][fnode->line]);
+      // fnode->gdval0 = ALL_F;
+    }
+    else if (fnode->ftval1 == 0)
+    {
+      fprintf(fp, "%d  0,", test_val[time][fnode->line]);
+    }
+  }
+  finnode = ffnode.next;
+  for (; finnode != NULL; finnode = finnode->next)
+  {
+    fnode = finnode->node;
+    //fprintf(fp, "%d ", fnode->line);
+    if (fnode->ftval1 == ALL_F)
+    {
+      fprintf(fp, "%d  1,", test_val[time][fnode->line]);
+    }
+    else if (fnode->ftval1 == 0)
+    {
+      fprintf(fp, "%d  0,", test_val[time][fnode->line]);
+    }
+    else
+    {
+      fprintf(fp, "%d  %x,", test_val[time][fnode->line], fnode->ftval1);
+    }
+  }
+  fnode = gnode.next;
+  for (; fnode != NULL; fnode = fnode->next)
+  {
+    //fprintf(fp, "%d ", fnode->line);
+    if (fnode->line == 9 || fnode->line == 11 || fnode->line == 13 || fnode->line == 17 || fnode->line == 18 || fnode->line == 12 || fnode->line == 14 || fnode->line == 16 || fnode->line == 10 || fnode->line == 15 || fnode->line == 5 || fnode->line == 19)
+    {
+      if (fnode->ftval1 == ALL_F)
+      {
+        fprintf(fp, "%d  1,", test_val[time][fnode->line]);
+      }
+      else if (fnode->ftval1 == 0)
+      {
+        fprintf(fp, "%d  0,", test_val[time][fnode->line]);
+      }
+      else
+      {
+        fprintf(fp, "%d  %x,", test_val[time][fnode->line], fnode->ftval1);
+      }
+    }
+  }
+  fprintf(fp, "\n");
+}
+
+prn_state_ao2(fp)
+    FILE *fp;
+{
+  L_NODE *fnode;
+  unsigned int val1;
+  int numg = 0, cnt;
+  FIN_NODE *finnode;
+
+  fprintf(fp, "gate,");
+  finnode = pinode.next;
+  //printf("%d ", fnode1->line);
+  for (; finnode != NULL; finnode = finnode->next)
+  {
+    fnode = finnode->node;
+    fprintf(fp, "%d,", fnode->line);
+  }
+  finnode = ffnode.next;
+  for (; finnode != NULL; finnode = finnode->next)
+  {
+    fnode = finnode->node;
+    fprintf(fp, "%d,", fnode->line);
+  }
+  fnode = gnode.next;
+  for (; fnode != NULL; fnode = fnode->next)
+  {
+    fprintf(fp, "%d,", fnode->line);
+  }
+  fprintf(fp, "\n");
+}
+
+prn_state_flt_ao(finnode)
+    FIN_NODE *finnode;
+{
+  L_NODE *fnode;
+  unsigned int val1;
+  int numg = 0, cnt;
+  FIN_NODE *finnode1;
+
+  finnode1 = pinode.next;
+  //printf("%d ", fnode1->line);
+  for (; finnode1 != NULL; finnode1 = finnode1->next)
+  {
+    fnode = finnode1->node;
+    if (fnode->gdval1 == ALL_F)
+    {
+      fprintf(fout_flt_in, "1,");
+      // fnode->gdval0 = ALL_F;
+    }
+    else if (fnode->gdval1 == 0)
+    {
+      fprintf(fout_flt_in, "0,");
+      //fnode->gdval0 = 0;
+    }
+  }
+  fprintf(fout_flt_in, ",");
+  for (; finnode != NULL; finnode = finnode->next)
+  {
+    fnode = finnode->node;
+    val1 = fnode->gdval1;
+    //printf("%d ", fnode->line);
+    if (val1 == 0)
+      fprintf(fout_flt_in, "0,");
+    else if (val1 == ALL_F)
+      fprintf(fout_flt_in, "1,");
+    else
+      printf(" error -28329-\n"), exit(1);
+  }
+  fprintf(fout_flt_in, "\n");
+}
+
+scan_out(finnode)
+    FIN_NODE *finnode;
+{
+  L_NODE *fnode;
+  int ia, ib, ic, togglecount, togglecount1, tmpl;
+  int ff_state[ffnum], tmp[ffnum];
+  unsigned int val1;
+
+  for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
+  {
+    fnode = finnode->node;
+    val1 = fnode->gdval1;
+    // if(initial_ff_state[2][ia]!=val1) printf("exit!\n");
+
+    if (val1 == 0)
+    {
+      ff_state[ia] = 0;
+      tmp[ia] = 0;
+    }
+    else if (val1 == ALL_F)
+    {
+      ff_state[ia] = 1;
+      tmp[ia] = 1;
+    }
+    else
+      printf("E:%d\n", val1);
+  }
+
+  for (ia = 0; ia < chainnum; ia++)
+  {
+    if (schain[ia].length > 0)
+    {
+      schain[ia].lastval = ff_state[schain[ia].top];
+    }
+  }
+  for (ia = 1; ia <= (ffnum - 1) / chainnum; ia++)
+  {
+    for (ib = 0; ib < chainnum; ib++)
+    {
+      if (ia < schain[ib].length)
+      {
+#if POWEREVA
+        if (ff_state[schain[ib].top + ia] != schain[ib].lastval)
+        {
+          toggle_scn += schain[ib].length - ia;
+          toggle_scn_out += schain[ib].length - ia;
+          toggle_shift_perpat += schain[ib].length - ia;
+        }
+#endif
+        schain[ib].lastval = ff_state[schain[ib].top + ia];
+      }
+    }
+  }
+
+  //exit(1);
+}
+
+initialize_detect(flt_node, length)
+    FLT_NODE *flt_node;
+int length;
+{
+  int ni;
+  while (flt_node != NULL)
+  {
+    flt_node->dtime = 0;
+    flt_node->OBdtime = 0;
+    flt_node->TranDetTimes = 0;
+    flt_node->TranOBDetTimes = 0;
+    for (ni = 0; ni <= length / 32; ni++)
+      flt_node->detect[ni] = flt_node->activ[ni] = 0;
+    for (ni = 0; ni <= FF_FILE; ni++)
+      flt_node->OBdtime_sel_FF[ni] = 0;
+    flt_node->full_ob_dtime = 0;
+    //printf("%d %d %d || ",flt_node->num,flt_node->saval,flt_node->TranDetTimes);
+    flt_node = flt_node->next;
+  }
+}
+
+flt_info(fgnode)
+    FLT_NODE *fgnode;
+{
+  int ia = 0;
+  for (; fgnode != NULL; fgnode = fgnode->next)
+  {
+    for (ia = 0; ia <= 10; ia++)
+    {
+      flt_det_flog[fgnode->num][ia] = 0;
+      flt_det_flog[0][ia] = 0;
+    }
+  }
+}
+
+prn_detect(fgnode, length)
+    FLT_NODE *fgnode;
+int length;
+{
+  int ni;
+
+  for (; fgnode != NULL; fgnode = fgnode->next)
+  {
+    if (!fgnode->dtime)
+      continue;
+    if (fgnode->num == 7765)
+    {
+      printf(" Fault %d", fgnode->back->line);
+      if (fgnode->forwd != NULL)
+        printf(" >> %d", fgnode->forwd->line);
+      else
+        printf(" >> 0");
+      printf(" num %d   sa %d |", fgnode->num, fgnode->saval);
+      printf(" %d times", fgnode->dtime);
+      printf("\n \t Detected ");
+
+      for (ni = 1; ni <= length; ni++)
+      {
+        if (fgnode->detect[ni / 32] & ITI << (ni % 32))
+          printf(" %d", ni);
+      }
+      printf("\n \t Propagate ");
+
+      for (ni = 1; ni <= length; ni++)
+      {
+        if (fgnode->activ[ni / 32] & ITI << (ni % 32))
+          printf(" %d", ni);
+      }
+      printf("\n");
+    }
+  }
+}
+
+onetimesim(capture) int capture;
+{
+  L_NODE *fnode;
+  FIN_NODE *finnode;
+  int tpi_cnt;
+  unsigned int val1;
+#if WSA_REC
+  unsigned int tmp_val;
+  double MaxTemp = 0.0, temp = 0.0;
+#endif
+  unsigned int tgl_val, tmp2_val, new_val1;
+  //printf("\nhere?\n ");
+  fnode = gnode.next;
+  tpi_cnt = 0;
+  for (; fnode != NULL; fnode = fnode->next)
+  {
+
+    finnode = fnode->finlst;
+    new_val1 = finnode->node->gdval1;
+    tmp2_val = fnode->gdval1;
+#if WSA_REC
+    tmp_val = fnode->gdval1; //printf(" %d: %x \n",fnode->line,fnode->gdval1);
+#endif
+    //printf("target  :Line %d %x %x \n", fnode->line, fnode->gdval1, new_val1);
+    //printf("input   :Line %d %x %x \n", finnode->node->line, finnode->node->gdval1, new_val1);
+    finnode = finnode->next;
+    //printf("%d %d\n", fnode->line, fnode->type);
+    //printf("target2 :Line %d val1 %x %x \n", fnode->line, fnode->gdval1, new_val1);
+    for (; finnode != NULL; finnode = finnode->next)
+    {
+      //printf("input   :Line %d %x %X \n", finnode->node->line, finnode->node->gdval1, new_val1);
+      val1 = finnode->node->gdval1;
+      // printf("--%d %d\n", finnode->node->line, finnode->node->line);
+      switch (fnode->type)
+      {
+      case AND:
+      case NAND:
+        new_val1 &= val1;
+        break;
+      case OR:
+      case NOR:
+        new_val1 |= val1;
+        break;
+      default:
+        printf(" error type %d -284-\n", fnode->type);
+        exit(1);
+      }
+    }
+    //printf("output1 :Line %d val %x newval %x \n", fnode->line, fnode->gdval1, new_val1);
+    if (fnode->type == NAND || fnode->type == NOR || fnode->type == NOT)
+    {
+      //printf("反転\n");
+      fnode->gdval1 = ~new_val1;
+      // if(capture==cap_freq-Transcycle) fnode->gdval0 = fnode->gdval1;
+    }
+    // else if (fnode->type == TPI)
+    // {
+    //   if (MODE_TOOL == 4)
+    //   {
+    //     if (TGL_GATE_MODE == 1)
+    //     {
+    //       if (capture >= SKIP_CYCLE - 1)
+    //       {
+    //         if (capture % INTERVAL_CYCLE == 0)
+    //         {
+    //           tgl_val = tmp2_val ^ new_val1;
+    //           fnode->gdval1 = ~(fnode->gdval1 ^ tgl_val);
+    //           //printf(" %d: %x %x\n",fnode->line,tmp2_val,fnode->gdval1);
+    //         }
+    //       }
+    //       else
+    //       {
+    //         fnode->gdval1 = new_val1;
+    //       }
+    //     }
+    //     else if (TGL_GATE_MODE == 4)
+    //     {
+    //       if (capture >= SKIP_CYCLE - 1)
+    //       {
+    //         if (tgl_tpi[tpi_cnt][capture] == 1)
+    //           fnode->gdval1 = ALL_F;
+    //         else if (tgl_tpi[tpi_cnt][capture] == 0)
+    //           fnode->gdval1 = 0;
+    //         else if (tgl_tpi[tpi_cnt][capture] == X)
+    //           printf("error: Not support X value\n"), exit(1);
+    //         tpi_cnt++;
+    //       }
+    //       else
+    //       {
+    //         fnode->gdval1 = new_val1;
+    //       }
+    //     }
+    //   }
+    // }
+    else
+    {
+      fnode->gdval1 = new_val1;
+    }
+    //printf("output1 :Line %d val %x newval %x \n\n", fnode->line, fnode->gdval1, new_val1);
+#if WSA_REC
+    if (capture == 1)
+    {
+      MaxWSA += (1 + fnode->outnum);
+      MaxTemp += (1 + fnode->outnum);
+    }
+    if (fnode->gdval1 != tmp_val)
+    {
+      WSA[capture] += (1 + fnode->outnum);
+      //temp+=fnode->outnum;
+      //Wsa_for_Peak[cap_cycle]+=fnode->outnum;
+    }
+#endif
+
+    if (MODE_TOOL == 4)
+    {
+      if (TGL_GATE_MODE == 1)
+      {
+        if (capture >= SKIP_CYCLE - 1)
+        {
+          if (capture % INTERVAL_CYCLE == 0)
+          {
+            tgl_val = tmp2_val ^ fnode->gdval1;
+            if (fnode->toggle_flog == 1)
+            {
+              fnode->gdval1 = ~(fnode->gdval1 ^ tgl_val);
+              //printf(" %d: %x %x\n",fnode->line,tmp2_val,fnode->gdval1);
+            }
+          }
+        }
+      }
+      else if (TGL_GATE_MODE == 4)
+      {
+        if (capture >= SKIP_CYCLE - 1)
+        {
+          if (fnode->toggle_flog == 1)
+          {
+            if (tgl_tpi[tpi_cnt][capture] == 1)
+              fnode->gdval1 = ALL_F;
+            else if (tgl_tpi[tpi_cnt][capture] == 0)
+              fnode->gdval1 = 0;
+            else if (tgl_tpi[tpi_cnt][capture] == X)
+              printf("error: Not support X value\n"), exit(1);
+            tpi_cnt++;
+          }
+        }
+      }
+    }
+
+#if DEBUG3
+    //if(capture>cap_freq-Transcycle)
+    printf(" Line %d val1 %x %x -298-\n", fnode->line, fnode->gdval0, fnode->gdval1);
+#endif
+  }
+  //printf("\nhere?\n ");
+}
+
+ftvalsim(capture) int capture;
+{
+  L_NODE *fnode;
+  FIN_NODE *finnode;
+  unsigned int val1;
+  int ia;
+  int count1 = 0;
+  unsigned int tgl_val, tmp_val, new_val1;
+  int tpi_cnt = 0;
+  fnode = gnode.next;
+  for (; fnode != NULL; fnode = fnode->next)
+  {
+    count1++;
+    finnode = fnode->finlst;
+    new_val1 = finnode->node->ftval1;
+    finnode = finnode->next;
+    tmp_val = fnode->ftval1;
+//if(TGL_GATE_MODE==1&&fnode->toggle_flog==1){
+// tgl_val= fnode->ftval1; printf(" %d: %x %x\n",fnode->line,fnode->gdval1,fnode->ftval1);
+//}
+#if DEBUG1
+    if (fnode->line == 38)
+      printf(" Faulty val In-line %x\n", new_val1);
+#endif
+    for (; finnode != NULL; finnode = finnode->next)
+    {
+      val1 = finnode->node->ftval1;
+      switch (fnode->type)
+      {
+      case AND:
+      case NAND:
+        new_val1 &= val1;
+        break;
+      case OR:
+      case NOR:
+        new_val1 |= val1;
+        break;
+      default:
+        printf(" error type %d -284-\n", fnode->type);
+        exit(1);
+      }
+    }
+    if (fnode->type == NAND || fnode->type == NOR || fnode->type == NOT)
+    {
+      fnode->ftval1 = ~new_val1;
+    }
+    else
+    {
+      fnode->ftval1 = new_val1;
+    }
+    if (MODE_TOOL == 4)
+    {
+      if (TGL_GATE_MODE == 1)
+      {
+        if (capture >= SKIP_CYCLE - 1)
+        {
+          if (capture % INTERVAL_CYCLE == 0)
+          {
+
+            tgl_val = tmp_val ^ fnode->ftval1;
+            if (fnode->toggle_flog == 1)
+            {
+              //printf(" %x ",fnode->ftval1);
+              //if(fnode->ftval0==fnode->ftval1)
+              fnode->ftval1 = ~(fnode->ftval1 ^ tgl_val); //printf(" %d: %x %x\n",fnode->line,tmp_val,fnode->ftval1);
+            }
+          }
+        }
+      }
+      else if (TGL_GATE_MODE == 4)
+      {
+        if (capture >= SKIP_CYCLE - 1)
+        {
+          if (fnode->toggle_flog == 1)
+          {
+            if (tgl_tpi[tpi_cnt][capture] == 1)
+              fnode->ftval1 = ALL_F;
+            else if (tgl_tpi[tpi_cnt][capture] == 0)
+              fnode->ftval1 = 0;
+            else if (tgl_tpi[tpi_cnt][capture] == X)
+              printf("error: Not support X value\n"), exit(1);
+            tpi_cnt++;
+          }
+        }
+      }
+    }
+
+    /*if(TGL_GATE_MODE==1&& fnode->toggle_flog==1){
+if(tgl_val==fnode->ftval1)
+  fnode->ftval1= ~fnode->ftval1;printf(" %d: %x %x\n",fnode->line,fnode->gdval1,fnode->ftval1);
+}*/
+
+#if DEBUG3
+    if (fnode->line == 380)
+      printf(" Line %d gdval %x ftval %x %d\n", fnode->line, fnode->gdval_slow, fnode->ftval1, count1);
+#endif
+  }
+  //printf("%d ",count1);
+  //exit(1);
+}
