@@ -2,7 +2,7 @@
 
 set -eu
 function catch {
-    echo "Error: FFOPS is failed!" >&2
+    echo "Error: Logic-BIST-Sim is failed!" >&2
 }
 trap catch ERR
 
