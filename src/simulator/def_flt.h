@@ -117,7 +117,7 @@ typedef struct element
 } ELEMENT;
 
 /*Instance Variable Defination*/
-int MODE_TOOL, MODE_TEST, TAP_NUM, cap_freq, SKIP_CAPTURE, SKIP_CYCLE, FF_SEL_METHOD, TGL_GATE_MODE, clocktime, LBISTMODE, ALPMODE, INTERVAL_CYCLE, TG_FILE, SOControlFlog, SoControlMode, FFSelMode, CHAINLENGTH, length,group_tpi;
+int MODE_TOOL, TPG_MODE, TAP_NUM, cap_freq, SKIP_CAPTURE, SKIP_CYCLE, FF_SEL_METHOD, TGL_GATE_MODE, clocktime, LBISTMODE, ALPMODE, INTERVAL_CYCLE, TG_FILE, SOControlFlog, SoControlMode, FFSelMode, CHAINLENGTH, length,group_tpi;
 int numout, slist, numgate, n_tpi;
 int lpnt, inpnum, ffnum, sum_flt, remain_flt, sum_Tran_flt, chainnum, interstatecount[2], tgl_gt_cnt;
 int **tgl_tpi;

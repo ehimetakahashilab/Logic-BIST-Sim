@@ -19,11 +19,11 @@ faultsim(argv) char *argv[13];
 	float TmpShiftPeek = 0.0, TmpSIPeek = 0.0, TmpSOPeek = 0.0, TmpCapPeek[MAXCAP];
 	int sum;
 
-	FILE *fout2;
+	FILE *fout_flt_pat;
 
 	char outpath[200];
-	char outpath_in[200];
-	char outpath_flt_in[200];
+	//char outpath_in[200];
+	//char outpath_flt_in[200];
 	char pt_file1[100];
 	char pt_file2[100];
 
@@ -32,185 +32,147 @@ faultsim(argv) char *argv[13];
 
 	for (ia = 0; ia < MAXCAP; ia++)
 		flt_cap[ia] = 0;
-	printf("==Simulation Parameter Setting for==\n");
+	printf("\n==Simulation Parameter Setting for==\n");
 	switch (MODE_TOOL)
 	{
 	case 1:
-		printf(" Normal BIST Testing Mode\n");
+		printf("\nNormal BIST Testing Mode\n");
 		sprintf(outpath, "./OUTPUTS/BIST/%s.csv", argv[1]);
-		if ((fout2 = fopen(outpath, "w")) == NULL)
-			printf("FCOV_PAT output file is not exist!\n"), exit(1);
+		fout_flt_pat = fopen(outpath, "w+");
 
 		break;
 	case 2:
-		printf(" BIST Multi-Cycle Testing Mode\n");
+		printf("\nBIST Multi-Cycle Testing Mode\n");
 		if (SKIP_CAPTURE)
 			printf("skip first %d capture\n", SKIP_CAPTURE);
 		sprintf(outpath, "./OUTPUTS/MULTI_BIST/%s_%d.csv", argv[1], cap_freq);
-		if ((fout2 = fopen(outpath, "w")) == NULL)
-			printf("FCOV_PAT output file is not exist!\n"), exit(1);
+    fout_flt_pat = fopen(outpath, "w+");
+		//	printf("FCOV_PAT output file is not exist!\n"), exit(1);
 
 		break;
 
 	case 3:
-		printf(" BIST Multi-Cycle Testing With Sequential Observation Mode");
+		printf("\nBIST Multi-Cycle Testing With Sequential Observation Mode\n");
 		sprintf(outpath, "./OUTPUTS/MULTI_BIST_OB/%s_%d.csv", argv[1], cap_freq);
-		if ((fout2 = fopen(outpath, "w")) == NULL)
-			printf("FCOV_PAT output file is not exist!\n"), exit(1);
+		fout_flt_pat = fopen(outpath, "w+");
+//			printf("FCOV_PAT output file is not exist!\n"), exit(1);
+
+			#if PO_OBSERVE
+					printf("PO observe mode\n");
+					po_observe = (T_NODE **)calloc(numout, sizeof(T_NODE *));
+					if (po_observe == NULL)
+						printf("memory error @faultsim\n"), exit(1);
+
+					for (ia = 0; ia < numout; ia++)
+					{
+						po_observe[ia] = (T_NODE *)calloc(cap_freq, sizeof(T_NODE));
+						if (po_observe[ia] == NULL)
+							printf("memory error @faultsim\n"), exit(1);
+					}
+			#endif
+
+					ff_observe = (T_NODE **)calloc(ffnum, sizeof(T_NODE *));
+					if (ff_observe == NULL)
+						printf("memory error @faultsim \n"), exit(1);
+					for (ia = 0; ia < ffnum; ia++)
+					{
+						ff_observe[ia] = (T_NODE *)calloc(cap_freq, sizeof(T_NODE));
+						if (ff_observe[ia] == NULL)
+							printf("memory error @faultsim \n"), exit(1);
+					}
+
+			#if SELECT_STATION
+					num_observe = ffnum * OBSERVE_RATE;
+					printf("Partial FF observation mode: %f \n", OBSERVE_RATE);
+					printf("Station rate = %.0f[%]\n", (float)(OBSERVE_RATE * 100));
+					ff_sta_src_read(FF_FILE, num_observe, argv);
+			#else
+					ff_select = (char *)calloc(ffnum, sizeof(char));
+					printf("Fully Observation Mode \n");
+					printf("Station rate = 100[%]\n");
+					for (ia = 0; ia < ffnum; ia++)
+					{
+						ff_select[ia] = '1';
+					}
+			#endif
+
+			break;
 	case 4:
-		printf(" Toggle gate Insertion MODE\n");
+		printf("\nBIST Multi-Cycle Testing under CPI Mode\n");
 		/*=======Memorry Assign for Sequential Observation*/
 
-#if PO_OBSERVE
-		printf("PO observe mode\n");
-		po_observe = (T_NODE **)calloc(numout, sizeof(T_NODE *));
-		if (po_observe == NULL)
-			printf("memory error @faultsim\n"), exit(1);
+					#if PO_OBSERVE
+							printf("PO observe mode\n");
+							po_observe = (T_NODE **)calloc(numout, sizeof(T_NODE *));
+							if (po_observe == NULL)
+								printf("memory error @faultsim\n"), exit(1);
 
-		for (ia = 0; ia < numout; ia++)
-		{
-			po_observe[ia] = (T_NODE *)calloc(cap_freq, sizeof(T_NODE));
-			if (po_observe[ia] == NULL)
-				printf("memory error @faultsim\n"), exit(1);
-		}
-#endif
+							for (ia = 0; ia < numout; ia++)
+							{
+								po_observe[ia] = (T_NODE *)calloc(cap_freq, sizeof(T_NODE));
+								if (po_observe[ia] == NULL)
+									printf("memory error @faultsim\n"), exit(1);
+							}
+					#endif
 
-		ff_observe = (T_NODE **)calloc(ffnum, sizeof(T_NODE *));
-		if (ff_observe == NULL)
-			printf("memory error @faultsim \n"), exit(1);
-		for (ia = 0; ia < ffnum; ia++)
-		{
-			ff_observe[ia] = (T_NODE *)calloc(cap_freq, sizeof(T_NODE));
-			if (ff_observe[ia] == NULL)
-				printf("memory error @faultsim \n"), exit(1);
-		}
+							ff_observe = (T_NODE **)calloc(ffnum, sizeof(T_NODE *));
+							if (ff_observe == NULL)
+								printf("memory error @faultsim \n"), exit(1);
+							for (ia = 0; ia < ffnum; ia++)
+							{
+								ff_observe[ia] = (T_NODE *)calloc(cap_freq, sizeof(T_NODE));
+								if (ff_observe[ia] == NULL)
+									printf("memory error @faultsim \n"), exit(1);
+							}
 
-#if SELECT_STATION
-		num_observe = ffnum * OBSERVE_RATE;
-		printf("Partial FF observation mode: %f \n", OBSERVE_RATE);
-		printf("Station rate = %.0f[%]\n", (float)(OBSERVE_RATE * 100));
-		ff_sta_src_read(FF_FILE, num_observe, argv);
-#else
-		ff_select = (char *)calloc(ffnum, sizeof(char));
-		printf("Fully Observation Mode \n");
-		printf("Station rate = 100[%]\n");
-		for (ia = 0; ia < ffnum; ia++)
-		{
-			ff_select[ia] = '1';
-		}
-#endif
+					#if SELECT_STATION
+							num_observe = ffnum * OBSERVE_RATE;
+							printf("Partial FF observation mode: %f \n", OBSERVE_RATE);
+							printf("Station rate = %.0f[%]\n", (float)(OBSERVE_RATE * 100));
+							ff_sta_src_read(FF_FILE, num_observe, argv);
+					#else
+							ff_select = (char *)calloc(ffnum, sizeof(char));
+							printf("Fully Observation Mode \n");
+							printf("Station rate = 100[%]\n");
+							for (ia = 0; ia < ffnum; ia++)
+							{
+								ff_select[ia] = '1';
+							}
+					#endif
+
 
 #if FCOVPERPAT
-if(MODE_TOOL==4){
-		char outpath[200];
-		switch (TGL_GATE_MODE)
-		{
-		case 0: //Non Toggle gate insertion
-			sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/Non_%s.csv", cap_freq, argv[1]);
-			sprintf(outpath_in, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/input_pat/%s_NONTG_FF_TPI_INP_%.2f_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], OBSERVE_RATE, FF_SEL_METHOD, ff_rate);
-			break;
-		case 1: //toggle gate insert by toggling
-		case 4:
-			switch (TG_FILE)
-			{
-			case 0:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_Prob_IND_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
-				break;
-			case 1:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_Prob_Over_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
-				break;
-			case 2:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_Struc_IND_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
-				break;
-			case 3:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_Struc_Over_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
+	//if(MODE_TOOL==4){
+			char cpi_sim_outpath[200];
+			switch (TGL_GATE_MODE)		{
+				case 0: //Non Toggle gate insertion
+				sprintf(cpi_sim_outpath, "./OUTPUTS/CPI/%d_cycles/Non_%s.csv", cap_freq, argv[1]);
+//			sprintf(outpath_in, "./OUTPUTS/CPI/%dcycles/%dSKIP/input_pat/%s_NONTG_FF_TPI_INP_%.2f_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], OBSERVE_RATE, FF_SEL_METHOD, ff_rate);
+					break;
+			case 1: //toggle gate insert by toggling
+		  sprintf(cpi_sim_outpath, "./OUTPUTS/CPI/%dcycles/%dSKIP/%s_LCPI_TGL_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], INTERVAL_CYCLE, Tgl_rate);
+				sprintf(cpi_sim_outpath, "./OUTPUTS/CPI/%d_cycles/%s_LCPI_TGL_%d_%d_%.2f.csv", cap_freq, argv[1], INTERVAL_CYCLE, SKIP_CYCLE,Tgl_rate);
 				break;
 			case 4:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_GT_PRO_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
-				break;
-			case 5:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_GT_STRUC_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
-				break;
-			case 6:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_GT_STRUC+PRO_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
-				break;
-			case 7:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_GT_CONF_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
-				break;
-			case 8:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_hybrid_max_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
-				break;
-			case 9:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_hybrid_sum_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
-				break;
-			case 10:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_renesas_tpi_cop_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
-				break;
-			case 11:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_renesas_tpi_cop+type_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
-				break;
-			case 12:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_renesas_tpi_cop+type_init_ave_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
-				break;
-			case 13:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_hybrid_max_init_ave_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
-				break;
-			case 14:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_renesas_tpi_copO_ave+type_init_ave_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
-				break;
-			case 15:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_hybrid_tpi_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
-				break;
-			case 16:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_hybrid_tpi_init_ave_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
-				break;
-			case 17:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_hybrid_tpi_init_ave_PRPF_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
-				break;
-			case 18:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_hybrid_tpi_init_ave_PRPF_PO_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
-				break;
-			case 19:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_renesas_tpi_fixed_gate+type_init_ave_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
-				break;
-			case 20:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_renesas_tpi_contribure_tgl_init_ave_%d_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
-				break;
-			case 21:
-				sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_rtpi_gp_%d_%d_%d_%.2f_%d.csv", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate,group_tpi);
-				break;
-			default:
-				break;
-			}
-			break;
-		case 2: //toggle FF  insert by toggling
-#if SELECT_STATION
-			sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_TG_FF_TPI_FDS%.2f_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], OBSERVE_RATE, FF_SEL_METHOD, ff_rate);
-#else
-			sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_TG_FF_TPI_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], FF_SEL_METHOD, ff_rate);
-#endif
-			break;
-		case 3:
-#if SELECT_STATION
-			sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_RLOAD_TPI_FDS%.2f_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], OBSERVE_RATE, FF_SEL_METHOD, ff_rate);
-#else
-			sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_RLOAD_TPI_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], FF_SEL_METHOD, ff_rate);
-#endif
-			break;
+		  	sprintf(cpi_sim_outpath, "./OUTPUTS/CPI/%d_cycles/%s_LCPI_RAN_%d_%d_%.2f.csv", cap_freq, argv[1], INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
+					break;
+			case 2: //toggle FF  insert by toggling
+				sprintf(cpi_sim_outpath, "./OUTPUTS/CPI/%d_cycles/%s_FFCPI_TGL_%d_%d_%.2f.csv", cap_freq, argv[1],INTERVAL_CYCLE, SKIP_CYCLE,  ff_rate);
+					break;
+			case 3:
+				sprintf(cpi_sim_outpath, "./OUTPUTS/CPI/%d_cycles/%s_FFCPI_RAN_%d_%d_%.2f.csv", cap_freq, argv[1], INTERVAL_CYCLE, SKIP_CYCLE,ff_rate);
+					break;
+			default: 		printf("No New Function is Supported by this Program!\n"), exit(1);
+					break;
 		}
 
-		if ((fout2 = fopen(outpath, "w")) == NULL)
-			printf("FCOV_PAT output file is not exist!\n"), exit(1);
-		break;
-
-	//case 4:  printf(" Toggle gate Insertion MODE\n");
-
-	//	  break;
-	default:
-		printf("No New Function is Supported by this Program!\n"), exit(1);
-	}
-}
+		fout_flt_pat = fopen(cpi_sim_outpath, "w+");
+	//		printf("FCOV_PAT output file is not exist!\n"), exit(1);
+	//}
 #endif
+break;
+}
+
 	/*=======Initialization for Power Evaluation*/
 #if POWEREVA
 	toggle_scn = 0;
@@ -232,18 +194,18 @@ if(MODE_TOOL==4){
 
 	////////////////////////////////////////////////////////////////
 	//input_patファイル出力///////////////////////////////////////////////////
-	finnode = pinode.next;
+	//finnode = pinode.next;
 	//printf("%d ", fnode1->line);
-	for (; finnode != NULL; finnode = finnode->next)
-	{
-		fnode = finnode->node;
-	}
-	finnode = ffnode.next;
+//	for (; finnode != NULL; finnode = finnode->next)
+//	{
+//		fnode = finnode->node;
+//	}
+//	finnode = ffnode.next;
 	//printf("%d ", fnode1->line);
-	for (; finnode != NULL; finnode = finnode->next)
-	{
-		fnode = finnode->node;
-	}
+//	for (; finnode != NULL; finnode = finnode->next)
+//	{
+//		fnode = finnode->node;
+//	}
 	/////////////////////////////////////////////////////////////////
 
 	////////////////////////////////////////////////////////////////
@@ -274,11 +236,11 @@ if(MODE_TOOL==4){
 	/////////////////////////////////////////////////////////////////
 
 #if OUTPUT_FLIST
-	flist_out = fopen("fault_list.dat", "w");
+	flist_out = fopen("fault_list.dat", "w+");
 	fprintf(flist_out, "%d %d\n", sum_flt, length);
 #endif
 
-	if (MODE_TEST == 1)
+	if (TPG_MODE == 1)
 	{ //=1:ATPG, =0:LFSR
 		test_pat = fopen("ATPG.dat", "r");
 		if (test_pat == NULL)
@@ -293,7 +255,7 @@ if(MODE_TOOL==4){
 		if (test_pat == NULL)
 			printf("%s is not found!\n", argv[2]), exit(1);
 		fscanf(test_pat, "%d %d", &length, &n_inp);
-		printf("%d,%d\n", n_inp, inpnum);
+
 		if (n_inp != inpnum)
 			printf("test pattern format1 error!\n"), exit(1);
 	}
@@ -341,7 +303,6 @@ if(MODE_TOOL==4){
 	printf("fault List initialization over \n");
 
 	remain_flt = count_flt(fltlst.next);
-	printf("%d %d\n", remain_flt,length);
 
 	//2019/12
 	// FILE *fp;
@@ -372,7 +333,7 @@ if(MODE_TOOL==4){
 		printf("\n ----- TIME %d -----\n", time);
 #endif
 		///////PI Pattern Set////////////////
-		if (MODE_TEST == 1)
+		if (TPG_MODE == 1)
 		{ //=1:ATPG, =0:LFSR
 			for (ia = 1; ia <= n_inp; ia++)
 				fscanf(test_pat, "%d", &pivalset[ia]);
@@ -446,13 +407,16 @@ if(MODE_TOOL==4){
 			case 4:
 #if SELECT_STATION
 				// ic=0;
+
 				finnode = ffnode.next;
 				for (ib = 0; finnode != NULL; finnode = finnode->next, ib++)
 				{
 					//if(ff_select[ib] == '1'){
 					fnode = finnode->node;
+
 					// ff_observe[ic][ia-1].gdval1 = fnode->gdval1;
 					ff_observe[ib][ia - 1].gdval1 = fnode->finlst->node->gdval1;
+
 					//ff_observe[ic][ia-1].gdval1 = fnode->finlst->node->gdval1;
 					//ic++;
 					// }
@@ -478,6 +442,7 @@ if(MODE_TOOL==4){
 				}
 #endif
 			}
+
 			update_nextstate(ia);
 
 			if (MODE_TOOL == 4 && TGL_GATE_MODE == 3 && ia >= SKIP_CYCLE - 1 && ia < cap_freq)
@@ -644,17 +609,17 @@ if(MODE_TOOL==4){
 		if (time % PRN_FLT_INT == 0)
 		{
 			//printf("is here?\n");
-			printf("CUT= %s,#pattern: %d -> ", argv[1], time);
+			printf("CUT= %s,#pattern: %d -> \n", argv[1], time);
 
 			remain_flt = count_flt(fltlst.next);
 #if TRANSITIONFAULT
-			printf("Fault Coverage: %6.4f \n", (1 - (float)remain_flt / (float)sum_Tran_flt) * 100.0);
+			printf("Fault Coverage: %4.6f \n", (1 - (float)remain_flt / (float)sum_Tran_flt) * 100.0);
 #else
 
 			//printf("Fault Coverage: %6.4f \n", (float)flt_det_num[10] / (float)sum_flt * 100.0);
-			printf("Fault Coverage: %6.4f \n",(1 - (float)remain_flt/ (float)sum_flt) * 100.0);
+			printf("#Ori FCov: %4.6f \n",(1 - (float)remain_flt/ (float)sum_flt) * 100.0);
 #if FCOVPERPAT
-			fprintf(fout2, "%d,", time);
+			fprintf(fout_flt_pat, "%d,", time);
 #endif
 #endif
 
@@ -681,40 +646,29 @@ if(MODE_TOOL==4){
 			{
 				printf(",%.0f", WSA[ia] / clocktime); // exit(1);
 #if FCOVPERPAT
-				fprintf(fout2, "%.0f,", WSA[ia] / clocktime);
+				fprintf(fout_flt_pat, "%.0f,", WSA[ia] / clocktime);
 #endif
 			}
 			printf(",%.0f", MaxWSA);
 #endif
 #endif
 
-/*#if FCOVPERPAT
-			fprintf(fout2, ",");
-			for (ia = 0; ia < cap_freq; ia++)
-			{
-				fprintf(fout2, "%d,", flt_cap[ia]);
-				//printf("??%d,", flt_cap[ia]);
-			}
-			fprintf(fout2, "%d,", sum_flt);
-//fprintf(fout2,"%6.4f,",(1-(float)remain_flt/(float)sum_flt)*100.0);
-#endif
-*/
-			fprintf(fout2, ",%4.6f", (1 - (float)remain_flt / (float)sum_flt) * 100.0);
+
+			fprintf(fout_flt_pat, ",%4.6f", (1 - (float)remain_flt / (float)sum_flt) * 100.0);
 			if (MODE_TOOL == 4||MODE_TOOL == 3)
 			{
 #if SELECT_STATION
-				//	count_flt_multi_ff_stations(fltlst.next);
+
 				for (ia = 0; ia < FF_FILE; ia++)
 				{
-					printf("| %d,%d,%4.6f", ia, flt_det_num[ia], (float)flt_det_num[ia] / (float)sum_flt * 100.0);
-					fprintf(fout2, ",%4.6f", (float)flt_det_num[ia] / (float)sum_flt * 100.0);
+					printf("#DFT FCov: %4.6f\n", (float)flt_det_num[ia] / (float)sum_flt * 100.0);
+					fprintf(fout_flt_pat, ",%4.6f", (float)flt_det_num[ia] / (float)sum_flt * 100.0);
 				}
-				fprintf(fout2, ",%4.6f", (float)flt_det_num[10] / (float)sum_flt * 100.0);
-				printf(",%d,%4.6f", flt_det_num[10], (float)flt_det_num[10] / (float)sum_flt * 100.0);
-				printf("\n");
+				fprintf(fout_flt_pat, ",%4.6f", (float)flt_det_num[10] / (float)sum_flt * 100.0);
+				printf("#Max FCov: %4.6f\n", (float)flt_det_num[10] / (float)sum_flt * 100.0);
 #endif
 			}
-			fprintf(fout2, "\n");
+			fprintf(fout_flt_pat, "\n");
 		}
 
 #if MAKE_REC
@@ -735,26 +689,7 @@ if(MODE_TOOL==4){
 		fprintf(flist_out, "\n");
 #endif
 	}
-	/*
-printf("\nHEHRE??\n");
-	char outfile1[200], outfile2[200];
-	FILE *flstout1, *flstout2;
-	sprintf(outfile1, "./FLT_LIST/%s_RPRF_%d", argv[1], TG_FILE);
-	if (NULL == (flstout1 = fopen(outfile1, "w")))
-		printf(" error fault list file does not exit!\n"), exit(0);
-printf("\nHEHRE???!\n");
-	int id;
-	fprintf(flstout1, "%d\n", sum_flt - flt_det_num[10] + 1);
-	printf("\nHEHRE???!!\n");
-	for (id = 0; id < sum_flt; id++)
-	{
-		if (flt_det_flog[id + 1][10] == 0)
-		{	printf("\nHEHRE???!!!!\n");
-			fprintf(flstout1, "%d\n", flt_list[id][0]);
-		}
-	}
-printf("\nHEHRE???\n");
-*/
+
 #if DEBUG2 || PRNT_FF
 	prn_detect(fltlst.next, length); //print undetected fault list
 #endif
@@ -766,7 +701,7 @@ printf("\nHEHRE???\n");
 #endif
 
 #if FCOVPERPAT
-	fclose(fout2);
+	fclose(fout_flt_pat);
 
 	//fclose(fout_flt_in);
 #endif
@@ -774,7 +709,6 @@ printf("\nHEHRE???\n");
 	if (MODE_TOOL == 3 || MODE_TOOL == 4)
 	{
 #if SELECT_STATION
-		printf("aaa\n"); //2014_10_21
 		for (ia = 0; ia < num_observe; ia++)
 			free(ff_observe[ia]);
 		free(ff_observe);

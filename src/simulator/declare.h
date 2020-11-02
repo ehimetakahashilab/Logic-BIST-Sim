@@ -59,7 +59,7 @@
 #define PRNT_FF 0      /* 1 when printing FFs */
 #define OUTPUT_FLIST 0 /* 1 when output fault list */
 
-#define PO_OBSERVE 1     /* 1 when observe POs */
+#define PO_OBSERVE 0    /* 1 when observe POs */
 #define FF_OBSERVE 1     /* 1 when observe FFs while multi-capture マルチサイクルの時0*/
 #define SELECT_STATION 1 /* 1 when select FF station 0: Full observation*/
 // 0なら全観測・1なら部分観測
