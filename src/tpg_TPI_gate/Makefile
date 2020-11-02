@@ -8,7 +8,5 @@ $(PROG):$(OBJ)
 	$(CC) -o $@ $(CFLAGS) $(OBJ)
 
 clean:
-	rm -f *.o *~
-
-cleanall:
-	rm -f *.test *.o *~
+	rm -f *.o *~ lfsr_gt
+	
