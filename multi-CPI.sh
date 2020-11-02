@@ -10,7 +10,8 @@ if [ ! -e ${OP_LIST_DIR} ]; then
 fi
 
 if [ ! -e ${CP_LIST_DIR} ]; then
-  mkdir -p ${CP_LIST_DIR}
+  mkdir -p ${CP_LIST_DIR}/LCP
+      mkdir -p ${CP_LIST_DIR}/FFCP
 fi
 
 TPG=0 #=0:LFSR,=1:ATPG
@@ -45,26 +46,17 @@ rm -f ${CIRCUIT}_tgl_ff_tpi.dat
 
 
 	CAPTURE=5 #the number of capture cycles
-	LCP_rate=0.01 #the ratio of Logic CPs in all logic gates
-     CP_GROUP=1 #=1: the number of CPs selected at each iteration
+   OBRATE=0.2 #ratio of OP FF
+  LCP_rate=0.01 #the ratio of Logic CPs in all logic gates
+  CP_GROUP=1 #=1: the number of CPs selected at each iteration
 
 	FFCP_rate=0.1	#the ration of FF-CPs in all FFs
-  OPI=0 #=1: Observation Point insertion aviable
   SKIP_CAP=3 #SKIP_CAP=3, the CP control starts from the third capture cycle.
   INTERVAL_CYCLE=1 #=1: the number of interval cycles
 
-  if [ ! -e ${User_DIR}/OUTPUTS/CPI/${SKIP_CAP}cycles/ ]; then
-    mkdir -p ${User_DIR}/OUTPUTS/CPI/${SKIP_CAP}cycles/
+  if [ ! -e ${User_DIR}/OUTPUTS/CPI/${CAPTURE}_cycles/ ]; then
+    mkdir -p ${User_DIR}/OUTPUTS/CPI/${CAPTURE}_cycles/
   fi
-
-  if [ ! -e ${CP_LIST_DIR}/LCP/ ]; then
-    mkdir -p ${CP_LIST_DIR}/OUTPUTS/LCP
-  fi
-
-  if [ "$OPI" = "1" ];
-  then
-    OBRATE=0.2 #Observation Rate
-    SKIPCYCLES=0
 
 	 cnt1=0
 	  for ff_sta_file in  ./FF_STATION/$CIRCUIT/TOPSIS #./FF_STATION/$CIRCUIT/BRANCH ./FF_STATION/$CIRCUIT/COMPLEX ./FF_STATION/$CIRCUIT/TYPE_1 ./FF_STATION/$CIRCUIT/TYPE_2 ./FF_STATION/$CIRCUIT/TYPE_3 ./FF_STATION/$CIRCUIT/TOPSIS
@@ -79,10 +71,10 @@ rm -f ${CIRCUIT}_tgl_ff_tpi.dat
 			exit
 		fi
 
-		ln -s ${ff_sta_file} ff_station_${CIRCUIT}_${cnt1}.dat
+		ln -s ${ff_sta_file} ff_station_${cnt1}.dat
 		let cnt1=${cnt1}+1
 	 done
-  fi
+
 
 for CP_CTRL in 1 #3 #0 2 3 #2 3 #4
 #=0:non CP control, =1: Logic gate toggling,=2:FF toggling, =3: applying random pattern to FF-CPs, =4: applying random patterns to Logic CPs
@@ -111,18 +103,18 @@ do
   ln -s ${CP_LIST_DIR}/LCP/${CIRCUIT}/rlcp_$CP_GROUP  tgl_gt_input.dat
 
 	echo ===$CIRCUIT: $CP_GROUP $INTERVAL_CYCLE===========
-			time ./proofsim $CIRCUIT $TOOLMODE $TPG $CP_CTRL $LCP_rate $CAPTURE $INTERVAL_CYCLE $SKIP_CAP $cnt1 $OBRATE $CP_GROUP $TEST_VEC #>> Switch_ctr.txt
+			time ./lbistsim $CIRCUIT $TOOLMODE $TPG $CP_CTRL $LCP_rate $CAPTURE $INTERVAL_CYCLE $SKIP_CAP $cnt1 $OBRATE $CP_GROUP $TEST_VEC #>> Switch_ctr.txt
   echo ===logic CPI simulation process end=== #>> $LOG_FILE
 	rm -rf tgl_gt_input.dat
 
 	else
     	echo ==Simulation for FF-CPI=== #>> $LOG_FILE
 
-  ln -s ${CP_LIST_DIR}/FFCP/${CIRCUIT}/rffcp_$CP_GROUP  ${CIRCUIT}_tgl_FF_input.dat
+  ln -s ${CP_LIST_DIR}/FFCP/${CIRCUIT}/rffcp  ${CIRCUIT}_tgl_FF_input.dat
 
 	echo ===$CIRCUIT: Interval capture = $INTERVAL_CYCLE===========
 
-			time ./proofsim $CIRCUIT $TOOLMODE $TPG $CP_CTRL $FFCP_rate $CAPTURE $CYCLE $SKIP_CAP $FF_SEL_METHOD $cnt1 $OBRATE $TEST_VEC #>> Switch_ctr.txt
+			time ./lbistsim $CIRCUIT $TOOLMODE $TPG $CP_CTRL $FFCP_rate $CAPTURE $CYCLE $SKIP_CAP $FF_SEL_METHOD $cnt1 $OBRATE $TEST_VEC #>> Switch_ctr.txt
 
     echo ==FF CPI simulation process end=== #>> $LOG_FILE
 
@@ -147,4 +139,3 @@ done
 #if exist fault list file -end-
 #rm -f #ff_station* tgl_* nfs*
 rm -f $CIRCUIT lfsr.dat *~ tmp*  ff_station.dat ATPG.dat *lfsr_pi.dat
-done

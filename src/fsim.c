@@ -100,25 +100,67 @@ faultsim(argv) char *argv[13];
 	case 4:
 		printf("\nBIST Multi-Cycle Testing under CPI Mode\n");
 		/*=======Memorry Assign for Sequential Observation*/
+
+					#if PO_OBSERVE
+							printf("PO observe mode\n");
+							po_observe = (T_NODE **)calloc(numout, sizeof(T_NODE *));
+							if (po_observe == NULL)
+								printf("memory error @faultsim\n"), exit(1);
+
+							for (ia = 0; ia < numout; ia++)
+							{
+								po_observe[ia] = (T_NODE *)calloc(cap_freq, sizeof(T_NODE));
+								if (po_observe[ia] == NULL)
+									printf("memory error @faultsim\n"), exit(1);
+							}
+					#endif
+
+							ff_observe = (T_NODE **)calloc(ffnum, sizeof(T_NODE *));
+							if (ff_observe == NULL)
+								printf("memory error @faultsim \n"), exit(1);
+							for (ia = 0; ia < ffnum; ia++)
+							{
+								ff_observe[ia] = (T_NODE *)calloc(cap_freq, sizeof(T_NODE));
+								if (ff_observe[ia] == NULL)
+									printf("memory error @faultsim \n"), exit(1);
+							}
+
+					#if SELECT_STATION
+							num_observe = ffnum * OBSERVE_RATE;
+							printf("Partial FF observation mode: %f \n", OBSERVE_RATE);
+							printf("Station rate = %.0f[%]\n", (float)(OBSERVE_RATE * 100));
+							ff_sta_src_read(FF_FILE, num_observe, argv);
+					#else
+							ff_select = (char *)calloc(ffnum, sizeof(char));
+							printf("Fully Observation Mode \n");
+							printf("Station rate = 100[%]\n");
+							for (ia = 0; ia < ffnum; ia++)
+							{
+								ff_select[ia] = '1';
+							}
+					#endif
+
+
 #if FCOVPERPAT
 	//if(MODE_TOOL==4){
 			char cpi_sim_outpath[200];
 			switch (TGL_GATE_MODE)		{
 				case 0: //Non Toggle gate insertion
-				sprintf(cpi_sim_outpath, "./OUTPUTS/CPI/%dcycles/Non_%s.csv", cap_freq, argv[1]);
+				sprintf(cpi_sim_outpath, "./OUTPUTS/CPI/%d_cycles/Non_%s.csv", cap_freq, argv[1]);
 //			sprintf(outpath_in, "./OUTPUTS/CPI/%dcycles/%dSKIP/input_pat/%s_NONTG_FF_TPI_INP_%.2f_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], OBSERVE_RATE, FF_SEL_METHOD, ff_rate);
 					break;
 			case 1: //toggle gate insert by toggling
 		  sprintf(cpi_sim_outpath, "./OUTPUTS/CPI/%dcycles/%dSKIP/%s_LCPI_TGL_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], INTERVAL_CYCLE, Tgl_rate);
+				sprintf(cpi_sim_outpath, "./OUTPUTS/CPI/%d_cycles/%s_LCPI_TGL_%d_%d_%.2f.csv", cap_freq, argv[1], INTERVAL_CYCLE, SKIP_CYCLE,Tgl_rate);
 				break;
 			case 4:
-		  	sprintf(cpi_sim_outpath, "./OUTPUTS/CPI/%dcycles/%dSKIP/%s_LCPI_RAN_%d_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], INTERVAL_CYCLE, Tgl_rate);
+		  	sprintf(cpi_sim_outpath, "./OUTPUTS/CPI/%d_cycles/%s_LCPI_RAN_%d_%d_%.2f.csv", cap_freq, argv[1], INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
 					break;
 			case 2: //toggle FF  insert by toggling
-				sprintf(cpi_sim_outpath, "./OUTPUTS/CPI/%dcycles/%dSKIP/%s_FFCPI_TGL_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], ff_rate);
+				sprintf(cpi_sim_outpath, "./OUTPUTS/CPI/%d_cycles/%s_FFCPI_TGL_%d_%d_%.2f.csv", cap_freq, argv[1],INTERVAL_CYCLE, SKIP_CYCLE,  ff_rate);
 					break;
 			case 3:
-				sprintf(cpi_sim_outpath, "./OUTPUTS/CPI/%dcycles/%dSKIP/%s_FFCPI_RAN_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], ff_rate);
+				sprintf(cpi_sim_outpath, "./OUTPUTS/CPI/%d_cycles/%s_FFCPI_RAN_%d_%d_%.2f.csv", cap_freq, argv[1], INTERVAL_CYCLE, SKIP_CYCLE,ff_rate);
 					break;
 			default: 		printf("No New Function is Supported by this Program!\n"), exit(1);
 					break;
@@ -365,13 +407,16 @@ break;
 			case 4:
 #if SELECT_STATION
 				// ic=0;
+
 				finnode = ffnode.next;
 				for (ib = 0; finnode != NULL; finnode = finnode->next, ib++)
 				{
 					//if(ff_select[ib] == '1'){
 					fnode = finnode->node;
+
 					// ff_observe[ic][ia-1].gdval1 = fnode->gdval1;
 					ff_observe[ib][ia - 1].gdval1 = fnode->finlst->node->gdval1;
+
 					//ff_observe[ic][ia-1].gdval1 = fnode->finlst->node->gdval1;
 					//ic++;
 					// }
@@ -397,6 +442,7 @@ break;
 				}
 #endif
 			}
+
 			update_nextstate(ia);
 
 			if (MODE_TOOL == 4 && TGL_GATE_MODE == 3 && ia >= SKIP_CYCLE - 1 && ia < cap_freq)
@@ -563,7 +609,7 @@ break;
 		if (time % PRN_FLT_INT == 0)
 		{
 			//printf("is here?\n");
-			printf("CUT= %s,#pattern: %d -> ", argv[1], time);
+			printf("CUT= %s,#pattern: %d -> \n", argv[1], time);
 
 			remain_flt = count_flt(fltlst.next);
 #if TRANSITIONFAULT
@@ -571,7 +617,7 @@ break;
 #else
 
 			//printf("Fault Coverage: %6.4f \n", (float)flt_det_num[10] / (float)sum_flt * 100.0);
-			printf("Original FCov: %4.6f \n",(1 - (float)remain_flt/ (float)sum_flt) * 100.0);
+			printf("#Ori FCov: %4.6f \n",(1 - (float)remain_flt/ (float)sum_flt) * 100.0);
 #if FCOVPERPAT
 			fprintf(fout_flt_pat, "%d,", time);
 #endif
@@ -607,17 +653,7 @@ break;
 #endif
 #endif
 
-/*#if FCOVPERPAT
-			fprintf(fout_flt_pat, ",");
-			for (ia = 0; ia < cap_freq; ia++)
-			{
-				fprintf(fout_flt_pat, "%d,", flt_cap[ia]);
-				//printf("??%d,", flt_cap[ia]);
-			}
-			fprintf(fout_flt_pat, "%d,", sum_flt);
-//fprintf(fout_flt_pat,"%6.4f,",(1-(float)remain_flt/(float)sum_flt)*100.0);
-#endif
-*/
+
 			fprintf(fout_flt_pat, ",%4.6f", (1 - (float)remain_flt / (float)sum_flt) * 100.0);
 			if (MODE_TOOL == 4||MODE_TOOL == 3)
 			{
@@ -625,11 +661,11 @@ break;
 
 				for (ia = 0; ia < FF_FILE; ia++)
 				{
-					printf("#POB FCov: Method %d, %4.6f\n", ia, (float)flt_det_num[ia] / (float)sum_flt * 100.0);
+					printf("#DFT FCov: %4.6f\n", (float)flt_det_num[ia] / (float)sum_flt * 100.0);
 					fprintf(fout_flt_pat, ",%4.6f", (float)flt_det_num[ia] / (float)sum_flt * 100.0);
 				}
 				fprintf(fout_flt_pat, ",%4.6f", (float)flt_det_num[10] / (float)sum_flt * 100.0);
-				printf("#Full OB FCov: %4.6f\n", (float)flt_det_num[10] / (float)sum_flt * 100.0);
+				printf("#Max FCov: %4.6f\n", (float)flt_det_num[10] / (float)sum_flt * 100.0);
 #endif
 			}
 			fprintf(fout_flt_pat, "\n");
@@ -653,26 +689,7 @@ break;
 		fprintf(flist_out, "\n");
 #endif
 	}
-	/*
-printf("\nHEHRE??\n");
-	char outfile1[200], outfile2[200];
-	FILE *flstout1, *flstout2;
-	sprintf(outfile1, "./FLT_LIST/%s_RPRF_%d", argv[1], TG_FILE);
-	if (NULL == (flstout1 = fopen(outfile1, "w")))
-		printf(" error fault list file does not exit!\n"), exit(0);
-printf("\nHEHRE???!\n");
-	int id;
-	fprintf(flstout1, "%d\n", sum_flt - flt_det_num[10] + 1);
-	printf("\nHEHRE???!!\n");
-	for (id = 0; id < sum_flt; id++)
-	{
-		if (flt_det_flog[id + 1][10] == 0)
-		{	printf("\nHEHRE???!!!!\n");
-			fprintf(flstout1, "%d\n", flt_list[id][0]);
-		}
-	}
-printf("\nHEHRE???\n");
-*/
+
 #if DEBUG2 || PRNT_FF
 	prn_detect(fltlst.next, length); //print undetected fault list
 #endif

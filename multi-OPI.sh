@@ -8,6 +8,10 @@ if [ ! -e ${OP_LIST_DIR} ]; then
   mkdir -p ${OP_LIST_DIR}
 fi
 
+if [ ! -e ${User_DIR}/OUTPUTS/MULTI_BIST_OB/ ]; then
+    mkdir -p ${User_DIR}/OUTPUTS/MULTI_BIST_OB/
+fi
+
 TPG=0 #=0:LFSR,=1:ATPG
 TEST_VEC=10 #0 00 # Number of Test patterns
 TOOLMODE=3 #=1:Normal Scan test, =2:Multi-cycle Test, =3: Multi-cycle test with Seq OB, =4:Toggle Gate TPI

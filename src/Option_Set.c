@@ -190,6 +190,7 @@ char *argv[14];
 		}
 		else
 		{
+
 			Tgl_rate = atof(argv[5]);
 			cap_freq = atoi(argv[6]);
 			//TG_FILE = atoi(argv[7]);
@@ -198,10 +199,10 @@ char *argv[14];
 			FF_FILE = atoi(argv[9]);
 			OBSERVE_RATE = atof(argv[10]);
 			group_tpi=atoi(argv[11]);
+
 			for (ia = 0; ia < FF_FILE; ia++)
 				flt_det_num[ia] = 0;
 			flt_det_num[20] = 0;
-			length=atoi(argv[12]);
 		}
 
 		printf("Toggle Gate Insertion Mode : %d\n", TGL_GATE_MODE);
@@ -506,16 +507,16 @@ Out_Put(argv) char *argv[13];
 		switch (TGL_GATE_MODE)
 		{
 		case 0: //Non Toggle gate insertion
-			sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/Non_%s.txt", cap_freq, argv[1]);
+			sprintf(outpath, "./OUTPUTS/CPI/%dcycles/Non_%s.txt", cap_freq, argv[1]);
 			break;
 		case 1: //toggle gate insert
 		case 4:
 
-			sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/summary/%s_%d_%d_%d_%.2f_%d.txt", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate,group_tpi);
+			sprintf(outpath, "./OUTPUTS/CPI/%d_cycles/%s_LogicCPI.txt", cap_freq, argv[1]);
 			break;
 		case 2: //toggle FF insert
 		case 3:
-			sprintf(outpath, "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/summary/%s_FF_Insert_%d_%d_%d_%.2f.txt", cap_freq, SKIP_CYCLE, argv[1], TGL_GATE_MODE, INTERVAL_CYCLE, SKIP_CYCLE, ff_rate);
+			sprintf(outpath, "./OUTPUTS/CPI/%d_cycles/%s_FFCPI.txt", cap_freq,argv[1]);
 			break;
 
 		default:
@@ -536,7 +537,7 @@ Out_Put(argv) char *argv[13];
 
 		if ((fout = fopen(outpath, "w")) == NULL)
 			printf("#TGL_GATE output file is not exist!\n"), exit(1);
-		printf("*************OUTPUT RESULTS****************\n");
+		printf("\n\n*************OUTPUT RESULTS****************\n");
 		fprintf(fout, "*************OUTPUT RESULTS****************\n");
 		if (TGL_GATE_MODE == 1)
 		{
@@ -546,7 +547,7 @@ Out_Put(argv) char *argv[13];
 
 		printf("#Test Pat.,	#Faults,	#Det. Flts,	#UnDet.Flts,	Fcov.\n");
 		fprintf(fout, "#Test Pat.,	#Faults,	#Det. Flts,	#UnDet.Flts,	Fcov.\n");
-		printf("%d,%d,%d,%d,%4.6f\n", length, sum_flt, sum_flt - remain_flt, remain_flt, (1 - (float)remain_flt / (float)sum_flt) * 100.0);
+		printf("%d, %d, %d, %d, %4.6f\n", length, sum_flt, sum_flt - remain_flt, remain_flt, (1 - (float)remain_flt / (float)sum_flt) * 100.0);
 		fprintf(fout, "%d,%d,%d,%d,%4.6f\n", length, sum_flt, sum_flt - remain_flt, remain_flt, (1 - (float)remain_flt / (float)sum_flt) * 100.0);
 #if POWEREVA
 		printf("Test Power Evaluation \n#SHIFT_IN,  SHIFT_OUT, SHIFT\n");
