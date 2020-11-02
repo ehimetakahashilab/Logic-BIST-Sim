@@ -37,7 +37,7 @@ char *argv[13];
   Instance_Get(argc, argv);
   faultnum = sum_flt;
  // printf("\nfaultnumber=%d %d\n",sum_flt,length);exit(1);
-  printf("\nOutput Fault List\n");
+
   flt_out(fltlst.next, argv);
 
 #if FLT_OUTPUT
@@ -162,46 +162,10 @@ count_flt(flttag)
 	flt_det_num[20]+=sum_flt-sumflt;
 #endif*/
 
-  printf("Total Fault=%d ,sumflt=%d \n", count, sumflt);
   return sumflt;
 #endif
 }
 
-count_flt_multi_ff_stations(flttag)
-    FLT_NODE *flttag;
-{
-  int ia;
-  for (ia = 0; ia < FF_FILE; ia++)
-    flt_det_num[ia] = 0;
-
-  for (; flttag != NULL; flttag = flttag->next)
-  {
-    for (ia = 0; ia < FF_FILE; ia++)
-    {
-      if (flttag->OBdtime_sel_FF[ia])
-      {
-        flt_det_num[ia]++;
-      }
-    //  printf("%d ", flttag->OBdtime_sel_FF[ia]);
-    }
-    //flt_det_num[20]=;
-    //printf("\n");
-  }
-}
-
-count_withOB_flt(flttag)
-    FLT_NODE *flttag;
-{
-  int sumTDoBflt = 0;
-
-  for (; flttag != NULL; flttag = flttag->next)
-  {
-
-    if ((!flttag->TranOBDetTimes) && (!flttag->TranDetTimes))
-      sumTDoBflt++;
-  }
-  return sumTDoBflt;
-}
 
 saf_list_check(flttag)
     FLT_NODE *flttag;

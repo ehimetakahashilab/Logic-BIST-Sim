@@ -70,8 +70,8 @@ char *argv[14];
 			printf("Please Setting the arguments for \nargv1: Tool Mode\nargv2:TPG_MODE\n argv3: Circuit\nargv4: Test_vector_generator path\n");
 			exit(1);
 		}
-		MODE_TEST = atoi(argv[3]);
-		if (MODE_TEST == 0)
+		TPG_MODE = atoi(argv[3]);
+		if (TPG_MODE == 0)
 			printf("TPG: %d bit LFSR \n", LFSR_BIT);
 		else
 			printf("TPG: In House ATPG\n");
@@ -85,8 +85,8 @@ char *argv[14];
 		break;
 	case 2:
 	case 3:
-		MODE_TEST = atoi(argv[3]);
-		if (MODE_TEST == 0)
+		TPG_MODE = atoi(argv[3]);
+		if (TPG_MODE == 0)
 			printf("TPG: %d bit LFSR \n", LFSR_BIT);
 		else
 			printf("TPG: In House ATPG\n");
@@ -158,15 +158,15 @@ char *argv[14];
 		break;
 
 	case 4:
-		printf("Tool: Toggle gate Insertion MODE\n");
+		printf("Tool: Logic CP Insertion MODE\n");
 		if (argc > 14)
 		{
 			printf("error: too much arguments!\n");
 			printf("Please Setting the arguments for \nargv1: Tool Mode\nargv2:TPG_MODE\n argv3: Circuit\nargv4: Test_vector_generator path\n");
 			exit(1);
 		}
-		MODE_TEST = atoi(argv[3]);
-		if (MODE_TEST == 0){
+		TPG_MODE = atoi(argv[3]);
+		if (TPG_MODE == 0){
 			printf("TPG: %d bit LFSR \n", LFSR_BIT);
 		}
 		else
@@ -192,16 +192,16 @@ char *argv[14];
 		{
 			Tgl_rate = atof(argv[5]);
 			cap_freq = atoi(argv[6]);
-			TG_FILE = atoi(argv[7]);
-			INTERVAL_CYCLE = atoi(argv[8]);
-			SKIP_CYCLE = atoi(argv[9]);
-			FF_FILE = atoi(argv[10]);
-			OBSERVE_RATE = atof(argv[11]);
-			group_tpi=atoi(argv[12]);
+			//TG_FILE = atoi(argv[7]);
+			INTERVAL_CYCLE = atoi(argv[7]);
+			SKIP_CYCLE = atoi(argv[8]);
+			FF_FILE = atoi(argv[9]);
+			OBSERVE_RATE = atof(argv[10]);
+			group_tpi=atoi(argv[11]);
 			for (ia = 0; ia < FF_FILE; ia++)
 				flt_det_num[ia] = 0;
 			flt_det_num[20] = 0;
-			length=atoi(argv[13]);
+			length=atoi(argv[12]);
 		}
 
 		printf("Toggle Gate Insertion Mode : %d\n", TGL_GATE_MODE);
@@ -356,11 +356,11 @@ Out_Put(argv) char *argv[13];
 
 	case 3:
 #if SELECT_STATION
-		count_flt_multi_ff_stations(fltlst.next);
+		count_flt(fltlst.next);
 		sprintf(outpath, "./OUTPUTS/MULTI_BIST_OB/%s.txt", argv[1]);
 		if ((fout = fopen(outpath, "w")) == NULL)
 			printf("MULTI_BIST_OB output file is not exist!\n"), exit(1);
-		printf("*************OUTPUT RESULTS****************\n");
+		printf("\n*************OUTPUT RESULTS****************\n");
 		printf("#Test Pat.,	#Faults,	#Det. Flts,	#UnDet.Flts,	Fcov.\n");
 		fprintf(fout, "#Test Pat.,	#Faults,	#Det. Flts,	#UnDet.Flts,	Fcov.\n");
 		printf("%10d,%10d", length, sum_flt);
@@ -378,7 +378,7 @@ Out_Put(argv) char *argv[13];
 		sprintf(outpath, "./OUTPUTS/MULTI_FULL_OB_BIST/%s.txt", argv[1]);
 		if ((fout = fopen(outpath, "w")) == NULL)
 			printf("MULTI_OB_BIST output file is not exist!\n"), exit(1);
-		printf("*************OUTPUT RESULTS****************\n");
+		printf("\n*************OUTPUT RESULTS****************\n");
 		printf("#Test Pat.,	#Faults,	#Det. Flts,	#UnDet.Flts,	Fcov.\n");
 		fprintf(fout, "#Test Pat.,	#Faults,	#Det. Flts,	#UnDet.Flts,	Fcov.\n");
 		printf("%10d,%10d,%10d,%10d,%4.6f\n", length, sum_flt, sum_flt - remain_flt, remain_flt, (1 - (float)remain_flt / (float)sum_flt) * 100.0);
@@ -425,7 +425,7 @@ Out_Put(argv) char *argv[13];
 		printf("%s\n", mode);
 		strcpy(tmp, argv[1]);
 
-		if (MODE_TEST == 1)
+		if (TPG_MODE == 1)
 			strcpy(mode, atpg);
 		else
 			strcpy(mode, lfsr);
