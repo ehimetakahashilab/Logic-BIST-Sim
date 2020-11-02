@@ -54,12 +54,12 @@ do
 
     case $TOOLMODE in
 	"1")
-	    time ./proofsim $CIRCUIT $TOOLMODE $TPG  #>> Switch_ctr.txt
+	    time ./sim $CIRCUIT $TOOLMODE $TPG  #>> Switch_ctr.txt
 	    ;;
 	"2")
 	    for CAPTURE in 5 #2 3 4 5 #10 #15 #1 #20 #1 5 10 15 #20 #15 #20 #2 #20 #2 3 4 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
 	    do
-		time ./proofsim $CIRCUIT $TOOLMODE $TPG $CAPTURE $SKIPCYCLES #>> Switch_ctr.txt
+		time ./sim $CIRCUIT $TOOLMODE $TPG $CAPTURE $SKIPCYCLES #>> Switch_ctr.txt
 	    done
 	    ;;
 	"3")
@@ -86,7 +86,7 @@ do
 
 	    for CAPTURE in 5 # 2 3 4 5  #15 #1 #20 #1 5 10 15 #20 #15 #20 #2 #20 #2 3 4 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
 	    do
-		time ./proofsim $CIRCUIT $TOOLMODE $TPG $CAPTURE $SKIPCYCLES $OBRATE $cnt1 #>> Switch_ctr.txt
+		time ./sim $CIRCUIT $TOOLMODE $TPG $CAPTURE $SKIPCYCLES $OBRATE $cnt1 #>> Switch_ctr.txt
 	    done
 	    rm -rf ff_station* lfsr*.dat ATPG.dat tmp.test *lfsr_pi.dat
 	    ;;
@@ -172,7 +172,7 @@ do
 				    for CYCLE in 1 #2 3 4
 				    do
 					echo ===$CIRCUIT: $METHOD $CYCLE===========
-					time ./proofsim $CIRCUIT $TOOLMODE $TPG   $TGL_MODE $TGL_RATE $CAPTURE $METHOD $CYCLE $SKIP_CAP $cnt1 $OBRATE $GP $TEST_VEC #>> Switch_ctr.txt
+					time ./sim $CIRCUIT $TOOLMODE $TPG   $TGL_MODE $TGL_RATE $CAPTURE $METHOD $CYCLE $SKIP_CAP $cnt1 $OBRATE $GP $TEST_VEC #>> Switch_ctr.txt
     					echo ===time end=== #>> $LOG_FILE
 				    done
 				    rm -f tgl_gt_input.dat
@@ -189,7 +189,7 @@ do
 			    do
 				echo ===$CIRCUIT: $CYCLE $SKIP_CAP===========
 
-				time ./proofsim $CIRCUIT $TOOLMODE $TPG $TGL_MODE $FF_RATE $CAPTURE $CYCLE $SKIP_CAP $FF_SEL_METHOD $cnt1 $OBRATE $TEST_VEC #>> Switch_ctr.txt
+				time ./sim $CIRCUIT $TOOLMODE $TPG $TGL_MODE $FF_RATE $CAPTURE $CYCLE $SKIP_CAP $FF_SEL_METHOD $cnt1 $OBRATE $TEST_VEC #>> Switch_ctr.txt
 
     				echo ===time end=== #>> $LOG_FILE
 			    done
