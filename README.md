@@ -33,16 +33,21 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ```
 
+## Getting Started
+```console
+$ git clone -b customize-MaineK00n https://github.com/ehimetakahashilab/Logic-BIST-Sim
+```
+
 ## How to Build
 ```console
 $ pwd
 /home/mainek00n/github/github.com/ehimetakahashilab/Logic-BIST-Sim
 
-$ git chechout customized-MaineK00n
-
 $ make
 ```
 
-## Getting Started
-
 ## Usage
+### src/lfsr
+```console
+$ lfst ./CIRCUITS/s27 10 ./PATTERNS/s27
+```
