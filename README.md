@@ -35,7 +35,7 @@ There is NO WARRANTY, to the extent permitted by law.
 
 ## Getting Started
 ```console
-$ git clone -b customize-MaineK00n https://github.com/ehimetakahashilab/Logic-BIST-Sim
+$ git clone -b customized-MaineK00n https://github.com/ehimetakahashilab/Logic-BIST-Sim
 ```
 
 ## How to Build
