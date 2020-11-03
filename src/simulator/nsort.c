@@ -1,6 +1,6 @@
 #include "declare.h"
-#include "def_gtype.h"
 #include "def_flt.h"
+#include "def_gtype.h"
 
 read_tpi_list(argv) char *argv[14];
 {
@@ -9,25 +9,23 @@ read_tpi_list(argv) char *argv[14];
   char tgl_file[100];
   sprintf(tgl_file, "%s_tgl_FF_input.dat", argv[1]);
   FILE *fin1;
-  for (i = 0; i <= lpnt; i++)
-    toggle_gates[i] = 0;
+  for (i = 0; i <= lpnt; i++) toggle_gates[i] = 0;
 
-  if (atoi(argv[4]) == 1 || atoi(argv[4]) == 4)
-  { //Structure Based toggle Gate selection
+  if (atoi(argv[4]) == 1 ||
+      atoi(argv[4]) == 4) {  // Structure Based toggle Gate selection
     fin1 = fopen("tgl_gt_input.dat", "r");
-    if (fin1 == NULL)
-      printf("'tgl_gt_input.dat' is not found!\n"), exit(1);
-   // printf("%d %f \n",numgate-ffnum-inpnum,GATE_GP_START*(numgate-ffnum-inpnum));
-// printf("----%d\n", (int)(numgate * atof(argv[5])));
-    for (ia = 0; ia < (int)(numgate * atof(argv[5])); ia++)
-    {
-      //for(ia=0;ia<TGL_GT_NUM;ia++){
+    if (fin1 == NULL) printf("'tgl_gt_input.dat' is not found!\n"), exit(1);
+    // printf("%d %f
+    // \n",numgate-ffnum-inpnum,GATE_GP_START*(numgate-ffnum-inpnum));
+    // printf("----%d\n", (int)(numgate * atof(argv[5])));
+    for (ia = 0; ia < (int)(numgate * atof(argv[5])); ia++) {
+      // for(ia=0;ia<TGL_GT_NUM;ia++){
       fscanf(fin1, "%d\n", &ib);
       toggle_gates[ib + inpnum + numout + ffnum] = 1;
-      //printf("-----%d %d\n", ib, ib + inpnum + numout + ffnum);
+      // printf("-----%d %d\n", ib, ib + inpnum + numout + ffnum);
     }
     fclose(fin1);
-  // exit(1);
+    // exit(1);
   }
 }
 
@@ -44,134 +42,109 @@ initial_node(argv) char *argv[1];
   sprintf(tgl_file, "%s_tgl_FF_input.dat", argv[1]);
 
   FILE *fin;
-  //int **gate_toggle;
+  // int **gate_toggle;
   // gate_toggle = (int **)calloc(numgate, sizeof(int *));
 
   int toggle_FFs[lpnt];
-  for (i = 0; i <= lpnt; i++)
-    toggle_FFs[i] = 0;
+  for (i = 0; i <= lpnt; i++) toggle_FFs[i] = 0;
 
-  if (TGL_GATE_MODE == 1 || TGL_GATE_MODE == 4)
-  {
-
-    //tgl_gt_cnt=TGL_GT_NUM;
+  if (TGL_GATE_MODE == 1 || TGL_GATE_MODE == 4) {
+    // tgl_gt_cnt=TGL_GT_NUM;
     tgl_gt_cnt = numgate * Tgl_rate;
 
-    //printf("%d\n", numgate);
+    // printf("%d\n", numgate);
     fnode = gnode.next;
     gt_cnt = 0.0;
     ib = 0;
-    for (; fnode != NULL; fnode = fnode->next)
-    {
+    for (; fnode != NULL; fnode = fnode->next) {
       fnode->toggle_flog = 0;
 
-      //printf("%d %d \n",fnode->line,toggle_gates[fnode->line]);
+      // printf("%d %d \n",fnode->line,toggle_gates[fnode->line]);
       ib = fnode->line;
-      if (toggle_gates[ib] == 1)
-      {
+      if (toggle_gates[ib] == 1) {
         fnode->toggle_flog = 1;
-        //printf("+++%d\n", fnode->line);
-        //printf("----maru\n");
+        // printf("+++%d\n", fnode->line);
+        // printf("----maru\n");
       }
-      for (i = 0; i < MAXCAP; i++)
-        fnode->toggle_rate[i] = 0.0;
+      for (i = 0; i < MAXCAP; i++) fnode->toggle_rate[i] = 0.0;
     }
-    //exit(1);
-  }
-  else if (TGL_GATE_MODE == 2 || TGL_GATE_MODE == 3)
-  { //FF TPI
+    // exit(1);
+  } else if (TGL_GATE_MODE == 2 || TGL_GATE_MODE == 3) {  // FF TPI
     fin = fopen(tgl_file, "r");
-    if (fin == NULL)
-      printf("'tgl_FF_input.dat' is not found!\n"), exit(1);
-    //printf("%d %f \n",numgate-ffnum-inpnum,GATE_GP_START*(numgate-ffnum-inpnum));
+    if (fin == NULL) printf("'tgl_FF_input.dat' is not found!\n"), exit(1);
+    // printf("%d %f
+    // \n",numgate-ffnum-inpnum,GATE_GP_START*(numgate-ffnum-inpnum));
 
     for (ia = 0; ia < (int)(ffnum * ff_rate); ia++)
-    //for (ia = 0; ia < 2; ia++)
+    // for (ia = 0; ia < 2; ia++)
     {
-      //for(ia=0;ia<TGL_GT_NUM;ia++){
+      // for(ia=0;ia<TGL_GT_NUM;ia++){
       fscanf(fin, "%d\n", &ib);
       toggle_FFs[ib] = 1;
-      //printf(" %d,%d|",ia,ib);
+      // printf(" %d,%d|",ia,ib);
     }
-    //tgl_gt_cnt=TGL_GT_NUM;
+    // tgl_gt_cnt=TGL_GT_NUM;
     tgl_gt_cnt = ffnum * ff_rate;
     fclose(fin);
 
     ib = 0;
     finnode = ffnode.next;
-    for (; finnode != NULL; finnode = finnode->next)
-    {
+    for (; finnode != NULL; finnode = finnode->next) {
       fnode = finnode->node;
       fnode->toggle_flog = 0;
       ib = fnode->line - inpnum - numout;
-      //printf("%d, %d\n", fnode->line, toggle_FFs[fnode->line]);
-      if (toggle_FFs[ib] == 1)
-      {
+      // printf("%d, %d\n", fnode->line, toggle_FFs[fnode->line]);
+      if (toggle_FFs[ib] == 1) {
         fnode->toggle_flog = 1;
         // printf("%d\n", fnode->line);
         // printf("----maru\n");
       }
-      //printf("%d, %d, %d\n",ib,fnode->line,toggle_FFs[ib]);
+      // printf("%d, %d, %d\n",ib,fnode->line,toggle_FFs[ib]);
 
       /*	if(toggle_FFs[fnode->line]==1){
-		fnode->toggle_flog=1;
-	}*/
-      for (i = 0; i < MAXCAP; i++)
-        fnode->toggle_rate[i] = 0.0;
+                fnode->toggle_flog=1;
+        }*/
+      for (i = 0; i < MAXCAP; i++) fnode->toggle_rate[i] = 0.0;
     }
-    //exit(1);
-  }
-  else
-  {
+    // exit(1);
+  } else {
     fnode = gnode.next;
-    for (; fnode != NULL; fnode = fnode->next)
-    {
-      for (i = 0; i < MAXCAP; i++)
-        fnode->toggle_rate[i] = 0.0;
+    for (; fnode != NULL; fnode = fnode->next) {
+      for (i = 0; i < MAXCAP; i++) fnode->toggle_rate[i] = 0.0;
     }
   }
 
   finnode = ffnode.next;
-  for (; finnode != NULL; finnode = finnode->next)
-  {
+  for (; finnode != NULL; finnode = finnode->next) {
     fnode = finnode->node;
-    for (i = 0; i < MAXCAP; i++)
-      fnode->toggle_rate[i] = 0.0;
+    for (i = 0; i < MAXCAP; i++) fnode->toggle_rate[i] = 0.0;
   }
   finnode = ponode.next;
-  for (; finnode != NULL; finnode = finnode->next)
-  {
+  for (; finnode != NULL; finnode = finnode->next) {
     fnode = finnode->node;
-    for (i = 0; i < MAXCAP; i++)
-      fnode->toggle_rate[i] = 0.0;
+    for (i = 0; i < MAXCAP; i++) fnode->toggle_rate[i] = 0.0;
   }
   finnode = pinode.next;
-  for (; finnode != NULL; finnode = finnode->next)
-  {
+  for (; finnode != NULL; finnode = finnode->next) {
     fnode = finnode->node;
-    for (i = 0; i < MAXCAP; i++)
-      fnode->toggle_rate[i] = 0.0;
+    for (i = 0; i < MAXCAP; i++) fnode->toggle_rate[i] = 0.0;
   }
 }
 
-sort_node()
-{
+sort_node() {
   L_NODE *fnode, *new_head, *target, *last_node;
   FIN_NODE *finnode, *finnode1;
   int i, ni, line, fil, fincheck[lpnt + 1];
 
-  for (ni = 1; ni <= lpnt; ni++)
-    fincheck[ni] = 0;
+  for (ni = 1; ni <= lpnt; ni++) fincheck[ni] = 0;
   new_head = NULL;
 
   /** extract FF nodes **/
   finnode = ffnode.next;
-  for (; finnode != NULL; finnode = finnode->next)
-  {
+  for (; finnode != NULL; finnode = finnode->next) {
     fnode = finnode->node;
 
-    if (fnode->next != NULL)
-      fnode->next->prev = fnode->prev;
+    if (fnode->next != NULL) fnode->next->prev = fnode->prev;
     fnode->prev->next = fnode->next;
     fnode->next = new_head;
     new_head = fnode;
@@ -180,11 +153,9 @@ sort_node()
   last_node = ffnode.next->node;
   /** extract PI nodes **/
   finnode = pinode.next;
-  for (; finnode != NULL; finnode = finnode->next)
-  {
+  for (; finnode != NULL; finnode = finnode->next) {
     fnode = finnode->node;
-    if (fnode->next != NULL)
-      fnode->next->prev = fnode->prev;
+    if (fnode->next != NULL) fnode->next->prev = fnode->prev;
     fnode->prev->next = fnode->next;
     fnode->next = new_head;
     new_head = fnode;
@@ -197,23 +168,18 @@ sort_node()
   prn_node(gnode.next); /** print the other nodes list **/
 #endif
   new_head = NULL;
-  while (gnode.next != NULL)
-  {
+  while (gnode.next != NULL) {
     fnode = gnode.next;
-    for (; fnode != NULL;)
-    {
-      if (fin_check(fnode->finlst, fincheck) == TRUE)
-      {
+    for (; fnode != NULL;) {
+      if (fin_check(fnode->finlst, fincheck) == TRUE) {
         target = fnode;
         fnode = fnode->next;
-        if (target->next != NULL)
-          target->next->prev = target->prev;
+        if (target->next != NULL) target->next->prev = target->prev;
         target->prev->next = target->next;
         target->next = new_head;
         new_head = target;
         fincheck[target->line] = 1;
-      }
-      else
+      } else
         fnode = fnode->next;
     }
   }
@@ -223,8 +189,7 @@ sort_node()
   /** reverse order **/
   fnode = new_head;
   new_head = NULL;
-  for (; fnode != NULL;)
-  {
+  for (; fnode != NULL;) {
     target = fnode;
     fnode = fnode->next;
     target->next = new_head;
@@ -262,14 +227,11 @@ sort_node()
   prn_node(gnode.next);
 #endif
 }
-fin_check(finnode, fincheck)
-    FIN_NODE *finnode;
+fin_check(finnode, fincheck) FIN_NODE *finnode;
 int fincheck[];
 {
-  for (; finnode != NULL; finnode = finnode->next)
-  {
-    if (fincheck[finnode->node->line] == 0)
-      break;
+  for (; finnode != NULL; finnode = finnode->next) {
+    if (fincheck[finnode->node->line] == 0) break;
   }
   if (finnode == NULL)
     return TRUE;

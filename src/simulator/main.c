@@ -1,8 +1,8 @@
 #include "declare.h"
-#include "def_gtype.h"
 #include "def_flt.h"
-#include "string.h"
+#include "def_gtype.h"
 #include "math.h"
+#include "string.h"
 
 main(argc, argv) int argc;
 char *argv[13];
@@ -22,7 +22,7 @@ char *argv[13];
   //  }
 
   /*::::::::::when using ATPG, set the test length :::::::::::::*/
-  //length=read_pival_01x(argv,pivalset);
+  // length=read_pival_01x(argv,pivalset);
   //#if DEBUG3
   //  printf(" Test Pattern are %d Patterns by ATPG\n",length);
   //#endif
@@ -36,7 +36,7 @@ char *argv[13];
   err_check(fltlst.next, 0);
   Instance_Get(argc, argv);
   faultnum = sum_flt;
- // printf("\nfaultnumber=%d %d\n",sum_flt,length);exit(1);
+  // printf("\nfaultnumber=%d %d\n",sum_flt,length);exit(1);
 
   flt_out(fltlst.next, argv);
 
@@ -63,18 +63,18 @@ char *argv[13];
   /*#if MAKE_REC
   fout = fopen("fault coverage.log", "a");
   fprintf(fout, "%s\n", argv[1]);
-	fprintf(fout, "Fcov(%) ShiftRate(%) capturerate(%)\n");
+        fprintf(fout, "Fcov(%) ShiftRate(%) capturerate(%)\n");
   fclose(fout);
 #endif*/
 
-  faultsim(argv); //←bug 2014_08_23 ===================
+  faultsim(argv);  //←bug 2014_08_23 ===================
 
 #if FLT_PER_PAT
   fclose(fout_fpp);
 #endif
-//printf("HEHRE???\n");
+  // printf("HEHRE???\n");
   Out_Put(argv);
-///printf("HEHRE???\n");
+  /// printf("HEHRE???\n");
   times(&cputime);
   totime = cputime.tms_utime - totime;
   printf(" ***  cputime = %.3f[sec] *** \n\n", (double)totime / 100);
@@ -104,87 +104,67 @@ FLT_NODE *flttag;
 }
 */
 
-count_flt(flttag)
-    FLT_NODE *flttag;
+count_flt(flttag) FLT_NODE *flttag;
 {
   int sumflt = 0, sumTDflt = 0, count = 0;
   int ia, ib;
 #if TRANSITIONFAULT
-  for (; flttag != NULL; flttag = flttag->next)
-  {
-
-    if (!flttag->TranDetTimes)
-      sumTDflt++;
+  for (; flttag != NULL; flttag = flttag->next) {
+    if (!flttag->TranDetTimes) sumTDflt++;
   }
   return sumTDflt;
 #else
 #if SELECT_STATION
-  for (ia = 0; ia < FF_FILE; ia++)
-    flt_det_num[ia] = 0;
+  for (ia = 0; ia < FF_FILE; ia++) flt_det_num[ia] = 0;
   flt_det_num[10] = 0;
 #endif
 
-  for (; flttag != NULL; flttag = flttag->next)
-  {
+  for (; flttag != NULL; flttag = flttag->next) {
     count++;
-    if (!flttag->dtime)
-      sumflt++;
+    if (!flttag->dtime) sumflt++;
     /*#if SELECT_STATION
-	if(MODE_TOOL==4){
-	for(ia=0;ia<FF_FILE;ia++) {
-		if(flttag->OBdtime_sel_FF[ia]==1) flt_det_num[ia]++;
-		}
-	if(flttag->full_ob_dtime==1) flt_det_num[20]++;
-	}
-	#endif*/
-    //printf("%d ",flttag->OBdtime_sel_FF[ia]);
-    //printf("\n");
-
+        if(MODE_TOOL==4){
+        for(ia=0;ia<FF_FILE;ia++) {
+                if(flttag->OBdtime_sel_FF[ia]==1) flt_det_num[ia]++;
+                }
+        if(flttag->full_ob_dtime==1) flt_det_num[20]++;
+        }
+        #endif*/
+    // printf("%d ",flttag->OBdtime_sel_FF[ia]);
+    // printf("\n");
   }
-  if ( MODE_TOOL == 3 || MODE_TOOL == 4)
-  {
-    for (ia = 0; ia <= sum_flt; ia++)
-    {
-      for (ib = 0; ib < FF_FILE; ib++)
-      {
-        if (flt_det_flog[ia][ib])
-          flt_det_num[ib]++;
-
+  if (MODE_TOOL == 3 || MODE_TOOL == 4) {
+    for (ia = 0; ia <= sum_flt; ia++) {
+      for (ib = 0; ib < FF_FILE; ib++) {
+        if (flt_det_flog[ia][ib]) flt_det_num[ib]++;
       }
 
-      if (flt_det_flog[ia][10])
-        flt_det_num[10]++;
+      if (flt_det_flog[ia][10]) flt_det_num[10]++;
     }
   }
   /*	#if SELECT_STATION
-	for(ia=0;ia<FF_FILE;ia++)
-		flt_det_num[ia]+=sum_flt-sumflt;
-	flt_det_num[20]+=sum_flt-sumflt;
+        for(ia=0;ia<FF_FILE;ia++)
+                flt_det_num[ia]+=sum_flt-sumflt;
+        flt_det_num[20]+=sum_flt-sumflt;
 #endif*/
 
   return sumflt;
 #endif
 }
 
-
-saf_list_check(flttag)
-    FLT_NODE *flttag;
+saf_list_check(flttag) FLT_NODE *flttag;
 {
   int count = 0;
-  for (; flttag != NULL; flttag = flttag->next)
-    count++;
+  for (; flttag != NULL; flttag = flttag->next) count++;
 
   return count;
 }
 
-err_check(flttag, time)
-    FLT_NODE *flttag;
+err_check(flttag, time) FLT_NODE *flttag;
 int time;
 {
-  while (flttag != NULL)
-  {
-    if (flttag->dfflst != NULL)
-    {
+  while (flttag != NULL) {
+    if (flttag->dfflst != NULL) {
       printf(" error fault %d  time %d\n", flttag->back->line, time);
       exit(1);
     }
@@ -199,47 +179,36 @@ char *argv[10];
   int ia, ib, ic, id, flog;
   float FF_TCov[ffnum], FF_Only_Flt[ffnum];
   FILE *FF_flt_list;
-  for (ia = 0; ia < ffnum; ia++)
-  {
+  for (ia = 0; ia < ffnum; ia++) {
     FF_Only_Flt[ia] = 0.0;
     FF_TCov[ia] = (float)fflist[ia][0] / totalflts * 100;
-    for (ib = 1; ib <= fflist[ia][0]; ib++)
-    {
+    for (ib = 1; ib <= fflist[ia][0]; ib++) {
       flog = 0;
-      for (ic = 0; ic < ffnum; ic++)
-      {
-        if (ia == ic)
-          continue;
-        for (id = 1; id <= fflist[ic][0]; id++)
-        {
-          if (fflist[ia][ib] == fflist[ic][id])
-          {
+      for (ic = 0; ic < ffnum; ic++) {
+        if (ia == ic) continue;
+        for (id = 1; id <= fflist[ic][0]; id++) {
+          if (fflist[ia][ib] == fflist[ic][id]) {
             flog = 1;
             break;
           }
         }
-        if (flog == 1)
-          break;
+        if (flog == 1) break;
       }
     }
 
-    if (flog == 0)
-      FF_Only_Flt[ia]++;
+    if (flog == 0) FF_Only_Flt[ia]++;
   }
   FF_flt_list = fopen("TCov_of_FFs.txt", "a");
   fprintf(FF_flt_list, "%s  %s  %s\n", argv[1], argv[3], argv[4]);
-  for (ia = 0; ia < ffnum; ia++)
-    fprintf(FF_flt_list, "%4.3f ", FF_TCov[ia]);
+  for (ia = 0; ia < ffnum; ia++) fprintf(FF_flt_list, "%4.3f ", FF_TCov[ia]);
   fprintf(FF_flt_list, "\n");
-  for (ia = 0; ia < ffnum; ia++)
-    fprintf(FF_flt_list, "%d ", FF_Only_Flt[ia]);
+  for (ia = 0; ia < ffnum; ia++) fprintf(FF_flt_list, "%d ", FF_Only_Flt[ia]);
   fprintf(FF_flt_list, "\n");
 
   fclose(FF_flt_list);
 }
 
-flt_out(flttag, argv)
-    FLT_NODE *flttag;
+flt_out(flttag, argv) FLT_NODE *flttag;
 char *argv[11];
 {
   int sumflt = 0, sumTDflt = 0;
@@ -253,8 +222,7 @@ char *argv[11];
   fprintf(flstout, "%d \n", sum_flt);
   int ie = 0;
 
-  for (; flttag != NULL; flttag = flttag->next)
-  {
+  for (; flttag != NULL; flttag = flttag->next) {
     flt_list[ie][0] = flttag->line;
     flt_list[ie][1] = flttag->saval;
     if (flttag->forwd != NULL)

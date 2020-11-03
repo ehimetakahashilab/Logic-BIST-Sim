@@ -36,13 +36,13 @@
 //#define TAP_NUM 5
 
 /*expect toggle rate*/
-#define TIMESCHEDULE 0 //1: yes 0:no
+#define TIMESCHEDULE 0  // 1: yes 0:no
 #define SPACECHANGE 0
-#define EXPECTTOGGLERATE 0.20 //expected toggle rate
-#define checktiming 0         // observe timing
+#define EXPECTTOGGLERATE 0.20  // expected toggle rate
+#define checktiming 0          // observe timing
 #define lev0 0.50
 #define lev1 0.18
-#define lev2 0.08 // given toggle rate level
+#define lev2 0.08  // given toggle rate level
 #define MASK 0xaaaa
 /*expect toggle rate*/
 #define EXTERNSEED 0
@@ -59,18 +59,20 @@
 #define PRNT_FF 0      /* 1 when printing FFs */
 #define OUTPUT_FLIST 0 /* 1 when output fault list */
 
-#define PO_OBSERVE 0    /* 1 when observe POs */
-#define FF_OBSERVE 1     /* 1 when observe FFs while multi-capture マルチサイクルの時0*/
+#define PO_OBSERVE 0 /* 1 when observe POs */
+#define FF_OBSERVE \
+  1 /* 1 when observe FFs while multi-capture マルチサイクルの時0*/
 #define SELECT_STATION 1 /* 1 when select FF station 0: Full observation*/
 // 0なら全観測・1なら部分観測
 //#define OBSERVE_RATE 1 /* MUST 0 <, < 1 */
 
-#define POWEREVA 0 //power evaluation トグル率の表示
-#define WSA_REC 0  //WSA evaluation 検出率の表示
-#define FF_CAP 0   //=1: evaluate the toggle rate at each FF
+#define POWEREVA 0  // power evaluation トグル率の表示
+#define WSA_REC 0   // WSA evaluation 検出率の表示
+#define FF_CAP 0    //=1: evaluate the toggle rate at each FF
 
-//#define INTERVAL_CYCLE 4 //=1:toggle at every cycle, =2:toggle at every 2 cycles, =3: toggle at every 3 cycles
-#define PEAK 0 //Shift Peak power computing
+//#define INTERVAL_CYCLE 4 //=1:toggle at every cycle, =2:toggle at every 2
+//cycles, =3: toggle at every 3 cycles
+#define PEAK 0  // Shift Peak power computing
 //#define SWITCH_GATE 1
 //#define LEFTSET 3
 //#define STUCT_TGL_GT 1 //Control by external input toggle gate data
@@ -80,15 +82,16 @@
 //#define GATE_GP_END	0.4
 
 /*Faultsimulation control*/
-#define FAULTSIMULATION 1 /*for observing scanout: 0: stop fault simulation*/
-#define TRANSITIONFAULT 0 // operate transition faults detection
-#define FAULTDROP 1       // 1: fault droping simulation 0: Full fault sim
+#define FAULTSIMULATION 1  /*for observing scanout: 0: stop fault simulation*/
+#define TRANSITIONFAULT 0  // operate transition faults detection
+#define FAULTDROP 1        // 1: fault droping simulation 0: Full fault sim
 #define FCOVPERPAT 1
-#define FAULTOB 0   //Observation Fault Detection Infomation
-#define BITRECORD 0 //2進数でパターンごと、FFごと、キャプチャごとの故障情報を記録する＿＿2015710_王
+#define FAULTOB 0  // Observation Fault Detection Infomation
+#define BITRECORD \
+  0  // 2進数でパターンごと、FFごと、キャプチャごとの故障情報を記録する＿＿2015710_王
 #define NORMAL_REC 0
 #define PAT_FCOV 0
-#define FLT_PER_PAT 0 //パターン毎の故障検出情報を取るための変数
+#define FLT_PER_PAT 0  //パターン毎の故障検出情報を取るための変数
 //全観測のとき1に部分観測のとき0にする
 /*if SELECT_STATION=1, FAULTOB !=1 */
 #define Transcycle 1
