@@ -47,7 +47,17 @@ $ make
 ```
 
 ## Usage
-### src/lfsr
+### src/tpg/tpg/lfsr
 ```console
-$ lfst ./CIRCUITS/s27 10 ./PATTERNS/s27
+$ lfsr <CIRCUIT_PATH> <TEST_VECTOR> <OUTPUT_PATH>
+```
+
+### src/tpg/tpg_TPI_ff/lfsr_ff
+```console
+$ lfsr_ff <CIRCUIT_PATH> <TEST_VECTOR> <FF_CP_RATE> <CAPTURE> <OUTPUT_PATH>
+```
+
+### src/tpg/tgp_TPI_gate/lfsr_gt
+```console
+$ lfsr_gt <CIRCUIT_PATH> <TEST_VECTOR> <LOGIC_CP_RATE> <CAPTURE> <OUTPUT_PATH>
 ```

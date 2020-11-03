@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
   fscanf(fin, "%d %d %d", &nfin, &nfin, &nfin);
   fclose(fin);
 
-  fin = fopen("lfsr.dat", "r");
+  fin = fopen("../commons/lfsr.dat", "r");
   if (fin == NULL) {
     fprintf(stderr, "error: 'lfsr.dat' is not found\n");
     exit(1);
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
     RTPG[ia] = 1;
     TFF[ia] = 1;
   }
-  fPTRGout = fopen("LT_RTPG.dat", "w");
+  fPTRGout = fopen("../commons/LT_RTPG.dat", "w");
   fprintf(fPTRGout, "testnum=%d bit length=%d K=%d\n", test_vec, nfin, K);
   for (i = 0; i < nfin; i++) fprintf(fPTRGout, " %d", TFF[i]);
   fprintf(fPTRGout, "\n");
