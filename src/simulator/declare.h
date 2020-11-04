@@ -71,7 +71,7 @@
 #define FF_CAP 0    //=1: evaluate the toggle rate at each FF
 
 //#define INTERVAL_CYCLE 4 //=1:toggle at every cycle, =2:toggle at every 2
-//cycles, =3: toggle at every 3 cycles
+// cycles, =3: toggle at every 3 cycles
 #define PEAK 0  // Shift Peak power computing
 //#define SWITCH_GATE 1
 //#define LEFTSET 3

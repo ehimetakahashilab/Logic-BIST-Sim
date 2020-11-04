@@ -54,7 +54,7 @@ faultsim(argv) char *argv[13];
       sprintf(outpath, "./OUTPUTS/MULTI_BIST_OB/%s_%d.csv", argv[1], cap_freq);
       fout_flt_pat = fopen(outpath, "w+");
       //			printf("FCOV_PAT output file is not exist!\n"),
-      //exit(1);
+      // exit(1);
 
 #if PO_OBSERVE
       printf("PO observe mode\n");
@@ -136,8 +136,8 @@ faultsim(argv) char *argv[13];
                   cap_freq, argv[1]);
           //			sprintf(outpath_in,
           //"./OUTPUTS/CPI/%dcycles/%dSKIP/input_pat/%s_NONTG_FF_TPI_INP_%.2f_%d_%.2f.csv",
-          //cap_freq, SKIP_CYCLE, argv[1], OBSERVE_RATE, FF_SEL_METHOD,
-          //ff_rate);
+          // cap_freq, SKIP_CYCLE, argv[1], OBSERVE_RATE, FF_SEL_METHOD,
+          // ff_rate);
           break;
         case 1:  // toggle gate insert by toggling
           sprintf(cpi_sim_outpath,
@@ -498,7 +498,7 @@ faultsim(argv) char *argv[13];
       num_injgate = fault_inject(&inj_flst, injarray);
 
       //	fprintf(fp, "fault value -%d %d-\n", injarray[0]->line,
-      //injarray[0]->saval); //2019/12
+      // injarray[0]->saval); //2019/12
 
       for (ia = 1; ia <= cap_freq; ia++) {
         //	fprintf(fp, "cycle %d,", ia); //2019/12

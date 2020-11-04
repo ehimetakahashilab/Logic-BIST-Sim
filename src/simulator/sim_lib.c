@@ -197,11 +197,11 @@ update_nextstate_ft(capture) int capture;
             tgl_val = fnode->ftval1 ^ tmp[ia];
             if (fnode->toggle_flog == 1) {
               // if(fnode->gdval0==fnode->gdval1)
-              fnode->ftval1 =
-                  ~(tmp[ia] ^
-                    tgl_val);  // printf(" %d: %x
-                               // %x\n",fnode->line,fnode->gdval0,fnode->gdval1);
-                               // fnode->gdval1= ~fnode->gdval1;
+              fnode->ftval1 = ~(
+                  tmp[ia] ^
+                  tgl_val);  // printf(" %d: %x
+                             // %x\n",fnode->line,fnode->gdval0,fnode->gdval1);
+                             // fnode->gdval1= ~fnode->gdval1;
             } else
               fnode->ftval1 = tmp[ia];
           } else
