@@ -14,7 +14,10 @@ read_tpi_list(argv) char *argv[14];
   if (atoi(argv[4]) == 1 ||
       atoi(argv[4]) == 4) {  // Structure Based toggle Gate selection
     fin1 = fopen("tgl_gt_input.dat", "r");
-    if (fin1 == NULL) printf("'tgl_gt_input.dat' is not found!\n"), exit(1);
+    if (fin1 == NULL) {
+      fprintf(stderr, "'tgl_gt_input.dat' is not found!\n");
+      exit(1);
+    }
     // printf("%d %f
     // \n",numgate-ffnum-inpnum,GATE_GP_START*(numgate-ffnum-inpnum));
     // printf("----%d\n", (int)(numgate * atof(argv[5])));
@@ -71,7 +74,10 @@ initial_node(argv) char *argv[1];
     // exit(1);
   } else if (TGL_GATE_MODE == 2 || TGL_GATE_MODE == 3) {  // FF TPI
     fin = fopen(tgl_file, "r");
-    if (fin == NULL) printf("'tgl_FF_input.dat' is not found!\n"), exit(1);
+    if (fin == NULL) {
+      fprintf(stderr, "'tgl_FF_input.dat' is not found!\n");
+      exit(1);
+    }
     // printf("%d %f
     // \n",numgate-ffnum-inpnum,GATE_GP_START*(numgate-ffnum-inpnum));
 

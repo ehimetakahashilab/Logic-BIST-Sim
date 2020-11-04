@@ -89,7 +89,10 @@ int ff_state[];
   for (ia = 0; ia < chainnum; ia++) ShiftPeak[ia] = 0.0;
 
   schain = (SCAN_CHAIN *)calloc(chainnum, sizeof(SCAN_CHAIN));
-  if (schain == NULL) printf("memory error @initial_lfsr\n"), exit(1);
+  if (schain == NULL) {
+    fprintf(stderr, "memory error @initial_lfsr\n");
+    exit(1);
+  }
 
   fin = fopen("lfsr.dat", "r");
   if (fin == NULL) {

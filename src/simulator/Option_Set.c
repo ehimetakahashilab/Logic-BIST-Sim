@@ -19,8 +19,10 @@ char *argv[1];
   i = 0;
   while (i < src_num) {
     sprintf(PATH, "ff_station_%d.dat", i);
-    if ((fin = fopen(PATH, "rt")) == NULL)
-      printf("error:'FF Station File' %s is not found!\n", PATH), exit(1);
+    if ((fin = fopen(PATH, "rt")) == NULL) {
+      fprintf(stderr, "error:'FF Station File' %s is not found!\n", PATH);
+      exit(1);
+    }
     for (ia = 0; ia < ffnum; ia++) {
       if (ia < ob_num) {
         fscanf(fin, "%d", &isel[i]);
@@ -121,13 +123,17 @@ char *argv[14];
         /* 1 when select FF station 0: Full observation*/
 
         flt_det_flog = (int **)malloc((sum_flt + 2) * sizeof(int *));
-        if (flt_det_flog == NULL)
-          printf("memory error @flt_det_flog in flt_info \n"), exit(1);
+        if (flt_det_flog == NULL) {
+          fprintf(stderr, "memory error @flt_det_flog in flt_info \n");
+          exit(1);
+        }
 
         for (ia = 0; ia <= sum_flt + 1; ia++) {
           flt_det_flog[ia] = (int *)malloc(11 * sizeof(int));
-          if (flt_det_flog[ia] == NULL)
-            printf("memory error @flt_det_flog \n"), exit(1);
+          if (flt_det_flog[ia] == NULL) {
+            fprintf(stderr, "memory error @flt_det_flog \n");
+            exit(1);
+          }
         }
       }
 
@@ -135,14 +141,18 @@ char *argv[14];
       /*2進数でパターンごと、FFごと、キャプチャごとの故障情報を記録する＿＿2015710_王*/
       Pat_FF_Faults =
           (FF_PAT_FLT_LIST **)calloc(length + 1, sizeof(FF_PAT_FLT_LIST *));
-      if (Pat_FF_Faults == NULL)
-        printf("memory error @FF_Faults_lists \n"), exit(1);
+      if (Pat_FF_Faults == NULL) {
+        fprintf(stderr, "memory error @FF_Faults_lists \n");
+        exit(1);
+      }
       for (ia = 0; ia < length + 1; ia++) {
         Pat_FF_Faults[ia] =
             (FF_PAT_FLT_LIST *)calloc(ffnum, sizeof(FF_PAT_FLT_LIST));
-        if (Pat_FF_Faults[ia] == NULL)
-          printf("memory error @Pat_FF_Faults for %d %d\n", length, ia),
-              exit(1);
+        if (Pat_FF_Faults[ia] == NULL) {
+          fprintf(stderr, "memory error @Pat_FF_Faults for %d %d\n", length,
+                  ia);
+          exit(1);
+        }
       }
       for (ia = 0; ia < length + 1; ia++)
         for (ib = 0; ib < ffnum; ib++) {
@@ -213,13 +223,17 @@ char *argv[14];
       printf("Toggle INTERVAL_CYCLE: %d\n", INTERVAL_CYCLE);
 
       flt_det_flog = (int **)malloc((sum_flt + 2) * sizeof(int *));
-      if (flt_det_flog == NULL)
-        printf("memory error @flt_det_flog in flt_info \n"), exit(1);
+      if (flt_det_flog == NULL) {
+        fprintf(stderr, "memory error @flt_det_flog in flt_info \n");
+        exit(1);
+      }
 
       for (ia = 0; ia <= sum_flt + 1; ia++) {
         flt_det_flog[ia] = (int *)malloc(11 * sizeof(int));
-        if (flt_det_flog[ia] == NULL)
-          printf("memory error @flt_det_flog \n"), exit(1);
+        if (flt_det_flog[ia] == NULL) {
+          fprintf(stderr, "memory error @flt_det_flog \n");
+          exit(1);
+        }
       }
 
       SKIP_CAPTURE = 0;
@@ -243,7 +257,8 @@ char *argv[14];
 
       break;
     default:
-      printf("No New Function is Supported by this Program!\n"), exit(1);
+      fprintf(stderr, "No New Function is Supported by this Program!\n");
+      exit(1);
   }
 }
 
@@ -256,8 +271,10 @@ Out_Put(argv) char *argv[13];
     case 1:
       remain_flt = count_flt(fltlst.next);
       sprintf(outpath, "./OUTPUTS/BIST/%s.txt", argv[1]);
-      if ((fout = fopen(outpath, "w")) == NULL)
-        printf("BIST output file is not exist!\n"), exit(1);
+      if ((fout = fopen(outpath, "w")) == NULL) {
+        fprintf(stderr, "BIST output file is not exist!\n");
+        exit(1);
+      }
       printf("*************OUTPUT RESULTS****************\n");
       printf("#Test Pat., #Faults, #Det. Flts, #UnDet.Flts, Fcov.\n");
       fprintf(fout, "#Test Pat., #Faults, #Det. Flts, #UnDet.Flts, Fcov.\n");
@@ -300,8 +317,10 @@ Out_Put(argv) char *argv[13];
       remain_flt = count_flt(fltlst.next);
       // printf("here?\n"); exit(1);
       sprintf(outpath, "./OUTPUTS/MULTI_BIST/%s.txt", argv[1]);
-      if ((fout = fopen(outpath, "w")) == NULL)
-        printf("MULTI_BIST output file is not exist!\n"), exit(1);
+      if ((fout = fopen(outpath, "w")) == NULL) {
+        fprintf(stderr, "MULTI_BIST output file is not exist!\n");
+        exit(1);
+      }
       printf("*************OUTPUT RESULTS****************\n");
       printf(
           "#Test Pat.,	#Faults,	#Det. Flts,	#UnDet.Flts,	"
@@ -342,8 +361,10 @@ Out_Put(argv) char *argv[13];
       FILE *fout2;
       sprintf(outpath2, "./OUTPUTS/MULTI_BIST/FF_TOGGLE_%s_%d.csv", argv[1],
               cap_freq);
-      if ((fout2 = fopen(outpath2, "w")) == NULL)
-        printf("FF_TOGGLE output file is not exist!\n"), exit(1);
+      if ((fout2 = fopen(outpath2, "w")) == NULL) {
+        fprintf(stderr, "FF_TOGGLE output file is not exist!\n");
+        exit(1);
+      }
       finnode = ffnode.next;
       for (ia = 0; finnode != NULL; finnode = finnode->next, ia++) {
         fnode = finnode->node;
@@ -374,8 +395,10 @@ Out_Put(argv) char *argv[13];
 #if SELECT_STATION
       count_flt(fltlst.next);
       sprintf(outpath, "./OUTPUTS/MULTI_BIST_OB/%s.txt", argv[1]);
-      if ((fout = fopen(outpath, "w")) == NULL)
-        printf("MULTI_BIST_OB output file is not exist!\n"), exit(1);
+      if ((fout = fopen(outpath, "w")) == NULL) {
+        fprintf(stderr, "MULTI_BIST_OB output file is not exist!\n");
+        exit(1);
+      }
       printf("\n*************OUTPUT RESULTS****************\n");
       printf(
           "#Test Pat.,	#Faults,	#Det. Flts,	#UnDet.Flts,	"
@@ -398,8 +421,10 @@ Out_Put(argv) char *argv[13];
 #else
       remain_flt = count_flt(fltlst.next);
       sprintf(outpath, "./OUTPUTS/MULTI_FULL_OB_BIST/%s.txt", argv[1]);
-      if ((fout = fopen(outpath, "w")) == NULL)
-        printf("MULTI_OB_BIST output file is not exist!\n"), exit(1);
+      if ((fout = fopen(outpath, "w")) == NULL) {
+        fprintf(stderr, "MULTI_OB_BIST output file is not exist!\n");
+        exit(1);
+      }
       printf("\n*************OUTPUT RESULTS****************\n");
       printf(
           "#Test Pat.,	#Faults,	#Det. Flts,	#UnDet.Flts,	"
@@ -571,8 +596,10 @@ Out_Put(argv) char *argv[13];
       }
       else sprintf(outpath, "./OUTPUTS/TGL_GATE/%s_non.txt", argv[1]);*/
 
-      if ((fout = fopen(outpath, "w")) == NULL)
-        printf("#TGL_GATE output file is not exist!\n"), exit(1);
+      if ((fout = fopen(outpath, "w")) == NULL) {
+        fprintf(stderr, "#TGL_GATE output file is not exist!\n");
+        exit(1);
+      }
       printf("\n\n*************OUTPUT RESULTS****************\n");
       fprintf(fout, "*************OUTPUT RESULTS****************\n");
       if (TGL_GATE_MODE == 1) {
@@ -630,6 +657,7 @@ Out_Put(argv) char *argv[13];
       break;
 
     default:
-      printf("No New Function is Supported by this Program!\n"), exit(1);
+      fprintf(stderr, "No New Function is Supported by this Program!\n");
+      exit(1);
   }
 }

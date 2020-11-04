@@ -182,7 +182,8 @@ FLT_NODE *injarray[32];
         }
       }
       if (finnode == NULL) {
-        printf(" error ni %d  -214-\n", ni), exit(1);
+        fprintf(stderr, " error ni %d  -214-\n", ni);
+        exit(1);
       }
 
       foutnode = new_injback->foutlst;

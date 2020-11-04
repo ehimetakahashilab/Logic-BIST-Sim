@@ -27,10 +27,12 @@ pi_valset(pivalset) int pivalset[];
       fnode->gdval1 = 0;
       // fnode->gdval0 = 0;
     } else if (val == X) {
-      printf("error: Not support X value\n");
+      fprintf(stderr, "error: Not support X value\n");
       exit(1);
-    } else
-      printf(" error 3982\n"), exit(1);
+    } else {
+      fprintf(stderr, " error 3982\n");
+      exit(1);
+    }
     fnode->ftval1 = fnode->gdval1;
     //  fnode->ftval0 = fnode->gdval0 ;
     // printf("%x %d %d\n", fnode->ftval1, fnode->line, ni);
@@ -137,12 +139,14 @@ tpi_ff_state_load(capture) int capture;
     fnode = finnode->node;
     if (fnode->toggle_flog == 1) {
       //  printf(" %d: %x %x\n", fnode->line, fnode->gdval0, fnode->gdval1);
-      if (tgl_tpi[tpi_cnt][capture] == 1)
+      if (tgl_tpi[tpi_cnt][capture] == 1) {
         fnode->gdval1 = ALL_F;
-      else if (tgl_tpi[tpi_cnt][capture] == 0)
+      } else if (tgl_tpi[tpi_cnt][capture] == 0) {
         fnode->gdval1 = 0;
-      else if (tgl_tpi[tpi_cnt][capture] == X)
-        printf("error: Not support X value\n"), exit(1);
+      } else if (tgl_tpi[tpi_cnt][capture] == X) {
+        fprintf(stderr, "error: Not support X value\n");
+        exit(1);
+      }
       tpi_cnt++;  // printf("herer?%d %d \n",tpi_cnt,capture);
     }
     // printf("out%d %d \n",tpi_cnt,capture);
@@ -161,13 +165,17 @@ tpi_ff_state_load_ft(capture) int capture;
   tpi_cnt = 0;
   for (ia = 0; finnode != NULL; finnode = finnode->next, ia++) {
     fnode = finnode->node;
-    if (fnode->toggle_flog != 1) continue;
-    if (tgl_tpi[tpi_cnt][capture] == 1)
+    if (fnode->toggle_flog != 1) {
+      continue;
+    }
+    if (tgl_tpi[tpi_cnt][capture] == 1) {
       fnode->ftval1 = ALL_F;
-    else if (tgl_tpi[tpi_cnt][capture] == 0)
+    } else if (tgl_tpi[tpi_cnt][capture] == 0) {
       fnode->ftval1 = 0;
-    else if (tgl_tpi[tpi_cnt][capture] == X)
-      printf("error: Not support X value\n"), exit(1);
+    } else if (tgl_tpi[tpi_cnt][capture] == X) {
+      fprintf(stderr, "error: Not support X value\n");
+      exit(1);
+    }
     tpi_cnt++;
   }
 }
@@ -297,12 +305,14 @@ prn_allvalue(node_head) L_NODE *node_head;
 
     val1 = fnode->gdval1;
     printf(" L[%d]= ", fnode->line);
-    if (val1 == 0)
+    if (val1 == 0) {
       printf("0");
-    else if (val1 == ALL_F)
+    } else if (val1 == ALL_F) {
       printf("1");
-    else
-      printf(" error -28329-\n"), exit(1);
+    } else {
+      fprintf(stderr, " error -28329-\n");
+      exit(1);
+    }
     /*     if(numg%5==0) */
     printf("\n");
   }
@@ -340,12 +350,14 @@ prn_state(finnode) FIN_NODE *finnode;
   for (; finnode != NULL; finnode = finnode->next) {
     fnode = finnode->node;
     val1 = fnode->gdval1;
-    if (val1 == 0)
+    if (val1 == 0) {
       printf("0");
-    else if (val1 == ALL_F)
+    } else if (val1 == ALL_F) {
       printf("1");
-    else
-      printf(" error -28329-\n"), exit(1);
+    } else {
+      fprintf(stderr, " error -28329-\n");
+      exit(1);
+    }
   }
 //#endif
 #if DEBUG1
@@ -541,12 +553,14 @@ prn_state_flt_ao(finnode) FIN_NODE *finnode;
     fnode = finnode->node;
     val1 = fnode->gdval1;
     // printf("%d ", fnode->line);
-    if (val1 == 0)
+    if (val1 == 0) {
       fprintf(fout_flt_in, "0,");
-    else if (val1 == ALL_F)
+    } else if (val1 == ALL_F) {
       fprintf(fout_flt_in, "1,");
-    else
-      printf(" error -28329-\n"), exit(1);
+    } else {
+      fprintf(stderr, " error -28329-\n");
+      exit(1);
+    }
   }
   fprintf(fout_flt_in, "\n");
 }
@@ -780,12 +794,14 @@ onetimesim(capture) int capture;
       } else if (TGL_GATE_MODE == 4) {
         if (capture >= SKIP_CYCLE - 1) {
           if (fnode->toggle_flog == 1) {
-            if (tgl_tpi[tpi_cnt][capture] == 1)
+            if (tgl_tpi[tpi_cnt][capture] == 1) {
               fnode->gdval1 = ALL_F;
-            else if (tgl_tpi[tpi_cnt][capture] == 0)
+            } else if (tgl_tpi[tpi_cnt][capture] == 0) {
               fnode->gdval1 = 0;
-            else if (tgl_tpi[tpi_cnt][capture] == X)
-              printf("error: Not support X value\n"), exit(1);
+            } else if (tgl_tpi[tpi_cnt][capture] == X) {
+              fprintf(stderr, "error: Not support X value\n");
+              exit(1);
+            }
             tpi_cnt++;
           }
         }
@@ -863,12 +879,14 @@ ftvalsim(capture) int capture;
       } else if (TGL_GATE_MODE == 4) {
         if (capture >= SKIP_CYCLE - 1) {
           if (fnode->toggle_flog == 1) {
-            if (tgl_tpi[tpi_cnt][capture] == 1)
+            if (tgl_tpi[tpi_cnt][capture] == 1) {
               fnode->ftval1 = ALL_F;
-            else if (tgl_tpi[tpi_cnt][capture] == 0)
+            } else if (tgl_tpi[tpi_cnt][capture] == 0) {
               fnode->ftval1 = 0;
-            else if (tgl_tpi[tpi_cnt][capture] == X)
-              printf("error: Not support X value\n"), exit(1);
+            } else if (tgl_tpi[tpi_cnt][capture] == X) {
+              fprintf(stderr, "error: Not support X value\n");
+              exit(1);
+            }
             tpi_cnt++;
           }
         }

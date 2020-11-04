@@ -216,8 +216,10 @@ char *argv[11];
   char outfile[30];
   sprintf(outfile, "./FLT_LIST/%s", argv[1]);
 
-  if (NULL == (flstout = fopen(outfile, "a")))
-    printf(" error fault list file does not exit!\n"), exit(0);
+  if (NULL == (flstout = fopen(outfile, "a"))) {
+    fprintf(stderr, " error fault list file does not exit!\n");
+    exit(1);
+  }
 
   fprintf(flstout, "%d \n", sum_flt);
   int ie = 0;

@@ -2,7 +2,11 @@
 #include "def_flt.h"
 #include "def_gtype.h"
 
-#define ERR_MSG(x) printf(" x \n"), exit(1);
+#define ERR_MSG(x)            \
+  {                           \
+    fprintf(stderr, " x \n"); \
+    exit(1);                  \
+  }
 #define NALLOC (L_NODE *)malloc(sizeof(L_NODE))
 #define FALLOC (FLT_NODE *)malloc(sizeof(FLT_NODE))
 #define INALLOC (FIN_NODE *)malloc(sizeof(FIN_NODE))
@@ -39,13 +43,19 @@ make_line_list(argv) char *argv[13];
 #endif
 
   address = (L_NODE **)calloc(lpnt + 1, sizeof(L_NODE *));
-  if (address == NULL) printf("memory error @make_line_list\n"), exit(1);
+  if (address == NULL) {
+    fprintf(stderr, "memory error @make_line_list\n");
+    exit(1);
+  }
 
   head_node = NULL;
   for (ni = lpnt; ni >= 1; ni--) {
     if (gate[ni].type == FAN) continue;
 
-    if (NULL == (fnode = NALLOC)) printf(" error -984-\n"), exit(1);
+    if (NULL == (fnode = NALLOC)) {
+      fprintf(stderr, " error -984-\n");
+      exit(1);
+    }
     // count2++;
     address[ni] = fnode;
     fnode->line = ni;
@@ -79,7 +89,10 @@ make_line_list(argv) char *argv[13];
     if (gate[line].type == PI) {
       fnode->finlst = NULL;
     } else if (gate[line].nfi == 1) {
-      if (NULL == (finnode = INALLOC)) printf(" error -239-\n"), exit(1);
+      if (NULL == (finnode = INALLOC)) {
+        fprintf(stderr, " error -239-\n");
+        exit(1);
+      }
 
       //  finnode=fin_tmp+(fill_fin_tmp++);
 
@@ -91,7 +104,10 @@ make_line_list(argv) char *argv[13];
       for (ni = 0; ni < gate[line].nfi; ni++) {
         fin = flist[ni + fil];
 
-        if (NULL == (finnode = INALLOC)) printf(" error -233-\n"), exit(1);
+        if (NULL == (finnode = INALLOC)) {
+          fprintf(stderr, " error -233-\n");
+          exit(1);
+        }
 
         //  finnode=fin_tmp+(fill_fin_tmp++);
 
@@ -121,7 +137,10 @@ make_line_list(argv) char *argv[13];
     if (gate[line].type == PO) {
       fnode->foutlst = NULL;
     } else if (gate[line].nfo == 1) {
-      if (NULL == (finnode = INALLOC)) printf(" error -239-\n"), exit(1);
+      if (NULL == (finnode = INALLOC)) {
+        fprintf(stderr, " error -239-\n");
+        exit(1);
+      }
       /*
       finnode=fin_tmp+(fill_fin_tmp++);
 */
@@ -133,7 +152,10 @@ make_line_list(argv) char *argv[13];
       for (ni = 0; ni < gate[line].nfo; ni++) {
         fin = flist[ni + fol];
 
-        if (NULL == (finnode = INALLOC)) printf(" error -233-\n"), exit(1);
+        if (NULL == (finnode = INALLOC)) {
+          fprintf(stderr, " error -233-\n");
+          exit(1);
+        }
         /*
         finnode=fin_tmp+(fill_fin_tmp++);
 
@@ -152,7 +174,10 @@ make_line_list(argv) char *argv[13];
   for (ni = 1; ni <= inpnum; ni++) {
     line = pitbl[ni];
 
-    if (NULL == (finnode = INALLOC)) printf(" error -259-\n"), exit(1);
+    if (NULL == (finnode = INALLOC)) {
+      fprintf(stderr, " error -259-\n");
+      exit(1);
+    }
     /*
     finnode=fin_tmp+(fill_fin_tmp++);
 */
@@ -166,7 +191,10 @@ make_line_list(argv) char *argv[13];
   for (ni = 1; ni <= ffnum; ni++) {
     line = fftbl[ni];
 
-    if (NULL == (finnode = INALLOC)) printf(" error -259-\n"), exit(1);
+    if (NULL == (finnode = INALLOC)) {
+      fprintf(stderr, " error -259-\n");
+      exit(1);
+    }
     /*
     finnode=fin_tmp+(fill_fin_tmp++);
 */
@@ -180,7 +208,10 @@ make_line_list(argv) char *argv[13];
   for (ni = numout; ni >= 1; ni--) {
     line = gate[potbl[ni]].fol;
 
-    if (NULL == (finnode = INALLOC)) printf(" error -259-\n"), exit(1);
+    if (NULL == (finnode = INALLOC)) {
+      fprintf(stderr, " error -259-\n");
+      exit(1);
+    }
     /*
     finnode=fin_tmp+(fill_fin_tmp++);
 */
@@ -243,16 +274,20 @@ make_fault_list(address) L_NODE **address;
           printf(" ni = %d %d %d error -9183-\n", ni, fol, gate[fol].type),
               exit(1);
       }
-      if (NULL == (flttag = FALLOC))
-        printf(" ni = %d error -639-\n", ni), exit(1);
+      if (NULL == (flttag = FALLOC)) {
+        fprintf(stderr, " ni = %d error -639-\n", ni);
+        exit(1);
+      }
       /***
       flttag=(fltlst_tmp+sum_flt);
 ***/
       sum_flt++;
       flttag->num = sum_flt;
       flttag->line = gate[ni].line;  //$B=$@5#1#5#0#9#1#1(B
-      if (sum_flt >= MAXFLT)
-        printf(" error 19485 sumflt = %d\n", sum_flt), exit(1);
+      if (sum_flt >= MAXFLT) {
+        fprintf(stderr, " error 19485 sumflt = %d\n", sum_flt);
+        exit(1);
+      }
 
       if (gate[ni].type == FAN)
         flttag->back = address[gate[ni].fil];
@@ -271,16 +306,20 @@ make_fault_list(address) L_NODE **address;
 
     else if (gate[ni].nfo == 1) { /** gate[fol].type==FF or PO **/
       for (saval = 0; saval < 2; saval++) {
-        if (NULL == (flttag = FALLOC)) printf(" error -639-\n"), exit(1);
+        if (NULL == (flttag = FALLOC)) {
+          fprintf(stderr, " error -639-\n");
+          exit(1);
+        }
         /***
         flttag=(fltlst_tmp+sum_flt);
 ***/
         sum_flt++;
         flttag->num = sum_flt;
         flttag->line = gate[ni].line;  //$B=$@5#1#5#0#9#1#1(B
-        if (sum_flt >= MAXFLT)
-          printf(" error 19486 sumflt = %d\n", sum_flt), exit(1);
-
+        if (sum_flt >= MAXFLT) {
+          fprintf(stderr, " error 19486 sumflt = %d\n", sum_flt);
+          exit(1);
+        }
         if (gate[ni].type != FAN)
           flttag->back = address[ni];
         else
@@ -294,14 +333,19 @@ make_fault_list(address) L_NODE **address;
       }
     } else {
       for (saval = 0; saval < 2; saval++) {
-        if (NULL == (flttag = FALLOC)) printf(" error -639-\n"), exit(1);
+        if (NULL == (flttag = FALLOC)) {
+          fprintf(stderr, " error -639-\n");
+          exit(1);
+        }
         /***
         flttag=(fltlst_tmp+sum_flt);
 ***/
         sum_flt++;
 
-        if (sum_flt >= MAXFLT)
-          printf(" error 19487 sumflt = %d\n", sum_flt), exit(1);
+        if (sum_flt >= MAXFLT) {
+          fprintf(stderr, " error 19487 sumflt = %d\n", sum_flt);
+          exit(1);
+        }
 
         flttag->back = address[ni];
         flttag->forwd = NULL;
@@ -360,12 +404,15 @@ make_Tranfault_list(address) L_NODE **address;
           case XOR:  // XORタイプＴＰＩ
             continue;
           default:
-            printf(" ni = %d %d %d error -9183-\n", ni, fol, gate[fol].type),
-                exit(1);
+            fprintf(stderr, " ni = %d %d %d error -9183-\n", ni, fol,
+                    gate[fol].type);
+            exit(1);
         }
 
-        if (NULL == (flttag = FALLOC))
-          printf(" ni = %d error -639-\n", ni), exit(1);
+        if (NULL == (flttag = FALLOC)) {
+          fprintf(stderr, " ni = %d error -639-\n", ni);
+          exit(1);
+        }
         /***
       flttag=(fltlst_tmp+sum_flt);
 
@@ -373,8 +420,10 @@ make_Tranfault_list(address) L_NODE **address;
 
         sum_Tran_flt++;
         flttag->num = sum_Tran_flt;
-        if (sum_Tran_flt >= MAXFLT)
-          printf(" error 19485 sumflt = %d\n", sum_Tran_flt), exit(1);
+        if (sum_Tran_flt >= MAXFLT) {
+          fprintf(stderr, " error 19485 sumflt = %d\n", sum_Tran_flt);
+          exit(1);
+        }
 
         if (gate[ni].type == FAN)
           flttag->back = address[gate[ni].fil];
@@ -395,16 +444,20 @@ make_Tranfault_list(address) L_NODE **address;
 
     else if (gate[ni].nfo == 1) { /** gate[fol].type==FF or PO **/
       for (saval = 0; saval < 2; saval++) {
-        if (NULL == (flttag = FALLOC)) printf(" error -639-\n"), exit(1);
+        if (NULL == (flttag = FALLOC)) {
+          fprintf(stderr, " error -639-\n");
+          exit(1);
+        }
         /***
         flttag=(fltlst_tmp+sum_flt);
 ***/
         sum_flt++;
         sum_Tran_flt++;
         flttag->num = sum_Tran_flt;
-        if (sum_flt >= MAXFLT)
-          printf(" error 19486 sumflt = %d\n", sum_flt), exit(1);
-
+        if (sum_flt >= MAXFLT) {
+          fprintf(stderr, " error 19486 sumflt = %d\n", sum_flt);
+          exit(1);
+        }
         if (gate[ni].type != FAN)
           flttag->back = address[ni];
         else
@@ -419,15 +472,20 @@ make_Tranfault_list(address) L_NODE **address;
       }
     } else {
       for (saval = 0; saval < 2; saval++) {
-        if (NULL == (flttag = FALLOC)) printf(" error -639-\n"), exit(1);
+        if (NULL == (flttag = FALLOC)) {
+          fprintf(stderr, " error -639-\n");
+          exit(1);
+        }
         /***
         flttag=(fltlst_tmp+sum_flt);
 ***/
         sum_flt++;
         sum_Tran_flt++;
         flttag->num = sum_Tran_flt;
-        if (sum_flt >= MAXFLT)
-          printf(" error 19487 sumflt = %d\n", sum_flt), exit(1);
+        if (sum_flt >= MAXFLT) {
+          fprintf(stderr, " error 19487 sumflt = %d\n", sum_flt);
+          exit(1);
+        }
 
         flttag->back = address[ni];
         flttag->forwd = NULL;
@@ -469,8 +527,10 @@ char *flt_file;
     if (!strncmp(moji, fault_moji, 5)) {
       det_flt_num++;
 
-      if (NULL == (flttag = FALLOC))
-        printf(" ni = %d error -639-\n", ni), exit(1);
+      if (NULL == (flttag = FALLOC)) {
+        fprintf(stderr, " ni = %d error -639-\n", ni);
+        exit(1);
+      }
 
       fscanf(fp, " %d %*s %d ", &back, &forwd);
       fscanf(fp, " %*s %d ", &saval);
@@ -491,7 +551,10 @@ char *flt_file;
   }
   head_flt->next = NULL;
   fclose(fp);
-  if (det_flt_num >= MAXFLT) printf(" 9914"), exit(0);
+  if (det_flt_num >= MAXFLT) {
+    fprintf(stderr, " 9914");
+    exit(1);
+  }
   sum_flt = det_flt_num;
 }
 
@@ -581,8 +644,10 @@ readf(argv) char *argv[13];
   ffintbl = (int *)calloc(ffnum + 1, sizeof(int));
 
   if ((gate == NULL) || (flist == NULL) || (pitbl == NULL) || (potbl == NULL) ||
-      (fftbl == NULL) || (ffintbl == NULL))
-    printf("memory error @readf\n"), exit(1);
+      (fftbl == NULL) || (ffintbl == NULL)) {
+    fprintf(stderr, "memory error @readf\n");
+    exit(1);
+  }
 
   for (i = 1; i <= lpnt; i++) {
     fscanf(fp, "%d", &j);
@@ -655,8 +720,10 @@ readf_ehime(argv) char *argv[13];
   // gate = (ELEMENT *)calloc(lpnt+1, sizeof(ELEMENT));
   flist = (int *)calloc(lpnt + 1, sizeof(int));
 
-  if ((gate == NULL) || (flist == NULL))
-    printf("memory error @readf\n"), exit(1);
+  if ((gate == NULL) || (flist == NULL)) {
+    printf(stderr, "memory error @readf\n");
+    exit(1);
+  }
 
   for (i = 1; i <= lpnt; i++) {
     fscanf(fp, "%d", &j);

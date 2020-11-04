@@ -59,20 +59,31 @@ faultsim(argv) char *argv[13];
 #if PO_OBSERVE
       printf("PO observe mode\n");
       po_observe = (T_NODE **)calloc(numout, sizeof(T_NODE *));
-      if (po_observe == NULL) printf("memory error @faultsim\n"), exit(1);
+      if (po_observe == NULL) {
+        fprintf(stderr, "memory error @faultsim\n");
+        exit(1);
+      }
 
       for (ia = 0; ia < numout; ia++) {
         po_observe[ia] = (T_NODE *)calloc(cap_freq, sizeof(T_NODE));
-        if (po_observe[ia] == NULL) printf("memory error @faultsim\n"), exit(1);
+        if (po_observe[ia] == NULL) {
+          fprintf(stderr, "memory error @faultsim\n");
+          exit(1);
+        }
       }
 #endif
 
       ff_observe = (T_NODE **)calloc(ffnum, sizeof(T_NODE *));
-      if (ff_observe == NULL) printf("memory error @faultsim \n"), exit(1);
+      if (ff_observe == NULL) {
+        fprintf(stderr, "memory error @faultsim\n");
+        exit(1);
+      }
       for (ia = 0; ia < ffnum; ia++) {
         ff_observe[ia] = (T_NODE *)calloc(cap_freq, sizeof(T_NODE));
-        if (ff_observe[ia] == NULL)
-          printf("memory error @faultsim \n"), exit(1);
+        if (ff_observe[ia] == NULL) {
+          fprintf(stderr, "memory error @faultsim\n");
+          exit(1);
+        }
       }
 
 #if SELECT_STATION
@@ -97,20 +108,31 @@ faultsim(argv) char *argv[13];
 #if PO_OBSERVE
       printf("PO observe mode\n");
       po_observe = (T_NODE **)calloc(numout, sizeof(T_NODE *));
-      if (po_observe == NULL) printf("memory error @faultsim\n"), exit(1);
+      if (po_observe == NULL) {
+        fprintf(stderr, "memory error @faultsim\n");
+        exit(1);
+      }
 
       for (ia = 0; ia < numout; ia++) {
         po_observe[ia] = (T_NODE *)calloc(cap_freq, sizeof(T_NODE));
-        if (po_observe[ia] == NULL) printf("memory error @faultsim\n"), exit(1);
+        if (po_observe[ia] == NULL) {
+          fprintf(stderr, "memory error @faultsim\n");
+          exit(1);
+        }
       }
 #endif
 
       ff_observe = (T_NODE **)calloc(ffnum, sizeof(T_NODE *));
-      if (ff_observe == NULL) printf("memory error @faultsim \n"), exit(1);
+      if (ff_observe == NULL) {
+        fprintf(stderr, "memory error @faultsim\n");
+        exit(1);
+      }
       for (ia = 0; ia < ffnum; ia++) {
         ff_observe[ia] = (T_NODE *)calloc(cap_freq, sizeof(T_NODE));
-        if (ff_observe[ia] == NULL)
-          printf("memory error @faultsim \n"), exit(1);
+        if (ff_observe[ia] == NULL) {
+          fprintf(stderr, "memory error @faultsim\n");
+          exit(1);
+        }
       }
 
 #if SELECT_STATION
@@ -163,8 +185,8 @@ faultsim(argv) char *argv[13];
                   cap_freq, argv[1], INTERVAL_CYCLE, SKIP_CYCLE, ff_rate);
           break;
         default:
-          printf("No New Function is Supported by this Program!\n"), exit(1);
-          break;
+          fprintf(stderr, "No New Function is Supported by this Program!\n");
+          exit(1);
       }
 
       fout_flt_pat = fopen(cpi_sim_outpath, "w+");
@@ -241,26 +263,40 @@ faultsim(argv) char *argv[13];
 
   if (TPG_MODE == 1) {  //=1:ATPG, =0:LFSR
     test_pat = fopen("ATPG.dat", "r");
-    if (test_pat == NULL) printf("ATPG.dat is not found!\n"), exit(1);
+    if (test_pat == NULL) {
+      fprintf(stderr, "ATPG.dat is not found!\n");
+      exit(1);
+    }
     fscanf(test_pat, "%d", &length);
     printf("#of Vector loaded=%d \n", length);
     n_inp = inpnum;
   } else {
     test_pat = fopen(pt_file1, "r");
-    if (test_pat == NULL) printf("%s is not found!\n", argv[2]), exit(1);
+    if (test_pat == NULL) {
+      fprintf(stderr, "%s is not found!\n", argv[2]);
+      exit(1);
+    }
     fscanf(test_pat, "%d %d", &length, &n_inp);
 
-    if (n_inp != inpnum) printf("test pattern format1 error!\n"), exit(1);
+    if (n_inp != inpnum) {
+      fprintf(stderr, "test pattern format1 error!\n");
+      exit(1);
+    }
   }
   // printf("herer?\n");
   if (MODE_TOOL == 4) {
     if (TGL_GATE_MODE == 3) {  // FF_TPI by LFSR
       tpi_pat = fopen(pt_file2, "r");
-      if (tpi_pat == NULL) printf("tgl_ff_tpi.dat is not found!\n"), exit(1);
+      if (tpi_pat == NULL) {
+        fprintf(stderr, "tgl_ff_tpi.dat is not found!\n");
+        exit(1);
+      }
       fscanf(tpi_pat, "%d %d", &n_tpi, &n_tpi);
       printf("%d %d %f %d\n", n_tpi, ffnum, ff_rate, (int)(ffnum * ff_rate));
-      if (n_tpi != (int)(ffnum * ff_rate))
-        printf("test pattern format2 error!\n"), exit(1);
+      if (n_tpi != (int)(ffnum * ff_rate)) {
+        fprintf(stderr, "test pattern format2 error!\n");
+        exit(1);
+      }
       // tgl_tpi = (int **) malloc((n_tpi+1)*sizeof(int *));
       tgl_tpi = (int **)calloc((n_tpi + 1), sizeof(int *));
       for (ia = 0; ia <= n_tpi; ia++)
@@ -268,12 +304,17 @@ faultsim(argv) char *argv[13];
       // tgl_tpi[ia] = (int *)malloc((cap_freq+1)*sizeof(int));
     } else if (TGL_GATE_MODE == 4) {  // Toggle Gate TPI by LFSR
       tpi_pat = fopen("tgl_gt_tpi.dat", "r");
-      if (tpi_pat == NULL) printf("tgl_gt_tpi.dat is not found!\n"), exit(1);
+      if (tpi_pat == NULL) {
+        fprintf(stderr, "tgl_gt_tpi.dat is not found!\n");
+        exit(1);
+      }
       fscanf(tpi_pat, "%d %d", &n_tpi, &n_tpi);
       printf("%d %d %f %d\n", n_tpi, numgate, Tgl_rate,
              (int)(numgate * Tgl_rate));
-      if (n_tpi != (int)(numgate * Tgl_rate))
-        printf("test pattern format3 error?!\n"), exit(1);
+      if (n_tpi != (int)(numgate * Tgl_rate)) {
+        fprintf(stderr, "test pattern format3 error?!\n");
+        exit(1);
+      }
       tgl_tpi = (int **)malloc((n_tpi + 1) * sizeof(int *));
       for (ia = 0; ia <= n_tpi; ia++)
         tgl_tpi[ia] = (int *)malloc((cap_freq + 1) * sizeof(int));
