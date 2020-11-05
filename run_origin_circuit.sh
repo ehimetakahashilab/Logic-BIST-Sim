@@ -29,10 +29,10 @@ CIRCUIT_NAME=$(basename ${CIRCUIT_PATH})
 LFSR_CONFIG_PATH=${APP_DIR}/src/lfsr.dat
 
 TPG=0
-TEST_VEC=1000 # Number of Test patterns
+TEST_VEC=100000 # Number of Test patterns
 TOOLMODE=2
 SKIPCYCLES=0
-CAPTURE=5
+CAPTURE=10
 
 ${APP_DIR}/src/tpg/tpg/lfsr ${CIRCUIT_PATH} ${TEST_VEC} ${LFSR_CONFIG_PATH} ${CIRCUIT_NAME}_lfsr_pi.dat
 ${APP_DIR}/src/simulator/sim ${CIRCUIT_PATH} ${TOOLMODE} ${TPG} ${CAPTURE} ${SKIPCYCLES}
