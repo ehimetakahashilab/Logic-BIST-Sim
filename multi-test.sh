@@ -21,6 +21,10 @@ if [ ! -e ${FLT_LIST_PATH} ]; then
 fi
 
 CIRCUIT_PATH=$1
+if [ ! -e ${CIRCUIT_PATH} ]; then 
+    echo "cannot read Circuit File" >&2
+    exit 1
+fi
 CIRCUIT_NAME=$(basename ${CIRCUIT_PATH})
 LFSR_CONFIG_PATH=${APP_DIR}/src/lfsr.dat
 
