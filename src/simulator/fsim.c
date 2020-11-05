@@ -29,7 +29,6 @@ faultsim(argv) char *argv[13];
   char pt_file2[100];
 
   sprintf(pt_file1, "%s_lfsr_pi.dat", argv[1]);
-  sprintf(pt_file2, "%s_tgl_ff_tpi.dat", argv[1]);
 
   for (ia = 0; ia < MAXCAP; ia++) flt_cap[ia] = 0;
   printf("\n==Simulation Parameter Setting for==\n");
@@ -285,24 +284,7 @@ faultsim(argv) char *argv[13];
   }
   // printf("herer?\n");
   if (MODE_TOOL == 4) {
-    if (TGL_GATE_MODE == 3) {  // FF_TPI by LFSR
-      tpi_pat = fopen(pt_file2, "r");
-      if (tpi_pat == NULL) {
-        fprintf(stderr, "tgl_ff_tpi.dat is not found!\n");
-        exit(1);
-      }
-      fscanf(tpi_pat, "%d %d", &n_tpi, &n_tpi);
-      printf("%d %d %f %d\n", n_tpi, ffnum, ff_rate, (int)(ffnum * ff_rate));
-      if (n_tpi != (int)(ffnum * ff_rate)) {
-        fprintf(stderr, "test pattern format2 error!\n");
-        exit(1);
-      }
-      // tgl_tpi = (int **) malloc((n_tpi+1)*sizeof(int *));
-      tgl_tpi = (int **)calloc((n_tpi + 1), sizeof(int *));
-      for (ia = 0; ia <= n_tpi; ia++)
-        tgl_tpi[ia] = (int *)calloc((cap_freq + 1), sizeof(int));
-      // tgl_tpi[ia] = (int *)malloc((cap_freq+1)*sizeof(int));
-    } else if (TGL_GATE_MODE == 4) {  // Toggle Gate TPI by LFSR
+    if (TGL_GATE_MODE == 4) {  // Toggle Gate TPI by LFSR
       tpi_pat = fopen("tgl_gt_tpi.dat", "r");
       if (tpi_pat == NULL) {
         fprintf(stderr, "tgl_gt_tpi.dat is not found!\n");
