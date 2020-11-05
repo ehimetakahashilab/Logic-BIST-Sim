@@ -6,7 +6,6 @@ function catch {
 }
 trap catch ERR
 
-LFSR_CONFIG_PATH=${APP_DIR}/src/lfsr.dat
 TPG=0
 TEST_VEC=10 # Number of Test patterns
 TOOLMODE=4
@@ -54,7 +53,9 @@ else
  	echo === NO OB_STATION INFO, PLEASE BACK TO FF_SELECTION PROCESS to Generate ${OP_PATH} === >&2
 	exit 1
 fi
-ln -s ${OP_PATH} ff_station_0.dat
+ln -sf ${OP_PATH} ff_station_0.dat
+
+LFSR_CONFIG_PATH=${APP_DIR}/src/lfsr.dat
 
 ${APP_DIR}/src/tpg/tpg/lfsr ${CIRCUIT_PATH} ${TEST_VEC} ${LFSR_CONFIG_PATH} ${CIRCUIT_NAME}_lfsr_pi.dat
 
@@ -67,8 +68,8 @@ fi
 
 if [ ${CP_CTRL} -eq 1 ] || [ ${CP_CTRL} -eq 4 ]; then
 	echo "== simulation for Logic CPI =="
-	ln -s ${CP_PATH}  tgl_gt_input.dat
-	echo === ${CIRCUIT_NAME}: ${CP_GROUP} ${INTERVAL_CYCLE} ===
+	ln -sf ${CP_PATH}  tgl_gt_input.dat
+	echo === ${CIRCUIT_NAME}: ${INTERVAL_CYCLE} ===
 	${APP_DIR}/src/simulator/sim ${CIRCUIT_PATH} ${TOOLMODE} ${TPG} ${CP_CTRL} ${LCP_rate} ${CAPTURE} ${INTERVAL_CYCLE} ${SKIP_CAP} 1 ${OBRATE}
 	echo ===logic CPI simulation process end===
 fi
