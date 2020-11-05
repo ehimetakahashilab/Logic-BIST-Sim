@@ -1,3 +1,5 @@
+#include <libgen.h>
+
 #include "declare.h"
 #include "def_flt.h"
 #include "def_gtype.h"
@@ -7,7 +9,9 @@ read_tpi_list(argv) char *argv[14];
   int i, ia, ib;
   float tmp, gt_cnt = 0.0;
   FILE *fin1;
-  for (i = 0; i <= lpnt; i++) {toggle_gates[i] = 0;}
+  for (i = 0; i <= lpnt; i++) {
+    toggle_gates[i] = 0;
+  }
 
   if (atoi(argv[4]) == 1 ||
       atoi(argv[4]) == 4) {  // Structure Based toggle Gate selection

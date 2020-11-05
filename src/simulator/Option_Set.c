@@ -1,3 +1,5 @@
+#include <libgen.h>
+
 #include "declare.h"
 #include "def_flt.h"
 #include "def_gtype.h"
@@ -359,8 +361,8 @@ Out_Put(argv) char *argv[13];
       L_NODE *fnode;
       char outpath2[200];
       FILE *fout2;
-      sprintf(outpath2, "./OUTPUTS/MULTI_BIST/FF_TOGGLE_%s_%d.csv", basename(argv[1]),
-              cap_freq);
+      sprintf(outpath2, "./OUTPUTS/MULTI_BIST/FF_TOGGLE_%s_%d.csv",
+              basename(argv[1]), cap_freq);
       if ((fout2 = fopen(outpath2, "w")) == NULL) {
         fprintf(stderr, "FF_TOGGLE output file is not exist!\n");
         exit(1);
@@ -420,7 +422,8 @@ Out_Put(argv) char *argv[13];
 
 #else
       remain_flt = count_flt(fltlst.next);
-      sprintf(outpath, "./OUTPUTS/MULTI_FULL_OB_BIST/%s.txt", basename(argv[1]));
+      sprintf(outpath, "./OUTPUTS/MULTI_FULL_OB_BIST/%s.txt",
+              basename(argv[1]));
       if ((fout = fopen(outpath, "w")) == NULL) {
         fprintf(stderr, "MULTI_OB_BIST output file is not exist!\n");
         exit(1);
@@ -583,8 +586,8 @@ Out_Put(argv) char *argv[13];
               switch (TG_FILE){
                       case 0: sprintf(outpath,
       "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_Prob_IND_%d_%d.txt",
-      cap_freq,SKIP_CYCLE,basename(argv[1]),INTERVAL_CYCLE,SKIP_CYCLE);break; case 1:
-      sprintf(outpath,
+      cap_freq,SKIP_CYCLE,basename(argv[1]),INTERVAL_CYCLE,SKIP_CYCLE);break;
+      case 1: sprintf(outpath,
       "./OUTPUTS/TGL_GATE/%dcycles/%s_Prob_Over_%d.txt",cap_freq,
       basename(argv[1]),INTERVAL_CYCLE);break; case 2: sprintf(outpath,
       "./OUTPUTS/TGL_GATE/%dcycles/%s_Struc_IND_%d.txt",cap_freq,
@@ -594,7 +597,8 @@ Out_Put(argv) char *argv[13];
               }
 
       }
-      else sprintf(outpath, "./OUTPUTS/TGL_GATE/%s_non.txt", basename(argv[1]));*/
+      else sprintf(outpath, "./OUTPUTS/TGL_GATE/%s_non.txt",
+      basename(argv[1]));*/
 
       if ((fout = fopen(outpath, "w")) == NULL) {
         fprintf(stderr, "#TGL_GATE output file is not exist!\n");
