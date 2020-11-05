@@ -6,10 +6,8 @@ read_tpi_list(argv) char *argv[14];
 {
   int i, ia, ib;
   float tmp, gt_cnt = 0.0;
-  char tgl_file[100];
-  sprintf(tgl_file, "%s_tgl_FF_input.dat", argv[1]);
   FILE *fin1;
-  for (i = 0; i <= lpnt; i++) toggle_gates[i] = 0;
+  for (i = 0; i <= lpnt; i++) {toggle_gates[i] = 0;}
 
   if (atoi(argv[4]) == 1 ||
       atoi(argv[4]) == 4) {  // Structure Based toggle Gate selection
@@ -42,7 +40,7 @@ initial_node(argv) char *argv[1];
 
   char tgl_file[100];
 
-  sprintf(tgl_file, "%s_tgl_FF_input.dat", argv[1]);
+  sprintf(tgl_file, "%s_tgl_FF_input.dat", basename(argv[1]));
 
   FILE *fin;
   // int **gate_toggle;

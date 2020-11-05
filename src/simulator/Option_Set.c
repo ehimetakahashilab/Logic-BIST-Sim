@@ -270,7 +270,7 @@ Out_Put(argv) char *argv[13];
   switch (MODE_TOOL) {
     case 1:
       remain_flt = count_flt(fltlst.next);
-      sprintf(outpath, "./OUTPUTS/BIST/%s.txt", argv[1]);
+      sprintf(outpath, "./OUTPUTS/BIST/%s.txt", basename(argv[1]));
       if ((fout = fopen(outpath, "w")) == NULL) {
         fprintf(stderr, "BIST output file is not exist!\n");
         exit(1);
@@ -316,7 +316,7 @@ Out_Put(argv) char *argv[13];
     case 2:
       remain_flt = count_flt(fltlst.next);
       // printf("here?\n"); exit(1);
-      sprintf(outpath, "./OUTPUTS/MULTI_BIST/%s.txt", argv[1]);
+      sprintf(outpath, "./OUTPUTS/MULTI_BIST/%s.txt", basename(argv[1]));
       if ((fout = fopen(outpath, "w")) == NULL) {
         fprintf(stderr, "MULTI_BIST output file is not exist!\n");
         exit(1);
@@ -359,7 +359,7 @@ Out_Put(argv) char *argv[13];
       L_NODE *fnode;
       char outpath2[200];
       FILE *fout2;
-      sprintf(outpath2, "./OUTPUTS/MULTI_BIST/FF_TOGGLE_%s_%d.csv", argv[1],
+      sprintf(outpath2, "./OUTPUTS/MULTI_BIST/FF_TOGGLE_%s_%d.csv", basename(argv[1]),
               cap_freq);
       if ((fout2 = fopen(outpath2, "w")) == NULL) {
         fprintf(stderr, "FF_TOGGLE output file is not exist!\n");
@@ -394,7 +394,7 @@ Out_Put(argv) char *argv[13];
     case 3:
 #if SELECT_STATION
       count_flt(fltlst.next);
-      sprintf(outpath, "./OUTPUTS/MULTI_BIST_OB/%s.txt", argv[1]);
+      sprintf(outpath, "./OUTPUTS/MULTI_BIST_OB/%s.txt", basename(argv[1]));
       if ((fout = fopen(outpath, "w")) == NULL) {
         fprintf(stderr, "MULTI_BIST_OB output file is not exist!\n");
         exit(1);
@@ -420,7 +420,7 @@ Out_Put(argv) char *argv[13];
 
 #else
       remain_flt = count_flt(fltlst.next);
-      sprintf(outpath, "./OUTPUTS/MULTI_FULL_OB_BIST/%s.txt", argv[1]);
+      sprintf(outpath, "./OUTPUTS/MULTI_FULL_OB_BIST/%s.txt", basename(argv[1]));
       if ((fout = fopen(outpath, "w")) == NULL) {
         fprintf(stderr, "MULTI_OB_BIST output file is not exist!\n");
         exit(1);
@@ -481,7 +481,7 @@ Out_Put(argv) char *argv[13];
            out4[50] = {'\0'}, tmp[10] = {'\0'};
       char *atpg = "ATPG", *lfsr = "LFSR", mode[4] = {'\0'};
       printf("%s\n", mode);
-      strcpy(tmp, argv[1]);
+      strcpy(tmp, basename(argv[1]));
 
       if (TPG_MODE == 1)
         strcpy(mode, atpg);
@@ -561,18 +561,18 @@ Out_Put(argv) char *argv[13];
       switch (TGL_GATE_MODE) {
         case 0:  // Non Toggle gate insertion
           sprintf(outpath, "./OUTPUTS/CPI/%dcycles/Non_%s.txt", cap_freq,
-                  argv[1]);
+                  basename(argv[1]));
           break;
         case 1:  // toggle gate insert
         case 4:
 
           sprintf(outpath, "./OUTPUTS/CPI/%d_cycles/%s_LogicCPI.txt", cap_freq,
-                  argv[1]);
+                  basename(argv[1]));
           break;
         case 2:  // toggle FF insert
         case 3:
           sprintf(outpath, "./OUTPUTS/CPI/%d_cycles/%s_FFCPI.txt", cap_freq,
-                  argv[1]);
+                  basename(argv[1]));
           break;
 
         default:
@@ -583,18 +583,18 @@ Out_Put(argv) char *argv[13];
               switch (TG_FILE){
                       case 0: sprintf(outpath,
       "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_Prob_IND_%d_%d.txt",
-      cap_freq,SKIP_CYCLE,argv[1],INTERVAL_CYCLE,SKIP_CYCLE);break; case 1:
+      cap_freq,SKIP_CYCLE,basename(argv[1]),INTERVAL_CYCLE,SKIP_CYCLE);break; case 1:
       sprintf(outpath,
       "./OUTPUTS/TGL_GATE/%dcycles/%s_Prob_Over_%d.txt",cap_freq,
-      argv[1],INTERVAL_CYCLE);break; case 2: sprintf(outpath,
+      basename(argv[1]),INTERVAL_CYCLE);break; case 2: sprintf(outpath,
       "./OUTPUTS/TGL_GATE/%dcycles/%s_Struc_IND_%d.txt",cap_freq,
-      argv[1],INTERVAL_CYCLE);break; case 3: sprintf(outpath,
+      basename(argv[1]),INTERVAL_CYCLE);break; case 3: sprintf(outpath,
       "./OUTPUTS/TGL_GATE/%dcycles/%s_Struc_Over_%d.txt",cap_freq,
-      argv[1],INTERVAL_CYCLE);break; default: break;
+      basename(argv[1]),INTERVAL_CYCLE);break; default: break;
               }
 
       }
-      else sprintf(outpath, "./OUTPUTS/TGL_GATE/%s_non.txt", argv[1]);*/
+      else sprintf(outpath, "./OUTPUTS/TGL_GATE/%s_non.txt", basename(argv[1]));*/
 
       if ((fout = fopen(outpath, "w")) == NULL) {
         fprintf(stderr, "#TGL_GATE output file is not exist!\n");

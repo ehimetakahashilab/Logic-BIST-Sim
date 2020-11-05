@@ -1,3 +1,4 @@
+#include <libgen.h>
 #include "declare.h"
 #include "def_flt.h"
 #include "def_gtype.h"
@@ -62,7 +63,7 @@ char *argv[13];
 
   /*#if MAKE_REC
   fout = fopen("fault coverage.log", "a");
-  fprintf(fout, "%s\n", argv[1]);
+  fprintf(fout, "%s\n", basename(argv[1]));
         fprintf(fout, "Fcov(%) ShiftRate(%) capturerate(%)\n");
   fclose(fout);
 #endif*/
@@ -199,7 +200,7 @@ char *argv[10];
     if (flog == 0) FF_Only_Flt[ia]++;
   }
   FF_flt_list = fopen("TCov_of_FFs.txt", "a");
-  fprintf(FF_flt_list, "%s  %s  %s\n", argv[1], argv[3], argv[4]);
+  fprintf(FF_flt_list, "%s  %s  %s\n", basename(argv[1]), argv[3], argv[4]);
   for (ia = 0; ia < ffnum; ia++) fprintf(FF_flt_list, "%4.3f ", FF_TCov[ia]);
   fprintf(FF_flt_list, "\n");
   for (ia = 0; ia < ffnum; ia++) fprintf(FF_flt_list, "%d ", FF_Only_Flt[ia]);
@@ -214,7 +215,7 @@ char *argv[11];
   int sumflt = 0, sumTDflt = 0;
   FILE *flstout;
   char outfile[30];
-  sprintf(outfile, "./FLT_LIST/%s", argv[1]);
+  sprintf(outfile, "./FLT_LIST/%s", basename(argv[1]));
 
   if (NULL == (flstout = fopen(outfile, "a"))) {
     fprintf(stderr, " error fault list file does not exit!\n");
