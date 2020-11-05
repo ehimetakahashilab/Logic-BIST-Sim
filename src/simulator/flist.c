@@ -2,11 +2,6 @@
 #include "def_flt.h"
 #include "def_gtype.h"
 
-#define ERR_MSG(x)            \
-  {                           \
-    fprintf(stderr, " x \n"); \
-    exit(1);                  \
-  }
 #define NALLOC (L_NODE *)malloc(sizeof(L_NODE))
 #define FALLOC (FLT_NODE *)malloc(sizeof(FLT_NODE))
 #define INALLOC (FIN_NODE *)malloc(sizeof(FIN_NODE))
@@ -520,8 +515,10 @@ char *flt_file;
   head_flt = &fltlst;
   sum_flt = det_flt_num = 0;
 
-  if (NULL == (fp = fopen(flt_file, "r")))
-    printf("%s", flt_file), ERR_MSG(29421);
+  if (NULL == (fp = fopen(flt_file, "r"))) {
+    fprintf(stderr, "error: cannnot open %s, 29421", flt_file);
+    exit(1);
+  }
 
   while (EOF != fscanf(fp, "%s", moji)) {
     if (!strncmp(moji, fault_moji, 5)) {
@@ -630,8 +627,8 @@ readf(argv) char *argv[13];
   FILE *fp;
   char name[30];
   if (NULL == (fp = fopen(argv[1], "r"))) {
-    printf("There is not such a file(%s).\n", argv[1]);
-    exit(2);
+    fprintf(stderr, "There is not such a file(%s).\n", argv[1]);
+    exit(1);
   }
 
   fscanf(fp, "%d%d%d%d%d%d", &lpnt, &numout, &inpnum, &slist, &ffnum, &numgate);
