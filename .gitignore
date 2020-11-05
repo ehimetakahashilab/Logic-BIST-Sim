@@ -59,5 +59,7 @@ lfsr
 lfsr_ff
 lfsr_gt
 
-## 
+## tmp files
 *_lfsr_pi.dat
+ff_station_0.dat
+tgl_gt_input.dat
