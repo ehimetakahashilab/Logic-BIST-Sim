@@ -56,3 +56,8 @@ $ lfsr <CIRCUIT_PATH> <TEST_VECTOR> <LFSR_CONFIG_PATH> <OUTPUT_PATH>
 ```console
 $ lfsr_gt <CIRCUIT_PATH> <TEST_VECTOR> <LOGIC_CP_RATE> <CAPTURE> <OUTPUT_PATH>
 ```
+
+### multi-test.sh
+```console
+$ multi-test.sh <CIRCUIT_PATH>
+```
