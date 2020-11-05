@@ -1,5 +1,5 @@
-#include <math.h>
 #include <libgen.h>
+#include <math.h>
 
 #include "declare.h"
 #include "def_flt.h"
@@ -43,7 +43,8 @@ faultsim(argv) char *argv[13];
     case 2:
       printf("\nBIST Multi-Cycle Testing Mode\n");
       if (SKIP_CAPTURE) printf("skip first %d capture\n", SKIP_CAPTURE);
-      sprintf(outpath, "./OUTPUTS/MULTI_BIST/%s_%d.csv", basename(argv[1]), cap_freq);
+      sprintf(outpath, "./OUTPUTS/MULTI_BIST/%s_%d.csv", basename(argv[1]),
+              cap_freq);
       fout_flt_pat = fopen(outpath, "w+");
       //	printf("FCOV_PAT output file is not exist!\n"), exit(1);
 
@@ -51,7 +52,8 @@ faultsim(argv) char *argv[13];
 
     case 3:
       printf("\nBIST Multi-Cycle Testing With Sequential Observation Mode\n");
-      sprintf(outpath, "./OUTPUTS/MULTI_BIST_OB/%s_%d.csv", basename(argv[1]), cap_freq);
+      sprintf(outpath, "./OUTPUTS/MULTI_BIST_OB/%s_%d.csv", basename(argv[1]),
+              cap_freq);
       fout_flt_pat = fopen(outpath, "w+");
       //			printf("FCOV_PAT output file is not exist!\n"),
       // exit(1);
@@ -158,31 +160,36 @@ faultsim(argv) char *argv[13];
                   cap_freq, basename(argv[1]));
           //			sprintf(outpath_in,
           //"./OUTPUTS/CPI/%dcycles/%dSKIP/input_pat/%s_NONTG_FF_TPI_INP_%.2f_%d_%.2f.csv",
-          // cap_freq, SKIP_CYCLE, basename(argv[1]), OBSERVE_RATE, FF_SEL_METHOD,
-          // ff_rate);
+          // cap_freq, SKIP_CYCLE, basename(argv[1]), OBSERVE_RATE,
+          // FF_SEL_METHOD, ff_rate);
           break;
         case 1:  // toggle gate insert by toggling
           sprintf(cpi_sim_outpath,
                   "./OUTPUTS/CPI/%dcycles/%dSKIP/%s_LCPI_TGL_%d_%.2f.csv",
-                  cap_freq, SKIP_CYCLE, basename(argv[1]), INTERVAL_CYCLE, Tgl_rate);
+                  cap_freq, SKIP_CYCLE, basename(argv[1]), INTERVAL_CYCLE,
+                  Tgl_rate);
           sprintf(cpi_sim_outpath,
                   "./OUTPUTS/CPI/%d_cycles/%s_LCPI_TGL_%d_%d_%.2f.csv",
-                  cap_freq, basename(argv[1]), INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
+                  cap_freq, basename(argv[1]), INTERVAL_CYCLE, SKIP_CYCLE,
+                  Tgl_rate);
           break;
         case 4:
           sprintf(cpi_sim_outpath,
                   "./OUTPUTS/CPI/%d_cycles/%s_LCPI_RAN_%d_%d_%.2f.csv",
-                  cap_freq, basename(argv[1]), INTERVAL_CYCLE, SKIP_CYCLE, Tgl_rate);
+                  cap_freq, basename(argv[1]), INTERVAL_CYCLE, SKIP_CYCLE,
+                  Tgl_rate);
           break;
         case 2:  // toggle FF  insert by toggling
           sprintf(cpi_sim_outpath,
                   "./OUTPUTS/CPI/%d_cycles/%s_FFCPI_TGL_%d_%d_%.2f.csv",
-                  cap_freq, basename(argv[1]), INTERVAL_CYCLE, SKIP_CYCLE, ff_rate);
+                  cap_freq, basename(argv[1]), INTERVAL_CYCLE, SKIP_CYCLE,
+                  ff_rate);
           break;
         case 3:
           sprintf(cpi_sim_outpath,
                   "./OUTPUTS/CPI/%d_cycles/%s_FFCPI_RAN_%d_%d_%.2f.csv",
-                  cap_freq, basename(argv[1]), INTERVAL_CYCLE, SKIP_CYCLE, ff_rate);
+                  cap_freq, basename(argv[1]), INTERVAL_CYCLE, SKIP_CYCLE,
+                  ff_rate);
           break;
         default:
           fprintf(stderr, "No New Function is Supported by this Program!\n");
@@ -286,9 +293,11 @@ faultsim(argv) char *argv[13];
   // printf("herer?\n");
   if (MODE_TOOL == 4) {
     if (TGL_GATE_MODE == 4) {  // Toggle Gate TPI by LFSR
-      tpi_pat = fopen("tgl_gt_tpi.dat", "r");
+      char tgl_gt_tpi_path[256];
+      sprintf(tgl_gt_tpi_path, "%s_tgl_gt_tpi.dat", basename(argv[1]));
+      tpi_pat = fopen(tgl_gt_tpi_path, "r");
       if (tpi_pat == NULL) {
-        fprintf(stderr, "tgl_gt_tpi.dat is not found!\n");
+        fprintf(stderr, "%s is not found!\n", tgl_gt_tpi_path);
         exit(1);
       }
       fscanf(tpi_pat, "%d %d", &n_tpi, &n_tpi);

@@ -15,12 +15,12 @@ char *argv[1];
 {
   int i, ia, ib, ic;
   FILE *fin;
-  char PATH[30];
+  char PATH[256];
   int isel[src_num];
   FIN_NODE *finnode;
   i = 0;
   while (i < src_num) {
-    sprintf(PATH, "ff_station_%d.dat", i);
+    sprintf(PATH, "ff_station_%s.dat", basename(argv[1]));
     if ((fin = fopen(PATH, "rt")) == NULL) {
       fprintf(stderr, "error:'FF Station File' %s is not found!\n", PATH);
       exit(1);

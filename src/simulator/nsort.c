@@ -15,9 +15,11 @@ read_tpi_list(argv) char *argv[14];
 
   if (atoi(argv[4]) == 1 ||
       atoi(argv[4]) == 4) {  // Structure Based toggle Gate selection
-    fin1 = fopen("tgl_gt_input.dat", "r");
+    char tgl_gt_input_path[256];
+    sprintf(tgl_gt_input_path, "%s_tgl_gt_input.dat", basename(argv[1]));
+    fin1 = fopen(tgl_gt_input_path, "r");
     if (fin1 == NULL) {
-      fprintf(stderr, "'tgl_gt_input.dat' is not found!\n");
+      fprintf(stderr, "'%s' is not found!\n", tgl_gt_input_path);
       exit(1);
     }
     // printf("%d %f

@@ -60,6 +60,7 @@ lfsr_ff
 lfsr_gt
 
 ## tmp files
-*_lfsr_pi.dat
-ff_station_0.dat
-tgl_gt_input.dat
+*_lfsr_pi.dat 
+*_tgl_gt_tpi.dat 
+*_tgl_gt_input.dat 
+ff_station_*.dat
