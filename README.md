@@ -47,6 +47,16 @@ $ make
 ```
 
 ## Usage
+### multi-test.sh
+```console
+$ multi-test.sh <CIRCUIT_PATH>
+```
+
+### multi-CPI.sh
+```console
+$ multi-CPI.sh <CIRCUIT_PATH> <OP_PATH> <CP_PATH>
+```
+
 ### src/tpg/tpg/lfsr
 ```console
 $ lfsr <CIRCUIT_PATH> <TEST_VECTOR> <LFSR_CONFIG_PATH> <OUTPUT_PATH>
@@ -55,9 +65,4 @@ $ lfsr <CIRCUIT_PATH> <TEST_VECTOR> <LFSR_CONFIG_PATH> <OUTPUT_PATH>
 ### src/tpg/tgp_TPI_gate/lfsr_gt
 ```console
 $ lfsr_gt <CIRCUIT_PATH> <TEST_VECTOR> <LFSR_CONFIG_PATH> <LOGIC_CP_RATE> <CAPTURE> <OUTPUT_PATH>
-```
-
-### multi-test.sh
-```console
-$ multi-test.sh <CIRCUIT_PATH>
 ```
