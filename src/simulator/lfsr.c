@@ -94,27 +94,29 @@ int ff_state[];
     exit(1);
   }
 
-  fin = fopen("lfsr.dat", "r");
+  fin = fopen("../tpg/commons/lfsr.dat", "r");
   if (fin == NULL) {
-    printf("error: 'lfsr.dat' is not found\n");
+    fprintf(stderr, "error: 'lfsr.dat' is not found\n");
     exit(1);
   }
   fscanf(fin, "%d", &max);
 
   if ((LFSR_BIT > max) || (chainnum > max)) {
-    printf("error: too many LFSR bits!\n");
     fclose(fin);
+    fprintf(stderr, "error: too many LFSR bits!\n");
     exit(1);
   }
 
   for (ia = 0; ia < LFSR_BIT; ia++)
     if (fgets(buf, 20, fin) == NULL) {
-      printf("error: too many fins!\n");
       fclose(fin);
+      fprintf(stderr, "error: too many fins!\n");
       exit(1);
     }
   fscanf(fin, "%d", &EX_OR[0]);
-  for (ia = 1; ia <= EX_OR[0]; ia++) fscanf(fin, "%d", &EX_OR[ia]);
+  for (ia = 1; ia <= EX_OR[0]; ia++) {
+    fscanf(fin, "%d", &EX_OR[ia]);
+  }
   fclose(fin);
 
   for (ia = 0; ia < chainnum; ia++) {
