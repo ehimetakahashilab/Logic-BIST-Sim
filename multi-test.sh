@@ -6,41 +6,34 @@ function catch {
 }
 trap catch ERR
 
-#######Path Defination###############
-User_DIR=$(cd "$(dirname "$0")";pwd)
+APP_DIR=$(dirname $0)
 
-if [ ! -e ${User_DIR}/OUTPUTS/MULTI_BIST/ ]; then
-    mkdir -p ${User_DIR}/OUTPUTS/MULTI_BIST/
+## OUTPUT path check
+OUTPUT_PATH=${APP_DIR}/OUTPUTS/MULTI_BIST
+if [ ! -e ${OUTPUT_PATH} ]; then
+    mkdir -p ${OUTPUT_PATH}
 fi
 
-TPG=0 #=0:LFSR,=1:ATPG
-TEST_VEC=10 #0 00 # Number of Test patterns
-TOOLMODE=2 #=1:Normal Scan test, =2:Multi-cycle Test, =3: Multi-cycle test with Seq OB, =4:Toggle Gate TPI
+## FLT_LIST path check
+FLT_LIST_PATH=${APP_DIR}/FLT_LIST
+if [ ! -e ${FLT_LIST_PATH} ]; then
+    mkdir -p ${FLT_LIST_PATH}
+fi
+
+CIRCUIT_PATH=$1
+CIRCUIT_NAME=$(basename ${CIRCUIT_PATH})
+LFSR_CONFIG_PATH=${APP_DIR}/src/tpg/commons/lfsr.dat
+
+TPG=0
+TEST_VEC=10 # Number of Test patterns
+TOOLMODE=2
 SKIPCYCLES=0
 CAPTURE=5
 
-for CIRCUIT in s9234
+${APP_DIR}/src/tpg/tpg/lfsr ${CIRCUIT_PATH} ${TEST_VEC} ${LFSR_CONFIG_PATH} ${CIRCUIT_NAME}_lfsr_pi.dat
+${APP_DIR}/src/simulator/sim ${CIRCUIT_PATH} ${TOOLMODE} ${TPG} ${CAPTURE} ${SKIPCYCLES}
 
-do
-    rm -f lfsr*.dat ATPG.dat
-
-    ln -s ./circuit/$CIRCUIT
-    ln -s ./tpg/lfsr.dat
-
-	rm -f ${CIRCUIT}_lfsr_pi.dat
-	./tpg/lfsr $CIRCUIT $TEST_VEC ${CIRCUIT}_lfsr_pi.dat
-	ln -s tmp.test ${CIRCUIT}_lfsr_pi.dat
-
-	time ./lbistsim $CIRCUIT $TOOLMODE $TPG $CAPTURE $SKIPCYCLES #>> Switch_ctr.txt
-
-    if [ -e fault_list.dat ];
-    then
-	mv fault_list.dat "$CIRCUIT"_fault_list.dat
-	if [ ! -e ./fault_list ];
-        then
-            mkdir fault_list
-	fi
-	mv "$CIRCUIT"_fault_list.dat ./fault_list
-    fi
-    rm -f $CIRCUIT lfsr.dat *~ tmp* ATPG.dat *lfsr_pi.dat
-done
+# if [ -e fault_list.dat ]; then
+#     mv fault_list.dat ${CIRCUIT_NAME}_fault_list.dat
+# 	mv ${CIRCUIT_NAME}_fault_list.dat ${FLT_LIST_PATH}
+# fi
