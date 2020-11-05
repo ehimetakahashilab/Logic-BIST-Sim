@@ -50,11 +50,15 @@ $ make
 ### run_origin_circuit.sh
 ```console
 $ run_origin_circuit.sh <CIRCUIT_PATH>
+
+$ parallel './run_origin_circuit.sh ../seq-benchmark/circuits/iscas89/{}' ::: s9234 s13207 s15854 s38417 s38584
 ```
 
 ### run_cp_op_circuit.sh
 ```console
 $ run_cp_op_circuit.sh <CIRCUIT_PATH> <OP_PATH> <CP_PATH>
+
+$ parallel './run_cp_op_circuit.sh ../seq-benchmark/circuits/iscas89/{} ~/eval/lab/ff_eval/{}/FF_STATION/TOPSIS ~/eval/cplist/{}' ::: s9234 s13207 s15854 s38417 s38584
 ```
 
 ### src/tpg/tpg/lfsr
