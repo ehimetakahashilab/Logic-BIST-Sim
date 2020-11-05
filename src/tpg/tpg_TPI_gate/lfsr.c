@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
   char buf[BUF_MAX];
   FILE *fin, *fout;
 
-  if (argc != 6) {
+  if (argc != 7) {
     fprintf(stderr, "error: wrong arguments!\n");
     exit(1);
   }
@@ -30,13 +30,13 @@ int main(int argc, char *argv[]) {
   fscanf(fin, "%d %d %d %d %d %d", &nfin, &nfin, &nfin, &nfin, &nfin, &nfin);
   fclose(fin);
 
-  fin = fopen("../commons/lfsr.dat", "r");
+  fin = fopen(argv[3], "r");
   if (fin == NULL) {
-    fprintf(stderr, "error: 'lfsr.dat' is not found\n");
+    fprintf(stderr, "error: %s is not found\n", argv[3]);
     exit(1);
   }
   fscanf(fin, "%d", &max);
-  nfin = (int)nfin * atof(argv[3]);
+  nfin = (int)nfin * atof(argv[4]);
   printf("%d\n", nfin);
   if (nfin > max) {
     loop = nfin / max + 1;
@@ -77,10 +77,10 @@ int main(int argc, char *argv[]) {
   int Y[nfin + 1];
 #endif
 
-  test_vec = (int)(atoi(argv[2]) * atof(argv[4]));
-  fout = fopen(argv[5], "w");
+  test_vec = (int)(atoi(argv[2]) * atof(argv[5]));
+  fout = fopen(argv[6], "w");
   if (fout == NULL) {
-    fprintf(stderr, "error: '%s' cannot open\n", argv[5]);
+    fprintf(stderr, "error: '%s' cannot open\n", argv[6]);
     exit(1);
   }
   fprintf(fout, "%d %d\n", test_vec, nfin);
