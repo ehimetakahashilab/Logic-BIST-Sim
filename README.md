@@ -47,14 +47,14 @@ $ make
 ```
 
 ## Usage
-### multi-test.sh
+### run_origin_circuit.sh
 ```console
-$ multi-test.sh <CIRCUIT_PATH>
+$ run_origin_circuit.sh <CIRCUIT_PATH>
 ```
 
-### multi-CPI.sh
+### run_cp_op_circuit.sh
 ```console
-$ multi-CPI.sh <CIRCUIT_PATH> <OP_PATH> <CP_PATH>
+$ run_cp_op_circuit.sh <CIRCUIT_PATH> <OP_PATH> <CP_PATH>
 ```
 
 ### src/tpg/tpg/lfsr
