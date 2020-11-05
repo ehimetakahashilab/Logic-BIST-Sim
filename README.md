@@ -49,12 +49,7 @@ $ make
 ## Usage
 ### src/tpg/tpg/lfsr
 ```console
-$ lfsr <CIRCUIT_PATH> <TEST_VECTOR> <OUTPUT_PATH>
-```
-
-### src/tpg/tpg_TPI_ff/lfsr_ff
-```console
-$ lfsr_ff <CIRCUIT_PATH> <TEST_VECTOR> <FF_CP_RATE> <CAPTURE> <OUTPUT_PATH>
+$ lfsr <CIRCUIT_PATH> <TEST_VECTOR> <LFSR_CONFIG_PATH> <OUTPUT_PATH>
 ```
 
 ### src/tpg/tgp_TPI_gate/lfsr_gt

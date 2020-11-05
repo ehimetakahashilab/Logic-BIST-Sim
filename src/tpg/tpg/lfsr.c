@@ -1,3 +1,4 @@
+#include <libgen.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -15,7 +16,7 @@ int main(int argc, char *argv[]) {
   char buf[BUF_MAX];
   FILE *fin, *fout;
 
-  if (argc != 4) {
+  if (argc != 5) {
     fprintf(stderr, "error: wrong arguments!\n");
     exit(1);
   }
@@ -28,9 +29,9 @@ int main(int argc, char *argv[]) {
   fscanf(fin, "%d %d %d", &nfin, &nfin, &nfin);
   fclose(fin);
 
-  fin = fopen("../commons/lfsr.dat", "r");
+  fin = fopen(argv[3], "r");
   if (fin == NULL) {
-    fprintf(stderr, "error: 'lfsr.dat' is not found\n");
+    fprintf(stderr, "error: %s is not found\n", argv[3]);
     exit(1);
   }
   fscanf(fin, "%d", &max);
@@ -61,9 +62,9 @@ int main(int argc, char *argv[]) {
 #endif
 
   test_vec = atoi(argv[2]);
-  fout = fopen(argv[3], "w");
+  fout = fopen(argv[4], "w");
   if (fout == NULL) {
-    fprintf(stderr, "error: '%s' is not found\n", argv[3]);
+    fprintf(stderr, "error: '%s' is not found\n", argv[4]);
     exit(1);
   }
   fprintf(fout, "%d %d\n", test_vec, nfin);
@@ -89,7 +90,9 @@ int main(int argc, char *argv[]) {
     RTPG[ia] = 1;
     TFF[ia] = 1;
   }
-  fPTRGout = fopen("../commons/LT_RTPG.dat", "w");
+  char lt_rtpg_output_path[256];
+  sprintf(lt_rtpg_output_path, "%s/LT_RTPG.dat", dirname(argv[4]));
+  fPTRGout = fopen(lt_rtpg_output_path, "w");
   fprintf(fPTRGout, "testnum=%d bit length=%d K=%d\n", test_vec, nfin, K);
   for (i = 0; i < nfin; i++) fprintf(fPTRGout, " %d", TFF[i]);
   fprintf(fPTRGout, "\n");
