@@ -22,10 +22,10 @@ fi
 
 CIRCUIT_PATH=$1
 CIRCUIT_NAME=$(basename ${CIRCUIT_PATH})
-LFSR_CONFIG_PATH=${APP_DIR}/src/tpg/commons/lfsr.dat
+LFSR_CONFIG_PATH=${APP_DIR}/src/lfsr.dat
 
 TPG=0
-TEST_VEC=10 # Number of Test patterns
+TEST_VEC=1000 # Number of Test patterns
 TOOLMODE=2
 SKIPCYCLES=0
 CAPTURE=5

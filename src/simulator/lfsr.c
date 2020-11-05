@@ -94,7 +94,7 @@ int ff_state[];
     exit(1);
   }
 
-  fin = fopen("../tpg/commons/lfsr.dat", "r");
+  fin = fopen("./src/lfsr.dat", "r");
   if (fin == NULL) {
     fprintf(stderr, "error: 'lfsr.dat' is not found\n");
     exit(1);
