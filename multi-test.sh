@@ -33,7 +33,10 @@ CAPTURE=5
 ${APP_DIR}/src/tpg/tpg/lfsr ${CIRCUIT_PATH} ${TEST_VEC} ${LFSR_CONFIG_PATH} ${CIRCUIT_NAME}_lfsr_pi.dat
 ${APP_DIR}/src/simulator/sim ${CIRCUIT_PATH} ${TOOLMODE} ${TPG} ${CAPTURE} ${SKIPCYCLES}
 
-# if [ -e fault_list.dat ]; then
-#     mv fault_list.dat ${CIRCUIT_NAME}_fault_list.dat
-# 	mv ${CIRCUIT_NAME}_fault_list.dat ${FLT_LIST_PATH}
-# fi
+if [ -e ${APP_DIR}/fault_list.dat ]; then
+    mv ${APP_DIR}/fault_list.dat ${APP_DIR}/${CIRCUIT_NAME}_fault_list.dat
+	mv ${APP_DIR}/${CIRCUIT_NAME}_fault_list.dat ${FLT_LIST_PATH}
+fi
+
+# delete LFSR generated pattern
+rm -f ${CIRCUIT_NAME}_lfsr_pi.dat
