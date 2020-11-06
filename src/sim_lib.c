@@ -732,7 +732,19 @@ int length;
 flt_info(fgnode)
     FLT_NODE *fgnode;
 {
-  int ia = 0;
+    int ia = 0;
+  flt_det_flog = (int **)malloc((sum_flt + 2) * sizeof(int *));
+  if (flt_det_flog == NULL)
+    printf("memory error @flt_det_flog in flt_info \n"), exit(1);
+
+  for (ia = 0; ia <= sum_flt + 1; ia++)
+  {
+    flt_det_flog[ia] = (int *)malloc(11 * sizeof(int));
+    if (flt_det_flog[ia] == NULL)
+      printf("memory error @flt_det_flog \n"), exit(1);
+  }
+
+
   for (; fgnode != NULL; fgnode = fgnode->next)
   {
     for (ia = 0; ia <= 10; ia++)

@@ -17,10 +17,13 @@ make_line_list(argv) char *argv[13];
   int i, ni, fil, line, fin, fol, saval;
   int count2 = 0;
 #if CKT_FORM == 0
+  //printf("herere?\n");exit(1);
   readf(argv);
-  #if MODE_TOOL==4
+  //  printf("herere?%d\n", MODE_TOOL);exit(1);
+  if (MODE_TOOL == 4){
+  //printf("herere?\n"); exit(1);
   read_tpi_list(argv);
-#endif
+}
   int ie;
   int ic = 0;
 

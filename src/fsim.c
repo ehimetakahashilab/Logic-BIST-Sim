@@ -130,6 +130,7 @@ faultsim(argv) char *argv[13];
 							printf("Partial FF observation mode: %f \n", OBSERVE_RATE);
 							printf("Station rate = %.0f[%]\n", (float)(OBSERVE_RATE * 100));
 							ff_sta_src_read(FF_FILE, num_observe, argv);
+
 					#else
 							ff_select = (char *)calloc(ffnum, sizeof(char));
 							printf("Fully Observation Mode \n");
@@ -140,7 +141,8 @@ faultsim(argv) char *argv[13];
 							}
 					#endif
 
-
+			initial_node(argv);
+			
 #if FCOVPERPAT
 	//if(MODE_TOOL==4){
 			char cpi_sim_outpath[200];
@@ -150,6 +152,7 @@ faultsim(argv) char *argv[13];
 //			sprintf(outpath_in, "./OUTPUTS/CPI/%dcycles/%dSKIP/input_pat/%s_NONTG_FF_TPI_INP_%.2f_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], OBSERVE_RATE, FF_SEL_METHOD, ff_rate);
 					break;
 			case 1: //toggle gate insert by toggling
+
 		  sprintf(cpi_sim_outpath, "./OUTPUTS/CPI/%dcycles/%dSKIP/%s_LCPI_TGL_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], INTERVAL_CYCLE, Tgl_rate);
 				sprintf(cpi_sim_outpath, "./OUTPUTS/CPI/%d_cycles/%s_LCPI_TGL_%d_%d_%.2f.csv", cap_freq, argv[1], INTERVAL_CYCLE, SKIP_CYCLE,Tgl_rate);
 				break;
@@ -192,48 +195,6 @@ break;
 	}
 #endif
 
-	////////////////////////////////////////////////////////////////
-	//input_patファイル出力///////////////////////////////////////////////////
-	//finnode = pinode.next;
-	//printf("%d ", fnode1->line);
-//	for (; finnode != NULL; finnode = finnode->next)
-//	{
-//		fnode = finnode->node;
-//	}
-//	finnode = ffnode.next;
-	//printf("%d ", fnode1->line);
-//	for (; finnode != NULL; finnode = finnode->next)
-//	{
-//		fnode = finnode->node;
-//	}
-	/////////////////////////////////////////////////////////////////
-
-	////////////////////////////////////////////////////////////////
-	//input_flt_patファイル出力///////////////////////////////////////////////////
-	// finnode = pinode.next;
-	// //printf("%d ", fnode1->line);
-	// for (; finnode != NULL; finnode = finnode->next)
-	// {
-	// 	fnode = finnode->node;
-	// 	fprintf(fout_flt_in, "%d,", fnode->line);
-	// }
-	// fprintf(fout_flt_in, ",");
-	// finnode = ffnode.next;
-	// //printf("%d ", fnode1->line);
-	// for (; finnode != NULL; finnode = finnode->next)
-	// {
-	// 	fnode = finnode->node;
-	// 	if (fnode->toggle_flog == 1)
-	// 	{
-	// 		fprintf(fout_flt_in, "%d_ctl,", fnode->line);
-	// 	}
-	// 	else
-	// 	{
-	// 		fprintf(fout_flt_in, "%d,", fnode->line);
-	// 	}
-	// }
-	// fprintf(fout_flt_in, "\n");
-	/////////////////////////////////////////////////////////////////
 
 #if OUTPUT_FLIST
 	flist_out = fopen("fault_list.dat", "w+");
@@ -296,7 +257,7 @@ break;
 	int pivalset[n_inp];
 	int tmp_tpi[n_tpi];
 	initialize_detect(fltlst.next, length);
-	//printf("herer?\n");
+	printf("herer?\n");
 	if (MODE_TOOL == 4)
 		flt_info(fltlst.next);
 
