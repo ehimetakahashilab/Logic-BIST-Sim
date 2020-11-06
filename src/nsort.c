@@ -11,14 +11,13 @@ read_tpi_list(argv) char *argv[14];
   FILE *fin1;
   for (i = 0; i <= lpnt; i++)
     toggle_gates[i] = 0;
-printf("\n\nCPI----%d\n", (int)(numgate * atof(argv[5])));
+printf("\n\nCPI Number=%d\n-----list,location\n", (int)(numgate * atof(argv[5])));
   if (atoi(argv[4]) == 1 || atoi(argv[4]) == 4)
   { //Structure Based toggle Gate selection
     fin1 = fopen("tgl_gt_input.dat", "r");
     if (fin1 == NULL)
-      //printf("'tgl_gt_input.dat' is not found!\n"), exit(1);
-    //printf("%d %f \n",numgate-ffnum-inpnum,GATE_GP_START*(numgate-ffnum-inpnum));
-printf("\n\nCPI----%d\n", (int)(numgate * atof(argv[5])));
+      printf("'tgl_gt_input.dat' is not found!\n"), exit(1);
+
     for (ia = 0; ia < (int)(numgate * atof(argv[5])); ia++)
     {
       //for(ia=0;ia<TGL_GT_NUM;ia++){

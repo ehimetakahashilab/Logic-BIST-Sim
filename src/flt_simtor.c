@@ -40,6 +40,8 @@ int time;
 			}
 		}
 #endif
+
+
 #if PO_OBSERVE
 		for (ia = 0; ia < numout; ia++)
 		{
@@ -178,7 +180,7 @@ printf("\n");
 						if (flt_det_flog[fgnode->num][ib] == 0)
 						{
 							flt_det_flog[fgnode->num][ib] = 1;
-							//printf("%d\n", fgnode->num);
+
 						}
 					}
 				}
@@ -231,32 +233,7 @@ printf("\n");
 			fgnode->detect[time / 32] |= ITI << (time % 32);
 			fgnode->dtime++;
 #else
-			//if(flt_det_flog==FF_FILE){
-			/*if(MODE_TOOL==3||MODE_TOOL==4){
-if(fgnode->dtime){
-      if(fgnode->next!=NULL)
-        fgnode->next->prev=fgnode->prev;
-      fgnode->prev->next=fgnode->next;
-      injarray[ia]=NULL;
-	}
-}
-else {
-if(fgnode->next!=NULL)
-        fgnode->next->prev=fgnode->prev;
-      fgnode->prev->next=fgnode->next;
-      injarray[ia]=NULL;
-}*/
-
-			// if (fgnode->dtime)
-			// {
-			// 	//printf("%d\n", fgnode->num);
-			// }
-			// if (fgnode->full_ob_dtime)
-			// {
-			// 	printf("--%d\n", fgnode->num);
-			// }
-
-			if (fgnode->dtime)
+if (fgnode->dtime)
 			{
 				if (fgnode->next != NULL)
 					fgnode->next->prev = fgnode->prev;
