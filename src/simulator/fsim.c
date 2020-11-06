@@ -277,7 +277,9 @@ faultsim(argv) char *argv[13];
   int tmp_tpi[n_tpi];
   initialize_detect(fltlst.next, length);
   // printf("herer?\n");
-  if (MODE_TOOL == 4) flt_info(fltlst.next);
+  if (MODE_TOOL == 3 || MODE_TOOL == 4) {
+    flt_info(fltlst.next);
+  }
 
   printf("fault List initialization over \n");
 
