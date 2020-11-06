@@ -17,9 +17,9 @@ make_line_list(argv) char *argv[13];
   int count2 = 0;
 #if CKT_FORM == 0
   readf(argv);
-#if MODE_TOOL == 4
-  read_tpi_list(argv);
-#endif
+  if (MODE_TOOL == 4) {
+    read_tpi_list(argv);
+  }
   int ie;
   int ic = 0;
 

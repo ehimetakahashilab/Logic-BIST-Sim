@@ -1,4 +1,5 @@
 #include <libgen.h>
+
 #include "declare.h"
 #include "def_flt.h"
 #include "def_gtype.h"
@@ -27,6 +28,7 @@ char *argv[13];
   //#if DEBUG3
   //  printf(" Test Pattern are %d Patterns by ATPG\n",length);
   //#endif
+  Instance_Get(argc, argv);
   make_line_list(argv);
   sort_node();
   // fnode = gnode.next;
@@ -35,7 +37,6 @@ char *argv[13];
   //   printf("%d\n", fnode->line);
   // }
   err_check(fltlst.next, 0);
-  Instance_Get(argc, argv);
   faultnum = sum_flt;
   // printf("\nfaultnumber=%d %d\n",sum_flt,length);exit(1);
 

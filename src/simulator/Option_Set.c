@@ -231,20 +231,6 @@ char *argv[14];
       printf("# of Capture Cycles: %d\n", cap_freq);
       printf("Toggle INTERVAL_CYCLE: %d\n", INTERVAL_CYCLE);
 
-      flt_det_flog = (int **)malloc((sum_flt + 2) * sizeof(int *));
-      if (flt_det_flog == NULL) {
-        fprintf(stderr, "memory error @flt_det_flog in flt_info \n");
-        exit(1);
-      }
-
-      for (ia = 0; ia <= sum_flt + 1; ia++) {
-        flt_det_flog[ia] = (int *)malloc(11 * sizeof(int));
-        if (flt_det_flog[ia] == NULL) {
-          fprintf(stderr, "memory error @flt_det_flog \n");
-          exit(1);
-        }
-      }
-
       SKIP_CAPTURE = 0;
       // OBSERVE_RATE=atof(argv[8]);
 #if TRANSITIONFAULT

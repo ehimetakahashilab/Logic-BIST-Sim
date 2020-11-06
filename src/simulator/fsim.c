@@ -151,6 +151,8 @@ faultsim(argv) char *argv[13];
       }
 #endif
 
+      initial_node(argv);
+
 #if FCOVPERPAT
       // if(MODE_TOOL==4){
       char cpi_sim_outpath[200];
@@ -219,49 +221,6 @@ faultsim(argv) char *argv[13];
 #endif
   }
 #endif
-
-  ////////////////////////////////////////////////////////////////
-  // input_patファイル出力///////////////////////////////////////////////////
-  // finnode = pinode.next;
-  // printf("%d ", fnode1->line);
-  //	for (; finnode != NULL; finnode = finnode->next)
-  //	{
-  //		fnode = finnode->node;
-  //	}
-  //	finnode = ffnode.next;
-  // printf("%d ", fnode1->line);
-  //	for (; finnode != NULL; finnode = finnode->next)
-  //	{
-  //		fnode = finnode->node;
-  //	}
-  /////////////////////////////////////////////////////////////////
-
-  ////////////////////////////////////////////////////////////////
-  // input_flt_patファイル出力///////////////////////////////////////////////////
-  // finnode = pinode.next;
-  // //printf("%d ", fnode1->line);
-  // for (; finnode != NULL; finnode = finnode->next)
-  // {
-  // 	fnode = finnode->node;
-  // 	fprintf(fout_flt_in, "%d,", fnode->line);
-  // }
-  // fprintf(fout_flt_in, ",");
-  // finnode = ffnode.next;
-  // //printf("%d ", fnode1->line);
-  // for (; finnode != NULL; finnode = finnode->next)
-  // {
-  // 	fnode = finnode->node;
-  // 	if (fnode->toggle_flog == 1)
-  // 	{
-  // 		fprintf(fout_flt_in, "%d_ctl,", fnode->line);
-  // 	}
-  // 	else
-  // 	{
-  // 		fprintf(fout_flt_in, "%d,", fnode->line);
-  // 	}
-  // }
-  // fprintf(fout_flt_in, "\n");
-  /////////////////////////////////////////////////////////////////
 
 #if OUTPUT_FLIST
   flist_out = fopen("fault_list.dat", "w+");
