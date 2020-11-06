@@ -258,7 +258,7 @@ break;
 	int tmp_tpi[n_tpi];
 	initialize_detect(fltlst.next, length);
 
-	if (MODE_TOOL == 4)
+	if (MODE_TOOL == 3 || MODE_TOOL == 4)
 		flt_info(fltlst.next);
 
 	printf("fault List initialization over \n");
