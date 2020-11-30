@@ -63,6 +63,12 @@ $ run_cp_op_circuit.sh <CIRCUIT_PATH> <OP_PATH> <CP_PATH>
 $ parallel --results OUTPUTS './run_cp_op_circuit.sh ../seq-benchmark/circuits/iscas89/{} ~/eval/lab/ff_eval/{}/FF_STATION/TOPSIS ~/eval/cplist/{}' ::: s9234 s13207 s15850 s38417 s38584
 ```
 
+### run_all.sh
+For [ehimetakahashilab/test_files](https://github.com/ehimetakahashilab/test_files), execute all patterns (TPI flow, CPI Method, TOPSIS config, iter) at once.
+```console
+$ run_all.sh
+```
+
 ### src/tpg/tpg/lfsr
 ```console
 $ lfsr <CIRCUIT_PATH> <TEST_VECTOR> <LFSR_CONFIG_PATH> <OUTPUT_PATH>

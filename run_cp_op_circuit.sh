@@ -13,7 +13,7 @@ CAPTURE=10 #the number of capture cycles
 OBRATE=0.2 #ratio of OP FF
 LCP_rate=0.01 #the ratio of Logic CPs in all logic gates
 CP_CTRL=1 #=0:non CP control, =1: Logic gate toggling, =4: applying random patterns to Logic CPs
-SKIP_CAP=0 # the CP control starts from the third capture cycle.
+SKIP_CAP=3 # the CP control starts from the third capture cycle.
 INTERVAL_CYCLE=1 #=1: the number of interval cycles
 
 APP_DIR=$(dirname $0)
@@ -70,7 +70,7 @@ if [ ${CP_CTRL} -eq 1 ] || [ ${CP_CTRL} -eq 4 ]; then
 	echo "== simulation for Logic CPI =="
 	ln -sf ${CP_PATH}  ${CIRCUIT_NAME}_tgl_gt_input.dat
 	echo === ${CIRCUIT_NAME}: ${INTERVAL_CYCLE} ===
-	${APP_DIR}/src/simulator/sim ${CIRCUIT_PATH} ${TOOLMODE} ${TPG} ${CP_CTRL} ${LCP_rate} ${CAPTURE} ${INTERVAL_CYCLE} ${SKIP_CAP} 1 ${OBRATE}
+	${APP_DIR}/src/simulator/sim ${CIRCUIT_PATH} ${TOOLMODE} ${TPG} ${CP_CTRL} ${LCP_rate} ${CAPTURE} ${INTERVAL_CYCLE} ${SKIP_CAP} 1 ${OBRATE} 1 ${TEST_VEC}
 	echo ===logic CPI simulation process end===
 fi
 

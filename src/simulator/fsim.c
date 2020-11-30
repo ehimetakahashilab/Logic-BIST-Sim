@@ -277,7 +277,9 @@ faultsim(argv) char *argv[13];
   int tmp_tpi[n_tpi];
   initialize_detect(fltlst.next, length);
   // printf("herer?\n");
-  if (MODE_TOOL == 4) flt_info(fltlst.next);
+  if (MODE_TOOL == 3 || MODE_TOOL == 4) {
+    flt_info(fltlst.next);
+  }
 
   printf("fault List initialization over \n");
 
@@ -293,7 +295,7 @@ faultsim(argv) char *argv[13];
   // prn_state_ao2(fp);
   /*Simulation Start*/
   for (time = 1; time <= length && fltlst.next != NULL &&
-                 ((float)flt_det_num[0] / (float)sum_flt) <= 0.90001;
+                 ((float)flt_det_num[0] / (float)sum_flt) <= 0.9;
        time++)
   // for (time = 1; time <= length && fltlst.next != NULL; time++)
   //	for (time = 1; time <= length && fltlst.next != NULL && (1 -

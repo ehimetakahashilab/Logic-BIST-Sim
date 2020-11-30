@@ -189,13 +189,12 @@ char *argv[14];
       TPG_MODE = atoi(argv[3]);
       if (TPG_MODE == 0) {
         printf("TPG: %d bit LFSR \n", LFSR_BIT);
-      } else {
+      } else
         printf("TPG: In House ATPG\n");
-      }
 
       TGL_GATE_MODE = atoi(argv[4]);  //=1: gate TPI, =2:FF TPI
 
-      if (TGL_GATE_MODE == 0) {
+      if (TGL_GATE_MODE == 0 || TGL_GATE_MODE == 2 || TGL_GATE_MODE == 3) {
         ff_rate = atof(argv[5]);
         cap_freq = atoi(argv[6]);
         INTERVAL_CYCLE = atoi(argv[7]);
@@ -203,26 +202,20 @@ char *argv[14];
         FF_SEL_METHOD = atoi(argv[9]);
         FF_FILE = atoi(argv[10]);
         OBSERVE_RATE = atof(argv[11]);
-        for (ia = 0; ia < FF_FILE; ia++) {
-          flt_det_num[ia] = 0;
-        }
+        for (ia = 0; ia < FF_FILE; ia++) flt_det_num[ia] = 0;
         flt_det_num[20] = 0;
         length = atoi(argv[12]);
-      } else if (TGL_GATE_MODE == 2 || TGL_GATE_MODE == 3) {
-        fprintf(stderr, "error: TGL_GATE_MODE: %d is not supported!\n",
-                TGL_GATE_MODE);
-        exit(1);
       } else {
         Tgl_rate = atof(argv[5]);
         cap_freq = atoi(argv[6]);
+        // TG_FILE = atoi(argv[7]);
         INTERVAL_CYCLE = atoi(argv[7]);
         SKIP_CYCLE = atoi(argv[8]);
         FF_FILE = atoi(argv[9]);
         OBSERVE_RATE = atof(argv[10]);
+        group_tpi = atoi(argv[11]);
 
-        for (ia = 0; ia < FF_FILE; ia++) {
-          flt_det_num[ia] = 0;
-        }
+        for (ia = 0; ia < FF_FILE; ia++) flt_det_num[ia] = 0;
         flt_det_num[20] = 0;
       }
 
