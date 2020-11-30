@@ -43,7 +43,9 @@ $ git clone -b customized-MaineK00n https://github.com/ehimetakahashilab/Logic-B
 $ pwd
 /home/mainek00n/github/github.com/ehimetakahashilab/Logic-BIST-Sim
 
-$ make
+$ docker build -t lab-centos .
+
+$ docker run --rm -i -t -v $(pwd):/app lab-centos bash -c "cd /app; make"
 ```
 
 ## Usage
