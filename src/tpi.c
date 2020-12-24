@@ -19,12 +19,12 @@ TPI_NODE *tpi_list;
 
   L_NODE *next, *prev;
   FIN_NODE *finlst, *foutlst;
-  int toggle_flog;
+  int toggle_flag;
 
   fnode = net_head;
   for (; fnode != NULL; fnode = fnode->next)
   {
-    if (fnode->toggle_flog == 0)
+    if (fnode->toggle_flag == 0)
       continue;
     tpi_cnt++;
     if (fnode->outnum == 1)
@@ -34,7 +34,7 @@ TPI_NODE *tpi_list;
       tpi_node->type = XOR;
       tpi_node->innum = 1;
       tpi_node->outnum = 1;
-      tpi_node->addgateflog = 1;
+      tpi_node->addgateflag = 1;
 
       head_fin = NULL;
       for (ni = 0; ni < 2; ni++)
@@ -74,14 +74,14 @@ TPI_NODE *tpi_list;
 
       struct l_node
       {
-        int line, type, innum, outnum, OBTimes, addgateflog;
+        int line, type, innum, outnum, OBTimes, addgateflag;
         float toggle_rate[MAXCAP];
-        int toggle_flog;
+        int toggle_flag;
         L_NODE *next, *prev;
         FIN_NODE *finlst, *foutlst;
         unsigned int gdval0[MAXCAP], gdval1, ftval0[MAXCAP], ftval1;
         char *Name;
-        int sel_flog[FF_FILE]; //5種類のFF選択法
+        int sel_flag[FF_FILE]; //5種類のFF選択法
       };
 
       //copy_state();
@@ -136,7 +136,7 @@ TPI_NODE *tpi_list;
         injarray[ni] = flttag;
         fnode = &add_gate[ni];
         fnode->line = ADD_LPNO + ni;
-        fnode->addgateflog = 1;
+        fnode->addgateflag = 1;
         if (new_injback->type == PI || new_injback->type == FF)
         {
           gnode.next->prev = fnode;
@@ -164,7 +164,7 @@ TPI_NODE *tpi_list;
         if (flttag->saval == 0)
         { //initialization values of PI for inseted gates
           fnode->type = AND;
-          /*#if TRANSITIONFAULT 
+          /*#if TRANSITIONFAULT
 //    for(ia=0;ia<cap_freq;ia++){
 	add_pi[ni].gdval1 = ALL_F;
 	add_pi[ni].ftval1 = ALL_F;
@@ -213,7 +213,7 @@ TPI_NODE *tpi_list;
           }
         }
         /** SET PI NODE **/
-        /*#if TRANSITIONFAULT 
+        /*#if TRANSITIONFAULT
 
      add_pi[ni].type=PI;
       add_pi[ni].line=ADD_PINO+ni;
@@ -316,7 +316,7 @@ TPI_NODE *tpi_list;
       for (ni = 0; ni < num_injgate; ni++)
       {
         fnode = &add_gate[ni];
-        fnode->addgateflog = 0;
+        fnode->addgateflag = 0;
         if (fnode->next != NULL)
           fnode->next->prev = fnode->prev;
         fnode->prev->next = fnode->next;

@@ -129,7 +129,7 @@ faultsim(argv) char *argv[13];
 							num_observe = ffnum * OBSERVE_RATE;
 							printf("Partial FF observation mode: %f \n", OBSERVE_RATE);
 							printf("Station rate = %.0f[%]\n", (float)(OBSERVE_RATE * 100));
-							ff_sta_src_read(FF_FILE, num_observe, argv);
+							ff_sta_src_read(FF_FILE, num_observe);
 
 					#else
 							ff_select = (char *)calloc(ffnum, sizeof(char));
@@ -214,7 +214,7 @@ break;
 	{
 		test_pat = fopen(pt_file1, "r");
 		if (test_pat == NULL)
-			printf("%s is not found!\n", argv[2]), exit(1);
+			printf("pi pattern %s is not found!\n", argv[2]), exit(1);
 		fscanf(test_pat, "%d %d", &length, &n_inp);
 
 		if (n_inp != inpnum)
@@ -274,8 +274,8 @@ break;
 	// }
 	// prn_state_ao2(fp);
 	/*Simulation Start*/
-	for (time = 1; time <= length && fltlst.next != NULL && ((float)flt_det_num[0] / (float)sum_flt) <= 0.90001; time++)
-	//for (time = 1; time <= length && fltlst.next != NULL; time++)
+	//for (time = 1; time <= length && fltlst.next != NULL && ((float)flt_det_num[0] / (float)sum_flt) <= 0.90001; time++)
+	for (time = 1; time <= length && fltlst.next != NULL; time++)
 	//	for (time = 1; time <= length && fltlst.next != NULL && (1 - (float)remain_flt / (float)sum_flt) <= 0.90001; time++)
 	{
 		clocktime = time;
@@ -351,24 +351,12 @@ break;
 
 		for (ia = 1; ia <= cap_freq; ia++)
 		{
-
-			//prn_state_ao(ffnode.next);
-
 			onetimesim(ia);
-
-			// if (cap_freq == ia)
-			// 	fprintf(fout_in, "\n");
-			// if (ia == 5)
-			// {
-			// 	exit(1);
-			// }
 			switch (MODE_TOOL)
 			{
 			case 3:
 			case 4:
 #if SELECT_STATION
-				// ic=0;
-
 				finnode = ffnode.next;
 				for (ib = 0; finnode != NULL; finnode = finnode->next, ib++)
 				{
@@ -573,7 +561,7 @@ break;
 #else
 
 			//printf("Fault Coverage: %6.4f \n", (float)flt_det_num[10] / (float)sum_flt * 100.0);
-			printf("#Ori FCov: %4.6f \n",(1 - (float)remain_flt/ (float)sum_flt) * 100.0);
+			printf("#Ori FCov: %4.6f \n", (float)(sum_flt-remain_flt)/sum_flt * 100.0);
 #if FCOVPERPAT
 			fprintf(fout_flt_pat, "%d,", time);
 #endif

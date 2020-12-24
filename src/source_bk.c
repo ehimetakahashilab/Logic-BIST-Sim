@@ -3,9 +3,9 @@
 int numout,slist,numgate;
 //int pitbl[MAXPT],potbl[MAXPT],fftbl[MAXPT],ffintbl[MAXPT],flist[MAXLINE];
 int lpnt,inpnum,ffnum,sum_flt,remain_flt,sum_Tran_flt,chainnum,interstatecount[2],tgl_gt_cnt,
-flog_ff_state[2000],FF_Fault_Det[2000],changed_freq[2000],FF_Fault_List[2000][60000],
+flag_ff_state[2000],FF_Fault_Det[2000],changed_freq[2000],FF_Fault_List[2000][60000],
 Ob_FF_Faults[2000][60000],FF_SA_Fault_List[2000][60000],Ob_FF_SA_Faults[2000][60000];
-int lfsr_count,FaultyFreeFlog[2000],FaultyFlog[2000],FF_flog[2000][4],SO_Reduction_Capa[2000];
+int lfsr_count,FaultyFreeflag[2000],Faultyflag[2000],FF_flag[2000][4],SO_Reduction_Capa[2000];
 
 double CTR,toggle_shift_perpat,toggle_cap_perpat[MAXCAP],WSA[MAXCAP],MaxWSA,UnChangeFF,Sum_UnChangeFF,
 sub_unchangedFF,sub_zero_unchangeFF,UnchangedFF_Logic;
@@ -18,7 +18,7 @@ FILE *flist_out;
 
 //2進数でパターンごとにキャプチャ毎に故障を記録するため変数_2015710_王
 
-int *scan_pat_flt,*scan_by_total_pat_flt,*scan_by_multi_pat_flt,*scan_by_last_pat_flt,**scan_by_OB_pat_flt; 
+int *scan_pat_flt,*scan_by_total_pat_flt,*scan_by_multi_pat_flt,*scan_by_last_pat_flt,**scan_by_OB_pat_flt;
 int TESTMODE;
 unsigned int **FF_Faults_lists,**FF_CapFaults_lists;
 int **Pat_Faults;
@@ -59,7 +59,7 @@ fclose(fout);
 
 for(ia=0;ia<ffnum;ia++){
 	fprintf(fout,"%d %d ",ia,Ob_FF_Faults[ia][0]);
-	for(ic=1;ic<=Ob_FF_Faults[ia][0];ic++)	
+	for(ic=1;ic<=Ob_FF_Faults[ia][0];ic++)
 	fprintf(fout,"%d ",Ob_FF_Faults[ia][ic]);
 	//for(ib=1;ib<=Ob_FF_Faults[ia][0];ib++)
 	//fprintf(fout,"%d ",Ob_FF_Faults[ia][ib]);
@@ -73,7 +73,7 @@ fclose(fout);
 
 /*2進数でパターンごと、FFごと、キャプチャごとの故障情報を記録する＿＿2015710_王*/
 /*開始*/
-#if BITRECORD 
+#if BITRECORD
 //四つの故障リストを出力する、故障リストは2進数の形で32個ごとに格納している
 //例：故障番号＝10であれば、2進数0000　0000　0100　0000　0000　0000　0000　0000で表し、10進数（4194304）で格納する　
 char *OPName1= "Total_Results";
@@ -134,14 +134,14 @@ fprintf(fout3,"patten %d  ",ia);
 	/*for(ic=1;ic<cap_freq;ic++){
 		fprintf(fout3,"\nCap %1d %1d",ic,Pat_FF_Faults[ia][ib].Cap_Faults[ic][0]);
 		for(id=1;id<=sum_flt/32+1;id++)
-		fprintf(fout3," %1x ",Pat_FF_Faults[ia][ib].Cap_Faults[ic][id]);	
+		fprintf(fout3," %1x ",Pat_FF_Faults[ia][ib].Cap_Faults[ic][id]);
 		}	*/
 	for(id=1;id<=sum_flt/32+1;id++){
 		fprintf(fout," %1x ",Pat_FF_Faults[ia][ib].Total_Faults[id]);
-		if(ia!=0){	
-		fprintf(fout1," %1x ",Pat_FF_Faults[ia][ib].Last_Cap_Faults[id]);	
+		if(ia!=0){
+		fprintf(fout1," %1x ",Pat_FF_Faults[ia][ib].Last_Cap_Faults[id]);
 		fprintf(fout2," %1x ",Pat_FF_Faults[ia][ib].OB_Cap_Faults[id]);
-		}	
+		}
 		}
 
 	}
@@ -239,7 +239,7 @@ fclose(fout);
   fprintf(fout,"%d %d\n",ffnum,sum_flt);
 for(ia=0;ia<ffnum;ia++){
 	fprintf(fout,"%d %d ",ia+1,Ob_FF_SA_Faults[ia][0]);
-	for(ic=1;ic<=Ob_FF_SA_Faults[ia][0];ic++)	
+	for(ic=1;ic<=Ob_FF_SA_Faults[ia][0];ic++)
 	fprintf(fout,"%d ",Ob_FF_SA_Faults[ia][ic]);
 	//for(ib=1;ib<=Ob_FF_Faults[ia][0];ib++)
 	//fprintf(fout,"%d ",Ob_FF_Faults[ia][ib]);
@@ -352,7 +352,7 @@ fclose(fp_pat_flt);
 ib=0;
 printf("%d ",ib);
 for(ia=0;ia<ffnum;ia++){
-		if(ia==schain[ib+1].top){ 
+		if(ia==schain[ib+1].top){
 			ib++;
 			printf("\n%d ",ib);
 					}
@@ -380,7 +380,7 @@ fprintf(fout,",%.0f\n",MaxWSA);
 fprintf(fout,"\n");
 #endif
 fclose(fout);
-#endif 
+#endif
 
 #if TOGGLE_GATE
   L_NODE *fnode;
@@ -403,7 +403,7 @@ sprintf(outpath, "./GATE_TOGGLE/%s_%d_switched_%.1f_%.1f.csv", argv[1],cap_freq,
 if((fout=fopen(outpath,"w"))==NULL)
 printf("Gate_TOGGLE results output file is not exist!\n"), exit(1);
 
-#else 
+#else
 sprintf(outpath, "./GATE_TOGGLE/STRUCT/test_%s_%d.csv", argv[1],cap_freq);
 if((fout=fopen(outpath,"w"))==NULL)
 printf("Gate_TOGGLE results output file is not exist!\n"), exit(1);
@@ -423,7 +423,7 @@ printf("Gate_TOGGLE results output file is not exist!\n"), exit(1);
 	mean/=cap_freq;
 	for(ia=1;ia<=cap_freq;ia++){
 	variation+=(fnode->toggle_rate[ia]-mean)*(fnode->toggle_rate[ia]-mean);
-	 // printf("%.0f ",fnode->toggle_rate[ia]);	
+	 // printf("%.0f ",fnode->toggle_rate[ia]);
 	}
  //printf("%.4f ",variation/(cap_freq-1));
 	variation=sqrtf(variation/(cap_freq-1));
@@ -436,7 +436,7 @@ printf("average variation=%.4f \n",ave_var);
   fnode=gnode.next;
   for( ;fnode!=NULL;fnode=fnode->next){
   fprintf(fout,"%d,",fnode->line);
-	if(fnode->toggle_flog==1){
+	if(fnode->toggle_flag==1){
 	  for(ia=1;ia<=cap_freq;ia++){
 	   fprintf(fout,"%.0f,",0.0);
 			}
@@ -449,10 +449,10 @@ printf("average variation=%.4f \n",ave_var);
 #if SWITCH_GATE
 
 #else
-if(fnode->toggle_rate[cap_freq+2]>=ave_var) fnode->toggle_flog=1;
-else fnode->toggle_flog=0;
+if(fnode->toggle_rate[cap_freq+2]>=ave_var) fnode->toggle_flag=1;
+else fnode->toggle_flag=0;
  #endif
-  fprintf(fout,"%.0f,%.4f,%d\n",fnode->toggle_rate[cap_freq+1],fnode->toggle_rate[cap_freq+2],fnode->toggle_flog);
+  fprintf(fout,"%.0f,%.4f,%d\n",fnode->toggle_rate[cap_freq+1],fnode->toggle_rate[cap_freq+2],fnode->toggle_flag);
 	}
 
 
@@ -506,7 +506,7 @@ fprintf(fout,"\n");
 #if PEAK
 float Max=0;
 for(ia=0;ia<chainnum;ia++){
-if(ShiftPeak[ia]/(schain[ia].length-1)>Max) 
+if(ShiftPeak[ia]/(schain[ia].length-1)>Max)
 Max=ShiftPeak[ia]/(schain[ia].length-1);
 }
   fout = fopen("shift_and_peak.txt", "a");
@@ -541,5 +541,3 @@ fprintf(fout,"%4.3f %4.3f \n",(float)toggle_scn/(float)toggle_scn_max*100.0,Max*
 
 
 }
-
-

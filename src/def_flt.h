@@ -14,11 +14,11 @@ typedef unsigned int BITGATA; /* sort of memorry used unit of bit */
 //typedef struct lfsr LFSR;
 struct l_node
 {
-  int line, type, innum, outnum, OBTimes, addgateflog;
+  int line, type, innum, outnum, OBTimes, addgateflag;
   //toggle gate insertion
-  int toggle_flog;
-  int toggle_br_flog[100];
-  int toggle_br_flog_num;
+  int toggle_flag;
+  int toggle_br_flag[100];
+  int toggle_br_flag_num;
   int toggle_cnt;
   int toggle_cap[MAXCAP];
   float toggle_rate[MAXCAP];
@@ -31,7 +31,7 @@ struct l_node
   FIN_NODE *finlst, *foutlst;
   unsigned int gdval0, gdval1, ftval0, ftval1;
   char *Name;
-  int sel_flog[20]; //5種類のFF選択法
+  int sel_flag[20]; //5種類のFF選択法
 };
 
 struct fin_node
@@ -42,7 +42,7 @@ struct fin_node
 
 struct flt_node
 {
-  int saval, typeflog, num, line;
+  int saval, typeflag, num, line;
   L_NODE *back, *forwd;
   FLT_NODE *next, *prev;
   DINFF *dfflst;
@@ -117,7 +117,7 @@ typedef struct element
 } ELEMENT;
 
 /*Instance Variable Defination*/
-int MODE_TOOL, TPG_MODE, TAP_NUM, cap_freq, SKIP_CAPTURE, SKIP_CYCLE, FF_SEL_METHOD, TGL_GATE_MODE, clocktime, LBISTMODE, ALPMODE, INTERVAL_CYCLE, TG_FILE, SOControlFlog, SoControlMode, FFSelMode, CHAINLENGTH, length,group_tpi;
+int MODE_TOOL, TPG_MODE, TAP_NUM, cap_freq, SKIP_CAPTURE, SKIP_CYCLE, FF_SEL_METHOD, TGL_GATE_MODE, clocktime, LBISTMODE, ALPMODE, INTERVAL_CYCLE, TG_FILE, SOControlflag, SoControlMode, FFSelMode, CHAINLENGTH, length,group_tpi;
 int numout, slist, numgate, n_tpi;
 int lpnt, inpnum, ffnum, sum_flt, remain_flt, sum_Tran_flt, chainnum, interstatecount[2], tgl_gt_cnt;
 int **tgl_tpi;
@@ -131,8 +131,8 @@ double WSA[MAXCAP], MaxWSA;
 char *ff_select;
 float ShiftPeak[CHAINNUM], OBSERVE_RATE;
 int flt_det_num[20];
-int **flt_det_flog;
-//int flt_det_flog[MAXFLT][11];
+int **flt_det_flag;
+//int flt_det_flag[MAXFLT][11];
 int FF_FILE;
 int toggle_gates[MAXGATE];
 FILE *fout_in;

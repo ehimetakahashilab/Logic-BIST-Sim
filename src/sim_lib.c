@@ -120,7 +120,7 @@ update_nextstate(capture) int capture;
           {
             if (capture % INTERVAL_CYCLE == 0)
             {
-              if (fnode->toggle_flog == 1)
+              if (fnode->toggle_flag == 1)
               {
                 //if(fnode->gdval0==fnode->gdval1)
                 fnode->gdval1 = ~fnode->gdval1;
@@ -156,7 +156,7 @@ tpi_ff_state_load(capture) int capture;
   for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
   {
     fnode = finnode->node;
-    if (fnode->toggle_flog == 1)
+    if (fnode->toggle_flag == 1)
     {
       //  printf(" %d: %x %x\n", fnode->line, fnode->gdval0, fnode->gdval1);
       if (tgl_tpi[tpi_cnt][capture] == 1)
@@ -184,7 +184,7 @@ tpi_ff_state_load_ft(capture) int capture;
   for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
   {
     fnode = finnode->node;
-    if (fnode->toggle_flog != 1)
+    if (fnode->toggle_flag != 1)
       continue;
     if (tgl_tpi[tpi_cnt][capture] == 1)
       fnode->ftval1 = ALL_F;
@@ -227,7 +227,7 @@ update_nextstate_ft(capture) int capture;
           if (capture % INTERVAL_CYCLE == 0)
           {
             tgl_val = fnode->ftval1 ^ tmp[ia];
-            if (fnode->toggle_flog == 1)
+            if (fnode->toggle_flag == 1)
             {
               //if(fnode->gdval0==fnode->gdval1)
               fnode->ftval1 = ~(tmp[ia] ^ tgl_val); //printf(" %d: %x %x\n",fnode->line,fnode->gdval0,fnode->gdval1);
@@ -733,15 +733,15 @@ flt_info(fgnode)
     FLT_NODE *fgnode;
 {
     int ia = 0;
-  flt_det_flog = (int **)malloc((sum_flt + 2) * sizeof(int *));
-  if (flt_det_flog == NULL)
-    printf("memory error @flt_det_flog in flt_info \n"), exit(1);
+  flt_det_flag = (int **)malloc((sum_flt + 2) * sizeof(int *));
+  if (flt_det_flag == NULL)
+    printf("memory error @flt_det_flag in flt_info \n"), exit(1);
 
   for (ia = 0; ia <= sum_flt + 1; ia++)
   {
-    flt_det_flog[ia] = (int *)malloc(11 * sizeof(int));
-    if (flt_det_flog[ia] == NULL)
-      printf("memory error @flt_det_flog \n"), exit(1);
+    flt_det_flag[ia] = (int *)malloc(11 * sizeof(int));
+    if (flt_det_flag[ia] == NULL)
+      printf("memory error @flt_det_flag \n"), exit(1);
   }
 
 
@@ -749,8 +749,8 @@ flt_info(fgnode)
   {
     for (ia = 0; ia <= 10; ia++)
     {
-      flt_det_flog[fgnode->num][ia] = 0;
-      flt_det_flog[0][ia] = 0;
+      flt_det_flag[fgnode->num][ia] = 0;
+      flt_det_flag[0][ia] = 0;
     }
   }
 }
@@ -915,7 +915,7 @@ onetimesim(capture) int capture;
           if (capture % INTERVAL_CYCLE == 0)
           {
             tgl_val = tmp2_val ^ fnode->gdval1;
-            if (fnode->toggle_flog == 1)
+            if (fnode->toggle_flag == 1)
             {
               fnode->gdval1 = ~(fnode->gdval1 ^ tgl_val);
               //printf(" %d: %x %x\n",fnode->line,tmp2_val,fnode->gdval1);
@@ -927,7 +927,7 @@ onetimesim(capture) int capture;
       {
         if (capture >= SKIP_CYCLE - 1)
         {
-          if (fnode->toggle_flog == 1)
+          if (fnode->toggle_flag == 1)
           {
             if (tgl_tpi[tpi_cnt][capture] == 1)
               fnode->gdval1 = ALL_F;
@@ -966,7 +966,7 @@ ftvalsim(capture) int capture;
     new_val1 = finnode->node->ftval1;
     finnode = finnode->next;
     tmp_val = fnode->ftval1;
-//if(TGL_GATE_MODE==1&&fnode->toggle_flog==1){
+//if(TGL_GATE_MODE==1&&fnode->toggle_flag==1){
 // tgl_val= fnode->ftval1; printf(" %d: %x %x\n",fnode->line,fnode->gdval1,fnode->ftval1);
 //}
 #if DEBUG1
@@ -1009,7 +1009,7 @@ ftvalsim(capture) int capture;
           {
 
             tgl_val = tmp_val ^ fnode->ftval1;
-            if (fnode->toggle_flog == 1)
+            if (fnode->toggle_flag == 1)
             {
               //printf(" %x ",fnode->ftval1);
               //if(fnode->ftval0==fnode->ftval1)
@@ -1022,7 +1022,7 @@ ftvalsim(capture) int capture;
       {
         if (capture >= SKIP_CYCLE - 1)
         {
-          if (fnode->toggle_flog == 1)
+          if (fnode->toggle_flag == 1)
           {
             if (tgl_tpi[tpi_cnt][capture] == 1)
               fnode->ftval1 = ALL_F;
@@ -1036,7 +1036,7 @@ ftvalsim(capture) int capture;
       }
     }
 
-    /*if(TGL_GATE_MODE==1&& fnode->toggle_flog==1){
+    /*if(TGL_GATE_MODE==1&& fnode->toggle_flag==1){
 if(tgl_val==fnode->ftval1)
   fnode->ftval1= ~fnode->ftval1;printf(" %d: %x %x\n",fnode->line,fnode->gdval1,fnode->ftval1);
 }*/

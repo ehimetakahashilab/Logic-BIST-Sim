@@ -1,14 +1,14 @@
 CC = gcc
-CFLAGS = -O3 
+CFLAGS = -O3
 OBJ = lfsr.o
 
 PROG := lfsr
 
-$(PROG):$(OBJ) 
+$(PROG):$(OBJ)
 	$(CC) -o $@ $(CFLAGS) $(OBJ)
 
 clean:
-	rm -f *.o *~
+	rm -rf *.o *~
 
 cleanall:
-	rm -f *.test *.o *~
+	rm -rf *.test *.o *~

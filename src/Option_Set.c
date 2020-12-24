@@ -7,15 +7,17 @@
 #define PATH_MIDDLE "SIM_RESULT/MIDDLE/"
 #define PATH_TOGGLE "test/TOGGLE_RATE/"
 
-ff_sta_src_read(src_num, ob_num, argv) int src_num;
+ff_sta_src_read(src_num, ob_num)
+int src_num;
 int ob_num;
-char *argv[1];
 {
-	int i, ia, ib, ic;
+	int i, ia;
 	FILE *fin;
 	char PATH[30];
-	int isel[src_num];
+	int isel;
 	FIN_NODE *finnode;
+	L_NODE *fnode;
+
 	i = 0;
 	while (i < src_num)
 	{
@@ -26,14 +28,15 @@ char *argv[1];
 		{
 			if (ia < ob_num)
 			{
-				fscanf(fin, "%d", &isel[i]);
-				//printf("%d, ",isel[i]);
+				fscanf(fin, "%d", &isel);
+				printf("%d, ",isel);
 				finnode = ffnode.next;
-				for (ib = 1; finnode != NULL; finnode = finnode->next, ib++)
+				for (; finnode != NULL; finnode = finnode->next)
 				{
-					if (isel[i] == ib)
+  				fnode=finnode->node;
+					if (isel == (fnode->line-inpnum-numout))
 					{
-						finnode->node->sel_flog[i] = 1;
+						fnode->sel_flag[i] = 1;
 						break;
 					}
 				}
@@ -43,13 +46,7 @@ char *argv[1];
 		fclose(fin);
 		memset(PATH, '\0', 30);
 	}
-	/*
-		finnode=ffnode.next;ib=0;
-		for(; finnode!=NULL; finnode=finnode->next){
-			if(finnode->node->sel_flog[0]==1) {ib++;
-			printf("\n%d, %d",finnode->node->line,ib);
-				}}
-exit(1);*/
+
 }
 
 Instance_Get(argc, argv) int argc;
@@ -119,15 +116,15 @@ char *argv[14];
 	  	printf("FF観測モード:SELECT_STATION = %d\n", SELECT_STATION);
 			 /* 1 when select FF station 0: Full observation*/
 
-			flt_det_flog = (int **)malloc((sum_flt + 2) * sizeof(int *));
-			if (flt_det_flog == NULL)
-				printf("memory error @flt_det_flog in flt_info \n"), exit(1);
+			flt_det_flag = (int **)malloc((sum_flt + 2) * sizeof(int *));
+			if (flt_det_flag == NULL)
+				printf("memory error @flt_det_flag in flt_info \n"), exit(1);
 
 			for (ia = 0; ia <= sum_flt + 1; ia++)
 			{
-				flt_det_flog[ia] = (int *)malloc(11 * sizeof(int));
-				if (flt_det_flog[ia] == NULL)
-					printf("memory error @flt_det_flog \n"), exit(1);
+				flt_det_flag[ia] = (int *)malloc(11 * sizeof(int));
+				if (flt_det_flag[ia] == NULL)
+					printf("memory error @flt_det_flag \n"), exit(1);
 			}
 		}
 
@@ -575,8 +572,8 @@ Out_Put(argv) char *argv[13];
 		fclose(fout);
 		printf("\n*************OUTPUT END****************\n");
 		for (ia = 0; ia <= sum_flt + 1; ia++)
-			free(flt_det_flog[ia]);
-		free(flt_det_flog);
+			free(flt_det_flag[ia]);
+		free(flt_det_flag);
 		break;
 
 	default:

@@ -84,7 +84,6 @@ make_line_list(argv) char *argv[13];
   for (; fnode != NULL; fnode = fnode->next)
   {
     line = fnode->line;
-
     /*** make fan-in lists ***/
     fil = gate[line].fil;
     if (gate[line].type == PI)
@@ -95,9 +94,7 @@ make_line_list(argv) char *argv[13];
     {
       if (NULL == (finnode = INALLOC))
         printf(" error -239-\n"), exit(1);
-
     //  finnode=fin_tmp+(fill_fin_tmp++);
-
       finnode->node = address[fil];
       finnode->next = NULL;
       fnode->finlst = finnode;
@@ -108,12 +105,9 @@ make_line_list(argv) char *argv[13];
       for (ni = 0; ni < gate[line].nfi; ni++)
       {
         fin = flist[ni + fil];
-
         if (NULL == (finnode = INALLOC))
           printf(" error -233-\n"), exit(1);
-
       //  finnode=fin_tmp+(fill_fin_tmp++);
-
         finnode->node = address[fin];
         finnode->next = head_fin;
         head_fin = finnode;
@@ -406,11 +400,11 @@ make_Tranfault_list(address)
         {
         case AND:
         case NAND:
-          flttag->typeflog = 1;
+          flttag->typeflag = 1;
           break;
         case OR:
         case NOR:
-          flttag->typeflog = 2;
+          flttag->typeflag = 2;
           break;
         case NOT: //インバーター出力側のs0,s1故障は、入力のs1とs0と等価
         case TPI://TPIの故障を考慮しない
@@ -470,7 +464,7 @@ make_Tranfault_list(address)
           flttag->back = address[gate[ni].fil];
         flttag->forwd = address[fol];
         flttag->saval = saval;
-        flttag->typeflog = 0;
+        flttag->typeflag = 0;
         flttag->dfflst = NULL;
         flttag->prev = head_flt;
         head_flt->next = flttag;
@@ -495,7 +489,7 @@ make_Tranfault_list(address)
         flttag->back = address[ni];
         flttag->forwd = NULL;
         flttag->saval = saval;
-        flttag->typeflog = 0;
+        flttag->typeflag = 0;
         flttag->dfflst = NULL;
         flttag->prev = head_flt;
         head_flt->next = flttag;
