@@ -89,12 +89,7 @@ update_nextstate(capture) int capture;
     if (fnode->gdval1 != tmp[ia])
     {
       fnode->gdval1 = tmp[ia];
-#if POWEREVA //トグル回数を数える                                                    \
-             //printf("%d\n",ia); //iaがFF番号を示す hamada 2014_09_22                  \
-             //printf("%d\n",capture);//2014_09_30 hamada                                     \
-             //printf("aaa\n");                                                               \
-             //toggle_cnt[ia]++;//個々のFFのトグル回数を数える hamada 2014_09_22 \
-             //printf("toggle[%d] = %d\n",ia,toggle_cnt[ia]);//hamada 2014_09_22
+#if POWEREVA 
       toggle_cap[capture]++;
       toggle_cap_perpat[capture]++;
 #if FF_CAP
@@ -120,7 +115,7 @@ update_nextstate(capture) int capture;
           {
             if (capture % INTERVAL_CYCLE == 0)
             {
-              if (fnode->toggle_flag == 1)
+              if (fnode->cp_flag == 1)
               {
                 //if(fnode->gdval0==fnode->gdval1)
                 fnode->gdval1 = ~fnode->gdval1;
@@ -156,7 +151,7 @@ tpi_ff_state_load(capture) int capture;
   for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
   {
     fnode = finnode->node;
-    if (fnode->toggle_flag == 1)
+    if (fnode->cp_flag == 1)
     {
       //  printf(" %d: %x %x\n", fnode->line, fnode->gdval0, fnode->gdval1);
       if (tgl_tpi[tpi_cnt][capture] == 1)
@@ -184,7 +179,7 @@ tpi_ff_state_load_ft(capture) int capture;
   for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
   {
     fnode = finnode->node;
-    if (fnode->toggle_flag != 1)
+    if (fnode->cp_flag != 1)
       continue;
     if (tgl_tpi[tpi_cnt][capture] == 1)
       fnode->ftval1 = ALL_F;
@@ -227,7 +222,7 @@ update_nextstate_ft(capture) int capture;
           if (capture % INTERVAL_CYCLE == 0)
           {
             tgl_val = fnode->ftval1 ^ tmp[ia];
-            if (fnode->toggle_flag == 1)
+            if (fnode->cp_flag == 1)
             {
               //if(fnode->gdval0==fnode->gdval1)
               fnode->ftval1 = ~(tmp[ia] ^ tgl_val); //printf(" %d: %x %x\n",fnode->line,fnode->gdval0,fnode->gdval1);
@@ -255,7 +250,7 @@ initial_state(int ff_state[])
   int inval1;
 #if INITIAL_ST == 0
   /** assume all 0 value **/
-#if DEBUG3
+#if DEBUG_NODE
   printf(" Assume initial all 0 state\n");
 #endif
   finnode = ffnode.next;
@@ -267,7 +262,7 @@ initial_state(int ff_state[])
 #endif
 #if INITIAL_ST == 1
   /** assume LFSR value **/
-#if DEBUG3
+#if DEBUG_NODE
   printf(" Assume initial RANDOM state\n");
 #endif
 
@@ -296,7 +291,7 @@ initial_state_ft(int ff_state[])
   int inval1;
 #if INITIAL_ST == 0
   /** assume all 0 value **/
-#if DEBUG3
+#if DEBUG_NODE
   printf(" Assume initial all 0 state\n");
 #endif
   finnode = ffnode.next;
@@ -308,7 +303,7 @@ initial_state_ft(int ff_state[])
 #endif
 #if INITIAL_ST == 1
   /** assume LFSR value **/
-#if DEBUG3
+#if DEBUG_NODE
   printf(" Assume initial RANDOM state\n");
 #endif
 
@@ -716,15 +711,9 @@ int length;
   while (flt_node != NULL)
   {
     flt_node->dtime = 0;
-    flt_node->OBdtime = 0;
     flt_node->TranDetTimes = 0;
-    flt_node->TranOBDetTimes = 0;
     for (ni = 0; ni <= length / 32; ni++)
       flt_node->detect[ni] = flt_node->activ[ni] = 0;
-    for (ni = 0; ni <= FF_FILE; ni++)
-      flt_node->OBdtime_sel_FF[ni] = 0;
-    flt_node->full_ob_dtime = 0;
-    //printf("%d %d %d || ",flt_node->num,flt_node->saval,flt_node->TranDetTimes);
     flt_node = flt_node->next;
   }
 }
@@ -915,7 +904,7 @@ onetimesim(capture) int capture;
           if (capture % INTERVAL_CYCLE == 0)
           {
             tgl_val = tmp2_val ^ fnode->gdval1;
-            if (fnode->toggle_flag == 1)
+            if (fnode->cp_flag == 1)
             {
               fnode->gdval1 = ~(fnode->gdval1 ^ tgl_val);
               //printf(" %d: %x %x\n",fnode->line,tmp2_val,fnode->gdval1);
@@ -927,7 +916,7 @@ onetimesim(capture) int capture;
       {
         if (capture >= SKIP_CYCLE - 1)
         {
-          if (fnode->toggle_flag == 1)
+          if (fnode->cp_flag == 1)
           {
             if (tgl_tpi[tpi_cnt][capture] == 1)
               fnode->gdval1 = ALL_F;
@@ -941,7 +930,7 @@ onetimesim(capture) int capture;
       }
     }
 
-#if DEBUG3
+#if DEBUG_NODE
     //if(capture>cap_freq-Transcycle)
     printf(" Line %d val1 %x %x -298-\n", fnode->line, fnode->gdval0, fnode->gdval1);
 #endif
@@ -966,7 +955,7 @@ ftvalsim(capture) int capture;
     new_val1 = finnode->node->ftval1;
     finnode = finnode->next;
     tmp_val = fnode->ftval1;
-//if(TGL_GATE_MODE==1&&fnode->toggle_flag==1){
+//if(TGL_GATE_MODE==1&&fnode->cp_flag==1){
 // tgl_val= fnode->ftval1; printf(" %d: %x %x\n",fnode->line,fnode->gdval1,fnode->ftval1);
 //}
 #if DEBUG1
@@ -1009,7 +998,7 @@ ftvalsim(capture) int capture;
           {
 
             tgl_val = tmp_val ^ fnode->ftval1;
-            if (fnode->toggle_flag == 1)
+            if (fnode->cp_flag == 1)
             {
               //printf(" %x ",fnode->ftval1);
               //if(fnode->ftval0==fnode->ftval1)
@@ -1022,7 +1011,7 @@ ftvalsim(capture) int capture;
       {
         if (capture >= SKIP_CYCLE - 1)
         {
-          if (fnode->toggle_flag == 1)
+          if (fnode->cp_flag == 1)
           {
             if (tgl_tpi[tpi_cnt][capture] == 1)
               fnode->ftval1 = ALL_F;
@@ -1036,12 +1025,12 @@ ftvalsim(capture) int capture;
       }
     }
 
-    /*if(TGL_GATE_MODE==1&& fnode->toggle_flag==1){
+    /*if(TGL_GATE_MODE==1&& fnode->cp_flag==1){
 if(tgl_val==fnode->ftval1)
   fnode->ftval1= ~fnode->ftval1;printf(" %d: %x %x\n",fnode->line,fnode->gdval1,fnode->ftval1);
 }*/
 
-#if DEBUG3
+#if DEBUG_NODE
     if (fnode->line == 380)
       printf(" Line %d gdval %x ftval %x %d\n", fnode->line, fnode->gdval_slow, fnode->ftval1, count1);
 #endif

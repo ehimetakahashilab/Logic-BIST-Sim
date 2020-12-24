@@ -57,8 +57,8 @@ initial_node(argv) char *argv[1];
 
     for (; fnode != NULL; fnode = fnode->next)
     {
-      fnode->toggle_flag = 0;
-      if (toggle_gates[fnode->line] == 1)   fnode->toggle_flag = 1;
+      fnode->cp_flag = 0;
+      if (toggle_gates[fnode->line] == 1)   fnode->cp_flag = 1;
       for (i = 0; i < MAXCAP; i++)
         fnode->toggle_rate[i] = 0.0;
       //  printf("-%d : %d ",fnode->line,fnode->type);
@@ -97,19 +97,19 @@ initial_node(argv) char *argv[1];
     for (; finnode != NULL; finnode = finnode->next)
     {
       fnode = finnode->node;
-      fnode->toggle_flag = 0;
+      fnode->cp_flag = 0;
       ib = fnode->line - inpnum - numout;
       //printf("%d, %d\n", fnode->line, toggle_FFs[fnode->line]);
       if (toggle_FFs[ib] == 1)
       {
-        fnode->toggle_flag = 1;
+        fnode->cp_flag = 1;
         // printf("%d\n", fnode->line);
         // printf("----maru\n");
       }
       //printf("%d, %d, %d\n",ib,fnode->line,toggle_FFs[ib]);
 
       /*	if(toggle_FFs[fnode->line]==1){
-		fnode->toggle_flag=1;
+		fnode->cp_flag=1;
 	}*/
       for (i = 0; i < MAXCAP; i++)
         fnode->toggle_rate[i] = 0.0;
@@ -187,7 +187,7 @@ sort_node()
   }
   inode.next = new_head;
 
-#if DEBUG3
+#if DEBUG_NODE
   prn_node(new_head);   /** print PI & FF nodes list **/
   prn_node(gnode.next); /** print the other nodes list **/
 #endif
@@ -212,7 +212,7 @@ sort_node()
         fnode = fnode->next;
     }
   }
-#if DEBUG3
+#if DEBUG_NODE
   prn_node(new_head);
 #endif
   /** reverse order **/
@@ -253,7 +253,7 @@ sort_node()
   inode.next->pre=&gnode;
 **/
 
-#if DEBUG3
+#if DEBUG_NODE
   prn_node(gnode.next);
 #endif
 }

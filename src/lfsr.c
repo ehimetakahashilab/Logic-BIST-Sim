@@ -93,10 +93,10 @@ int ff_state[];
     CHAINLENGTH = (1 + ffnum / (LFSR_BIT * CHAINLENGTH)) * 100;
   }
   chainnum = (ffnum - 1) / CHAINLENGTH + 1;
-
+#if POWEREVA
   for (ia = 0; ia < chainnum; ia++)
     ShiftPeak[ia] = 0.0;
-
+#endif
   schain = (SCAN_CHAIN *)calloc(chainnum, sizeof(SCAN_CHAIN));
   if (schain == NULL)
     printf("memory error @initial_lfsr\n"), exit(1);
@@ -164,8 +164,7 @@ int lfsr_state[];
 int ff_state[];
 {
   int ia, ib, i;
-
-#if PEAK
+#if POWEREVA&&PEAK
   int OrigPatTog[chainnum], TogPerClk[chainnum];
   int Tem_state[ffnum];
   for (ia = 0; ia < ffnum; ia++)

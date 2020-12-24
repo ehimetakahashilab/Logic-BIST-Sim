@@ -10,11 +10,11 @@ char ff_select[ffnum];
 	int count=0, unccount=0;
 	int select_FF[ffnum];
 	int tmp;
-int unchangeFF_ratio=0.01*30000;	
+int unchangeFF_ratio=0.01*30000;
 ib=0;//printf("%d \n",ib);
 unccount=schain[0].length*UNCFFRATE;
 	for(ia=0;ia<ffnum; ia++){
-		if(ia==schain[ib+1].top){ 
+		if(ia==schain[ib+1].top){
 				ib++;
 				unccount=schain[ib].length*UNCFFRATE;
 				//printf("\n%d ",ib);
@@ -22,7 +22,7 @@ unccount=schain[0].length*UNCFFRATE;
 		if(SO_Reduction_Capa[ia]==0) select_FF[ia]=0;
 		else{count=0;//mp=SO_Reduction_Capa[ia];
 		for(ic=1;ic<schain[ib].length;ic++){
-		if(SO_Reduction_Capa[ia]<SO_Reduction_Capa[ic+schain[ib].top]) count++; 
+		if(SO_Reduction_Capa[ia]<SO_Reduction_Capa[ic+schain[ib].top]) count++;
 		//if(changed_freq[ia]<=unchangeFF_ratio&&SO_Reduction_Capa[ia]>10000) select_FF[ia]=1;
 			}
 			if(count<unccount) select_FF[ia]=1;
@@ -30,7 +30,7 @@ unccount=schain[0].length*UNCFFRATE;
 		}
 		//else select_FF[ia]=0;
 		for(ic=0;ic<3;ic++){
-		FF_flog[ia][ic]=0;
+		FF_flag[ia][ic]=0;
 
 			}
 		//printf("%d ",select_FF[ia]);
@@ -39,111 +39,111 @@ unccount=schain[0].length*UNCFFRATE;
 	if(changed_freq[ia]<=unchangeFF_ratio&&SO_Reduction_Capa[ia]>10000) select_FF[ia]=1;
 else select_FF[ia]=0;
 	for(ic=0;ic<3;ic++){
-		FF_flog[ia][ic]=0;
+		FF_flag[ia][ic]=0;
 
 			}
 		printf("%d ",select_FF[ia]);
 		}*/
-if(SOControlFlog==1){
+if(SOControlflag==1){
 	if(SoControlMode==0){
 		ib=0;
 	unccount=schain[0].length*UNCFFRATE;
 	count=0;
 	for(ia=0;ia<ffnum; ia++){
-		if(ia==schain[ib+1].top){ 
+		if(ia==schain[ib+1].top){
 				ib++;count=0;
 				unccount=schain[ib].length*UNCFFRATE;
 					}
 		if(ff_select[ia] == '0'&&count<unccount&&select_FF[ia]==1){
 			//if(ff_select[ia+1] == '0'){
-				FF_flog[ia][0]=2;//FF_flog[ia][1]=1;//FF_flog[ia][3]=ia+1;
-				//FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
+				FF_flag[ia][0]=2;//FF_flag[ia][1]=1;//FF_flag[ia][3]=ia+1;
+				//FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
 				count++;
 				//}
 			}
 		else if(ff_select[ia] == '1')
-			FF_flog[ia][0]=2;
+			FF_flag[ia][0]=2;
 			}
 		}
 	else{
 	ib=0;
 	for(ia=0;ia<ffnum; ia++){
-	if(ia==schain[ib+1].top&&ib<chainnum) ib++; 
+	if(ia==schain[ib+1].top&&ib<chainnum) ib++;
 		if(ia<schain[ib].top+3){
 			if(ia==schain[ib].top&&ff_select[ia] == '1'&&ff_select[ia+1] == '1'&&ff_select[ia+2] == '1'){
-				 FF_flog[ia][0]=1; FF_flog[ia][1]=2;//FF_flog[ia][2]=ia+2;
-				 FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
-				 FF_flog[ia+2][0]=2;FF_flog[ia+2][1]=ia;
+				 FF_flag[ia][0]=1; FF_flag[ia][1]=2;//FF_flag[ia][2]=ia+2;
+				 FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
+				 FF_flag[ia+2][0]=2;FF_flag[ia+2][1]=ia;
 				}
-			else if(ia==schain[ib].top&&ff_select[ia] == '0'&&ff_select[ia+1] == '1') { 
-					FF_flog[ia][0]=1;FF_flog[ia][1]=1;
-					FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
+			else if(ia==schain[ib].top&&ff_select[ia] == '0'&&ff_select[ia+1] == '1') {
+					FF_flag[ia][0]=1;FF_flag[ia][1]=1;
+					FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
 					if(ff_select[ia+2] == '1'){
-						FF_flog[ia][1]++;	//FF_flog[ia][3]=ia+1;FF_flog[ia][4]=ia+2;
-						//FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
-						FF_flog[ia+2][0]=2;FF_flog[ia+2][1]=ia;
+						FF_flag[ia][1]++;	//FF_flag[ia][3]=ia+1;FF_flag[ia][4]=ia+2;
+						//FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
+						FF_flag[ia+2][0]=2;FF_flag[ia+2][1]=ia;
 
 					}
 				}
 			if(ia==schain[ib].top+1&&ff_select[ia-1] == '1'&&ff_select[ia] == '0'){
-					FF_flog[ia][0]=1; FF_flog[ia][1]=1;//FF_flog[ia][2]=ia-1;FF_flog[ia-1][0]=2;
-					FF_flog[ia-1][0]=2;FF_flog[ia-1][1]=ia;
+					FF_flag[ia][0]=1; FF_flag[ia][1]=1;//FF_flag[ia][2]=ia-1;FF_flag[ia-1][0]=2;
+					FF_flag[ia-1][0]=2;FF_flag[ia-1][1]=ia;
 					if(ff_select[ia+1] == '1'){
-						FF_flog[ia][1]++;
-						FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
+						FF_flag[ia][1]++;
+						FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
 						if(ff_select[ia+2] == '1'){
-							FF_flog[ia][1]++;	//FF_flog[ia][3]=ia+1;FF_flog[ia][4]=ia+2;
-							//FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
-							FF_flog[ia+2][0]=2;FF_flog[ia+2][1]=ia;
+							FF_flag[ia][1]++;	//FF_flag[ia][3]=ia+1;FF_flag[ia][4]=ia+2;
+							//FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
+							FF_flag[ia+2][0]=2;FF_flag[ia+2][1]=ia;
 							}
 						}
 				}
-			if(ia==schain[ib].top+2&&ff_select[ia-1] == '1'&&ff_select[ia-2] == '1'&&ff_select[ia] == '0'){ 
-					FF_flog[ia][0]=1; FF_flog[ia][1]=2;	//FF_flog[ia][1]=ia-2;FF_flog[ia][2]=ia-1;
-					FF_flog[ia-1][0]=2;FF_flog[ia-1][1]=ia;
-					FF_flog[ia-2][0]=2;FF_flog[ia-2][1]=ia;
+			if(ia==schain[ib].top+2&&ff_select[ia-1] == '1'&&ff_select[ia-2] == '1'&&ff_select[ia] == '0'){
+					FF_flag[ia][0]=1; FF_flag[ia][1]=2;	//FF_flag[ia][1]=ia-2;FF_flag[ia][2]=ia-1;
+					FF_flag[ia-1][0]=2;FF_flag[ia-1][1]=ia;
+					FF_flag[ia-2][0]=2;FF_flag[ia-2][1]=ia;
 					if(ff_select[ia+1] == '1'){
-						FF_flog[ia][1]++; //FF_flog[ia][3]=ia+1;FF_flog[ia+1][0]=2;
-						FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
-						
+						FF_flag[ia][1]++; //FF_flag[ia][3]=ia+1;FF_flag[ia+1][0]=2;
+						FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
+
 						if(ff_select[ia+2] == '1'){
-							FF_flog[ia][1]++; //FF_flog[ia][3]=ia+1;FF_flog[ia][4]=ia+2;
-							//FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
-							FF_flog[ia+2][0]=2;FF_flog[ia+2][1]=ia;
+							FF_flag[ia][1]++; //FF_flag[ia][3]=ia+1;FF_flag[ia][4]=ia+2;
+							//FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
+							FF_flag[ia+2][0]=2;FF_flag[ia+2][1]=ia;
 							}
 					}
 				}
 			}
 		else {
-			if(ff_select[ia] == '0'&&FF_flog[ia][0]==0){
-				if(ff_select[ia-1] == '1'&&ff_select[ia-2] == '1'&&ff_select[ia-3] == '1'&&(FF_flog[ia-3][0]==2&&FF_flog[ia-2][0]!=1)){
-					FF_flog[ia][0]=1; FF_flog[ia][1]=1;
-					FF_flog[ia-1][0]=2;FF_flog[ia-1][1]=ia;
+			if(ff_select[ia] == '0'&&FF_flag[ia][0]==0){
+				if(ff_select[ia-1] == '1'&&ff_select[ia-2] == '1'&&ff_select[ia-3] == '1'&&(FF_flag[ia-3][0]==2&&FF_flag[ia-2][0]!=1)){
+					FF_flag[ia][0]=1; FF_flag[ia][1]=1;
+					FF_flag[ia-1][0]=2;FF_flag[ia-1][1]=ia;
 					}
-				if(((ib+1<chainnum&&ia+1<schain[ib+1].top)||(ib+1>=chainnum&&ia+1<ffnum))&&ff_select[ia+1] == '1') { 
-					FF_flog[ia][0]=1;FF_flog[ia][1]++; //FF_flog[ia][3]=ia+1;
-					FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
+				if(((ib+1<chainnum&&ia+1<schain[ib+1].top)||(ib+1>=chainnum&&ia+1<ffnum))&&ff_select[ia+1] == '1') {
+					FF_flag[ia][0]=1;FF_flag[ia][1]++; //FF_flag[ia][3]=ia+1;
+					FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
 					if(((ib+1<chainnum&&ia+2<schain[ib+1].top)||(ib+1>=chainnum&&ia+2<ffnum))&&ff_select[ia+2] == '1'){
-						FF_flog[ia][1]++;//FF_flog[ia][4]=ia+2;
-						FF_flog[ia+2][0]=2;FF_flog[ia+2][1]=ia;
+						FF_flag[ia][1]++;//FF_flag[ia][4]=ia+2;
+						FF_flag[ia+2][0]=2;FF_flag[ia+2][1]=ia;
 							}
 						}
 					}
-				
-			else if(ff_select[ia] == '1'&&FF_flog[ia][0]==0){
-				if(ff_select[ia-1] == '1'&&ff_select[ia-2] == '1'&&ff_select[ia+1] == '1'&&FF_flog[ia-1][0]==2&&FF_flog[ia-2][0]==2&&((ib+1<chainnum&&ia+1<schain[ib+1].top)||(ib+1>=chainnum&&ia+1<ffnum))){
-				FF_flog[ia][0]=1;FF_flog[ia][1]=1;//FF_flog[ia][3]=ia+1;
-				FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
+
+			else if(ff_select[ia] == '1'&&FF_flag[ia][0]==0){
+				if(ff_select[ia-1] == '1'&&ff_select[ia-2] == '1'&&ff_select[ia+1] == '1'&&FF_flag[ia-1][0]==2&&FF_flag[ia-2][0]==2&&((ib+1<chainnum&&ia+1<schain[ib+1].top)||(ib+1>=chainnum&&ia+1<ffnum))){
+				FF_flag[ia][0]=1;FF_flag[ia][1]=1;//FF_flag[ia][3]=ia+1;
+				FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
 				if(((ib+1<chainnum&&ia+2<schain[ib+1].top)||(ib+1>=chainnum&&ia+2<ffnum))&&ff_select[ia+2] == '1'){
-					FF_flog[ia][1]++;//FF_flog[ia][4]=ia+2;
-					FF_flog[ia+2][0]=2;FF_flog[ia+2][1]=ia;
+					FF_flag[ia][1]++;//FF_flag[ia][4]=ia+2;
+					FF_flag[ia+2][0]=2;FF_flag[ia+2][1]=ia;
 					}
 				}
 
-		
+
 			}
 		}
-	}	
+	}
 
 
 	if(SoControlMode==1){
@@ -152,20 +152,20 @@ if(SOControlFlog==1){
 	unccount=schain[0].length*UNCFFRATE;
 	count=0;
 	for(ia=0;ia<ffnum; ia++){
-		if(ia==schain[ib+1].top){ 
+		if(ia==schain[ib+1].top){
 				ib++;count=0;
 				unccount=schain[ib].length*UNCFFRATE;
 					}
-		if(ff_select[ia] == '0'&&FF_flog[ia][0]!=2&&count<unccount){
+		if(ff_select[ia] == '0'&&FF_flag[ia][0]!=2&&count<unccount){
 			if(ia==schain[ib].top){
-				if(changed_freq[ia]<=unchangeFF_ratio&&ff_select[ia+1] == '0'&&select_FF[ia]==0&&select_FF[ia+1]==1&&FF_flog[ia+1][0]==0){
-					 FF_flog[ia][0]=1; FF_flog[ia][1]++;//FF_flog[ia][2]=ia+2;
-				 	FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
+				if(changed_freq[ia]<=unchangeFF_ratio&&ff_select[ia+1] == '0'&&select_FF[ia]==0&&select_FF[ia+1]==1&&FF_flag[ia+1][0]==0){
+					 FF_flag[ia][0]=1; FF_flag[ia][1]++;//FF_flag[ia][2]=ia+2;
+				 	FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
 				 	count++;
 						}
-				else if(select_FF[ia]==1&&(changed_freq[ia+1]>unchangeFF_ratio||select_FF[ia+1]==0)&&FF_flog[ia+1][0]!=2) { 
-					FF_flog[ia][0]=2;FF_flog[ia][1]=ia+1;
-					FF_flog[ia+1][0]=1;FF_flog[ia+1][1]=1;
+				else if(select_FF[ia]==1&&(changed_freq[ia+1]>unchangeFF_ratio||select_FF[ia+1]==0)&&FF_flag[ia+1][0]!=2) {
+					FF_flag[ia][0]=2;FF_flag[ia][1]=ia+1;
+					FF_flag[ia+1][0]=1;FF_flag[ia+1][1]=1;
 					count++;
 						}
 				}
@@ -173,42 +173,42 @@ if(SOControlFlog==1){
 			else{
 
 
-		if(FF_flog[ia][0]!=2){
-				if(FF_flog[ia][0]==1){
-					if(select_FF[ia+1]==1&&FF_flog[ia+1][0]==0){
-					//if(FF_flog[ia+1][0]!=2)
-						FF_flog[ia][0]=1; FF_flog[ia][1]++;
-						FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
+		if(FF_flag[ia][0]!=2){
+				if(FF_flag[ia][0]==1){
+					if(select_FF[ia+1]==1&&FF_flag[ia+1][0]==0){
+					//if(FF_flag[ia+1][0]!=2)
+						FF_flag[ia][0]=1; FF_flag[ia][1]++;
+						FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
 						count++;
 						}
 					}
-				else if(FF_flog[ia][0]==0){
-					if(select_FF[ia]==1&&FF_flog[ia+1][0]!=2){
-						if(select_FF[ia+1]==0&&FF_flog[ia+1][0]==0){
-					//if(FF_flog[ia+1][0]!=2)
-							FF_flog[ia+1][0]=1; FF_flog[ia+1][1]=1;
-							FF_flog[ia][0]=2;FF_flog[ia][1]=ia+1;
+				else if(FF_flag[ia][0]==0){
+					if(select_FF[ia]==1&&FF_flag[ia+1][0]!=2){
+						if(select_FF[ia+1]==0&&FF_flag[ia+1][0]==0){
+					//if(FF_flag[ia+1][0]!=2)
+							FF_flag[ia+1][0]=1; FF_flag[ia+1][1]=1;
+							FF_flag[ia][0]=2;FF_flag[ia][1]=ia+1;
 							count++;
 							}
-						else if(FF_flog[ia+1][0]==1){
-					//if(FF_flog[ia+1][0]!=2)
-							FF_flog[ia+1][0]=1; FF_flog[ia+1][1]++;
-							FF_flog[ia][0]=2;FF_flog[ia][1]=ia+1;
+						else if(FF_flag[ia+1][0]==1){
+					//if(FF_flag[ia+1][0]!=2)
+							FF_flag[ia+1][0]=1; FF_flag[ia+1][1]++;
+							FF_flag[ia][0]=2;FF_flag[ia][1]=ia+1;
 							count++;
 							}
 
 						}
-					else if(select_FF[ia]==0&&FF_flog[ia+1][0]==0){
+					else if(select_FF[ia]==0&&FF_flag[ia+1][0]==0){
 						if(select_FF[ia+1]==1){
-							FF_flog[ia][0]=1; FF_flog[ia][1]=1;
-							FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
+							FF_flag[ia][0]=1; FF_flag[ia][1]=1;
+							FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
 							count++;
 							}
 						}
 					}
 					}
 				}
-			}	
+			}
 		}
 		}
 	else{
@@ -216,20 +216,20 @@ if(SOControlFlog==1){
 	unccount=schain[0].length*UNCFFRATE;
 	count=0;
 	for(ia=0;ia<ffnum; ia++){
-		if(ia==schain[ib+1].top){ 
+		if(ia==schain[ib+1].top){
 				ib++;count=0;
 				unccount=schain[ib].length*UNCFFRATE;
 					}
 		if(ff_select[ia] == '0'&&count<unccount){
 			if(ff_select[ia+1] == '0'){
-				FF_flog[ia][0]=2;//FF_flog[ia][1]=1;//FF_flog[ia][3]=ia+1;
-				//FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
+				FF_flag[ia][0]=2;//FF_flag[ia][1]=1;//FF_flag[ia][3]=ia+1;
+				//FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
 				count++;
 						}
 					}
 				}
 			}
-		}	
+		}
 		}
 	}
 
@@ -241,138 +241,138 @@ char ff_select[ffnum];
 	int count=0, unccount=0;
 	int select_FF[ffnum];
 	int tmp;
-for(ia=0;ia<ffnum;ia++){FF_flog[ia][0]=0;FF_flog[ia][1]=0;}	
-if(SOControlFlog==1){
+for(ia=0;ia<ffnum;ia++){FF_flag[ia][0]=0;FF_flag[ia][1]=0;}
+if(SOControlflag==1){
 	if(SoControlMode==0){
 		for(ia=0;ia<ffnum;ia++){
 			if(ff_select[ia]=='1')
-				FF_flog[ia][0]=2;
+				FF_flag[ia][0]=2;
 				}
 			}
 	else if(SoControlMode==1){
 
 	ib=0;
 	for(ia=0;ia<ffnum; ia++){
-	if(ia==schain[ib+1].top&&ib<chainnum) ib++; 
+	if(ia==schain[ib+1].top&&ib<chainnum) ib++;
 		if(ia<schain[ib].top+3){
 			if(ia==schain[ib].top&&ff_select[ia] == '1'&&ff_select[ia+1] == '1'&&ff_select[ia+2] == '1'){
-				 FF_flog[ia][0]=1; FF_flog[ia][1]=2;//FF_flog[ia][2]=ia+2;
-				 FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
-				 FF_flog[ia+2][0]=2;FF_flog[ia+2][1]=ia;
+				 FF_flag[ia][0]=1; FF_flag[ia][1]=2;//FF_flag[ia][2]=ia+2;
+				 FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
+				 FF_flag[ia+2][0]=2;FF_flag[ia+2][1]=ia;
 				}
-			else if(ia==schain[ib].top&&ff_select[ia] == '0'&&ff_select[ia+1] == '1') { 
-					FF_flog[ia][0]=1;FF_flog[ia][1]=1;
-					FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
+			else if(ia==schain[ib].top&&ff_select[ia] == '0'&&ff_select[ia+1] == '1') {
+					FF_flag[ia][0]=1;FF_flag[ia][1]=1;
+					FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
 					if(ff_select[ia+2] == '1'){
-						FF_flog[ia][1]++;	//FF_flog[ia][3]=ia+1;FF_flog[ia][4]=ia+2;
-						//FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
-						FF_flog[ia+2][0]=2;FF_flog[ia+2][1]=ia;
+						FF_flag[ia][1]++;	//FF_flag[ia][3]=ia+1;FF_flag[ia][4]=ia+2;
+						//FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
+						FF_flag[ia+2][0]=2;FF_flag[ia+2][1]=ia;
 
 					}
 				}
 			if(ia==schain[ib].top+1&&ff_select[ia-1] == '1'&&ff_select[ia] == '0'){
-					FF_flog[ia][0]=1; FF_flog[ia][1]=1;//FF_flog[ia][2]=ia-1;FF_flog[ia-1][0]=2;
-					FF_flog[ia-1][0]=2;FF_flog[ia-1][1]=ia;
+					FF_flag[ia][0]=1; FF_flag[ia][1]=1;//FF_flag[ia][2]=ia-1;FF_flag[ia-1][0]=2;
+					FF_flag[ia-1][0]=2;FF_flag[ia-1][1]=ia;
 					if(ff_select[ia+1] == '1'){
-						FF_flog[ia][1]++;
-						FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
+						FF_flag[ia][1]++;
+						FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
 						if(ff_select[ia+2] == '1'){
-							FF_flog[ia][1]++;	//FF_flog[ia][3]=ia+1;FF_flog[ia][4]=ia+2;
-							//FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
-							FF_flog[ia+2][0]=2;FF_flog[ia+2][1]=ia;
+							FF_flag[ia][1]++;	//FF_flag[ia][3]=ia+1;FF_flag[ia][4]=ia+2;
+							//FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
+							FF_flag[ia+2][0]=2;FF_flag[ia+2][1]=ia;
 							}
 						}
 				}
-			if(ia==schain[ib].top+2&&ff_select[ia-1] == '1'&&ff_select[ia-2] == '1'&&ff_select[ia] == '0'){ 
-					FF_flog[ia][0]=1; FF_flog[ia][1]=2;	//FF_flog[ia][1]=ia-2;FF_flog[ia][2]=ia-1;
-					FF_flog[ia-1][0]=2;FF_flog[ia-1][1]=ia;
-					FF_flog[ia-2][0]=2;FF_flog[ia-2][1]=ia;
+			if(ia==schain[ib].top+2&&ff_select[ia-1] == '1'&&ff_select[ia-2] == '1'&&ff_select[ia] == '0'){
+					FF_flag[ia][0]=1; FF_flag[ia][1]=2;	//FF_flag[ia][1]=ia-2;FF_flag[ia][2]=ia-1;
+					FF_flag[ia-1][0]=2;FF_flag[ia-1][1]=ia;
+					FF_flag[ia-2][0]=2;FF_flag[ia-2][1]=ia;
 					if(ff_select[ia+1] == '1'){
-						FF_flog[ia][1]++; //FF_flog[ia][3]=ia+1;FF_flog[ia+1][0]=2;
-						FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
-						
+						FF_flag[ia][1]++; //FF_flag[ia][3]=ia+1;FF_flag[ia+1][0]=2;
+						FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
+
 						if(ff_select[ia+2] == '1'){
-							FF_flog[ia][1]++; //FF_flog[ia][3]=ia+1;FF_flog[ia][4]=ia+2;
-							//FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
-							FF_flog[ia+2][0]=2;FF_flog[ia+2][1]=ia;
+							FF_flag[ia][1]++; //FF_flag[ia][3]=ia+1;FF_flag[ia][4]=ia+2;
+							//FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
+							FF_flag[ia+2][0]=2;FF_flag[ia+2][1]=ia;
 							}
 					}
 				}
 			}
 		else {
-			if(ff_select[ia] == '0'&&FF_flog[ia][0]==0){
-				if(ff_select[ia-1] == '1'&&ff_select[ia-2] == '1'&&ff_select[ia-3] == '1'&&(FF_flog[ia-3][0]==2&&FF_flog[ia-2][0]!=1)){
-					FF_flog[ia][0]=1; FF_flog[ia][1]=1;
-					FF_flog[ia-1][0]=2;FF_flog[ia-1][1]=ia;
+			if(ff_select[ia] == '0'&&FF_flag[ia][0]==0){
+				if(ff_select[ia-1] == '1'&&ff_select[ia-2] == '1'&&ff_select[ia-3] == '1'&&(FF_flag[ia-3][0]==2&&FF_flag[ia-2][0]!=1)){
+					FF_flag[ia][0]=1; FF_flag[ia][1]=1;
+					FF_flag[ia-1][0]=2;FF_flag[ia-1][1]=ia;
 					}
-				if(((ib+1<chainnum&&ia+1<schain[ib+1].top)||(ib+1>=chainnum&&ia+1<ffnum))&&ff_select[ia+1] == '1') { 
-					FF_flog[ia][0]=1;FF_flog[ia][1]++; //FF_flog[ia][3]=ia+1;
-					FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
+				if(((ib+1<chainnum&&ia+1<schain[ib+1].top)||(ib+1>=chainnum&&ia+1<ffnum))&&ff_select[ia+1] == '1') {
+					FF_flag[ia][0]=1;FF_flag[ia][1]++; //FF_flag[ia][3]=ia+1;
+					FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
 					if(((ib+1<chainnum&&ia+2<schain[ib+1].top)||(ib+1>=chainnum&&ia+2<ffnum))&&ff_select[ia+2] == '1'){
-						FF_flog[ia][1]++;//FF_flog[ia][4]=ia+2;
-						FF_flog[ia+2][0]=2;FF_flog[ia+2][1]=ia;
+						FF_flag[ia][1]++;//FF_flag[ia][4]=ia+2;
+						FF_flag[ia+2][0]=2;FF_flag[ia+2][1]=ia;
 							}
 						}
 					}
-				
-			else if(ff_select[ia] == '1'&&FF_flog[ia][0]==0){
-				if(ff_select[ia-1] == '1'&&ff_select[ia-2] == '1'&&ff_select[ia+1] == '1'&&FF_flog[ia-1][0]==2&&FF_flog[ia-2][0]==2&&((ib+1<chainnum&&ia+1<schain[ib+1].top)||(ib+1>=chainnum&&ia+1<ffnum))){
-				FF_flog[ia][0]=1;FF_flog[ia][1]=1;//FF_flog[ia][3]=ia+1;
-				FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
+
+			else if(ff_select[ia] == '1'&&FF_flag[ia][0]==0){
+				if(ff_select[ia-1] == '1'&&ff_select[ia-2] == '1'&&ff_select[ia+1] == '1'&&FF_flag[ia-1][0]==2&&FF_flag[ia-2][0]==2&&((ib+1<chainnum&&ia+1<schain[ib+1].top)||(ib+1>=chainnum&&ia+1<ffnum))){
+				FF_flag[ia][0]=1;FF_flag[ia][1]=1;//FF_flag[ia][3]=ia+1;
+				FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
 				if(((ib+1<chainnum&&ia+2<schain[ib+1].top)||(ib+1>=chainnum&&ia+2<ffnum))&&ff_select[ia+2] == '1'){
-					FF_flog[ia][1]++;//FF_flog[ia][4]=ia+2;
-					FF_flog[ia+2][0]=2;FF_flog[ia+2][1]=ia;
+					FF_flag[ia][1]++;//FF_flag[ia][4]=ia+2;
+					FF_flag[ia+2][0]=2;FF_flag[ia+2][1]=ia;
 					}
 				}
 
-		
+
 			}
 		}
-	}	
+	}
 
 }
 else if(SoControlMode==2){
 	ib=0;count=schain[ib].length;
 	for(ia=0;ia<ffnum; ia++){
 	if(ia==schain[ib+1].top&&ib<chainnum-1){ ib++;count+=schain[ib].length; }
-		if( FF_flog[ia][0]!=0) continue;
+		if( FF_flag[ia][0]!=0) continue;
 		if(ia<count-3&&ia<ffnum-3){
 			if(ff_select[ia] == '1'&&ff_select[ia+1] == '1'&&ff_select[ia+2] == '1'){
-				 FF_flog[ia][0]=3; 
-				 FF_flog[ia+1][0]=3;
-				 FF_flog[ia+2][0]=3;
+				 FF_flag[ia][0]=3;
+				 FF_flag[ia+1][0]=3;
+				 FF_flag[ia+2][0]=3;
 						}
 			else if(ff_select[ia] == '0'&&ff_select[ia+1] == '1'){
-				if(ff_select[ia+2] == '0'){	
-					FF_flog[ia][0]=1;FF_flog[ia][1]+=1;
-					FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
+				if(ff_select[ia+2] == '0'){
+					FF_flag[ia][0]=1;FF_flag[ia][1]+=1;
+					FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
 						}
-				else if(ff_select[ia+2] == '1'&&ff_select[ia+3] == '0'){		
-					FF_flog[ia][0]=1;FF_flog[ia][1]=2;
-					FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
-					FF_flog[ia+2][0]=2;FF_flog[ia+2][1]=ia;
+				else if(ff_select[ia+2] == '1'&&ff_select[ia+3] == '0'){
+					FF_flag[ia][0]=1;FF_flag[ia][1]=2;
+					FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
+					FF_flag[ia+2][0]=2;FF_flag[ia+2][1]=ia;
 						}
-				else if(ff_select[ia+2] == '1'&&ff_select[ia+3] == '1'){		
-					FF_flog[ia+1][0]=3;
-					FF_flog[ia+2][0]=3;
-					FF_flog[ia+3][0]=3;
+				else if(ff_select[ia+2] == '1'&&ff_select[ia+3] == '1'){
+					FF_flag[ia+1][0]=3;
+					FF_flag[ia+2][0]=3;
+					FF_flag[ia+3][0]=3;
 						}
 					}
-			else if(FF_flog[ia][0]==0&&ff_select[ia] == '1'&&ff_select[ia-1] == '1'&&ff_select[ia-2] == '1')	{
-					 FF_flog[ia][0]=3; 
-					}			
+			else if(FF_flag[ia][0]==0&&ff_select[ia] == '1'&&ff_select[ia-1] == '1'&&ff_select[ia-2] == '1')	{
+					 FF_flag[ia][0]=3;
+					}
 				}
 		else {
-			if(FF_flog[ia][0]==0&&ff_select[ia] == '1'&&ff_select[ia-1] == '1'&&ff_select[ia-2] == '1')FF_flog[ia][0]=3;
-			else if(FF_flog[ia][0]==0&&ff_select[ia] == '0'&&ff_select[ia+1] == '1'&&ia+1<schain[ib+1].top&&ia+1<ffnum){
-				if(ff_select[ia+2] == '0'&&ia+2<schain[ib+1].top&&ia+2<ffnum){	
-					FF_flog[ia][0]=1;FF_flog[ia][1]+=1;
-					FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
+			if(FF_flag[ia][0]==0&&ff_select[ia] == '1'&&ff_select[ia-1] == '1'&&ff_select[ia-2] == '1')FF_flag[ia][0]=3;
+			else if(FF_flag[ia][0]==0&&ff_select[ia] == '0'&&ff_select[ia+1] == '1'&&ia+1<schain[ib+1].top&&ia+1<ffnum){
+				if(ff_select[ia+2] == '0'&&ia+2<schain[ib+1].top&&ia+2<ffnum){
+					FF_flag[ia][0]=1;FF_flag[ia][1]+=1;
+					FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
 						}
-				else if(ff_select[ia+2] == '1'&&ia+2<schain[ib+1].top&&ia+2<ffnum){		
-					FF_flog[ia][0]=1;FF_flog[ia][1]=2;
-					FF_flog[ia+1][0]=2;FF_flog[ia+1][1]=ia;
-					FF_flog[ia+2][0]=2;FF_flog[ia+2][1]=ia;
+				else if(ff_select[ia+2] == '1'&&ia+2<schain[ib+1].top&&ia+2<ffnum){
+					FF_flag[ia][0]=1;FF_flag[ia][1]=2;
+					FF_flag[ia+1][0]=2;FF_flag[ia+1][1]=ia;
+					FF_flag[ia+2][0]=2;FF_flag[ia+2][1]=ia;
 							}
 						}
 					}
@@ -392,23 +392,23 @@ int ff_state[ffnum];
 	int ia,ib=0;
 
 	for(ia=0;ia<ffnum; ia++){
-	FF_flog[ia][2]=0;
-		if(ia==schain[ib+1].top){ 	
+	FF_flag[ia][2]=0;
+		if(ia==schain[ib+1].top){
 				ib++;
 				//unccount=schain[ib].length*UNCFFRATE;
 					}
 		if(ia==schain[ib].top){
-			if(FF_flog[ia][0]==2){
+			if(FF_flag[ia][0]==2){
 				if(ff_state[ia+1]!=FIXVALUE)
-					FF_flog[ia][2]=0;
-				else	FF_flog[ia][2]=1;
+					FF_flag[ia][2]=0;
+				else	FF_flag[ia][2]=1;
 				}
 			}
 		else{
-			if(FF_flog[ia][0]==2){
+			if(FF_flag[ia][0]==2){
 				if(ff_state[ia-1]!=FIXVALUE&&ff_state[ia+1]!=FIXVALUE&&ia+1<schain[ib+1].top)
-					FF_flog[ia][2]=0;
-				else	FF_flog[ia][2]=1;
+					FF_flag[ia][2]=0;
+				else	FF_flag[ia][2]=1;
 				}
 			}
 
@@ -427,21 +427,21 @@ int toggle,Max_toggle;
 	for(ia=0;ia<ffnum; ia++){
 		toggle=0;
 		Max_toggle=0;
-		if(ia==schain[ib+1].top&&ib<chainnum) ib++;  
+		if(ia==schain[ib+1].top&&ib<chainnum) ib++;
 
 		if(ia-OFFSET<schain[ib].top) iB=schain[ib].top;
 		else iB=ia-OFFSET;
 		if(ia+OFFSET>=schain[ib+1].top) iF=schain[ib+1].top-1;
 		else iF=ia+OFFSET;
-	
+
 		for(;iB<iF;iB++){
-			if(ff_state[iB]!=ff_state[iB+1]){ 
+			if(ff_state[iB]!=ff_state[iB+1]){
 				toggle++;
 				//if(iB+2<=iF&&ff_state[iB]==ff_state[iB+2])
-				//toggle++;	
+				//toggle++;
 				}
-			Max_toggle++;	
-			}	
+			Max_toggle++;
+			}
 	ff_toggle_density[ia]+=(float)toggle/Max_toggle;
 }
 }
@@ -454,19 +454,19 @@ char ff_select[ffnum];
 	int ia,ib=0;
 
 	for(ia=0;ia<ffnum; ia++){
-		//FF_flog[ia][3]=0;
+		//FF_flag[ia][3]=0;
 		if(ia==schain[ib+1].top)	ib++;
-						
+
 		if(ia==schain[ib].top){
-			if(changed_freq[ia]<=300&&ff_select[ia]=='0'&&FaultyFreeFlog[ia]==0){
+			if(changed_freq[ia]<=300&&ff_select[ia]=='0'&&FaultyFreeflag[ia]==0){
 				if(ff_state[ia+1]!=ff_state[ia])
-					FF_flog[ia][3]++;
+					FF_flag[ia][3]++;
 				}
 			}
 		else{
-			if(changed_freq[ia]<=300&&ff_select[ia]=='0'&&FaultyFreeFlog[ia]==0){
+			if(changed_freq[ia]<=300&&ff_select[ia]=='0'&&FaultyFreeflag[ia]==0){
 				if(ff_state[ia-1]!=ff_state[ia])
-					FF_flog[ia][3]++;
+					FF_flag[ia][3]++;
 				}
 			}
 
@@ -487,9 +487,9 @@ int ff_state[ffnum];
   FLT_NODE *fgnode;
   FIN_NODE *finnode,*foutnode;
   L_NODE *fnode;
-  int ia, ib, ic, mask,flog,count=100000;
+  int ia, ib, ic, mask,flag,count=100000;
   int num_observe;
-int flog1,flog2,flog3,flog4;
+int flag1,flag2,flag3,flag4;
   unsigned int signature;
 unsigned int FF_Signature[ffnum],OBFF_Signature[ffnum];
 
@@ -497,15 +497,15 @@ num_observe = ffnum * OBSERVE_RATE;
 
 
   signature=0;
-#if FAULTOB  
+#if FAULTOB
 for(ia=0;ia<ffnum;ia++){
 FF_Signature[ia]=0;
 OBFF_Signature[ia]=0;
 }
 
-#endif 
+#endif
 
- 
+
 #if PO_OBSERVE
   for(ia=0; ia<numout; ia++){
     for(ib=0; ib<cap_freq; ib++){
@@ -514,13 +514,13 @@ OBFF_Signature[ia]=0;
   }
 #endif
 
-if(SOControlFlog==1){
+if(SOControlflag==1){
 	if(SoControlMode==0){
   finnode=ffnode.next;
   for(ia=0;finnode!=NULL;finnode=finnode->next, ia++){
 	fnode=finnode->node;
 
-	if(FF_flog[ia][0]==2){	
+	if(FF_flag[ia][0]==2){
 		signature |= 0;
 		}
 	else signature |= fnode->gdval1 ^ fnode->ftval1;
@@ -532,8 +532,8 @@ else if(SoControlMode==1){
   	finnode=ffnode.next;
   for(ia=0;finnode!=NULL;finnode=finnode->next, ia++){
 	fnode=finnode->node;
-	if(FF_flog[ia][0]==2)
-		signature |= initial_ff_state[0][FF_flog[ia][1]]^initial_ff_state[1][FF_flog[ia][1]];
+	if(FF_flag[ia][0]==2)
+		signature |= initial_ff_state[0][FF_flag[ia][1]]^initial_ff_state[1][FF_flag[ia][1]];
 	else signature |= fnode->gdval1 ^ fnode->ftval1;
 }
 }
@@ -543,9 +543,9 @@ else if(SoControlMode==2){
   	finnode=ffnode.next;
   for(ia=0;finnode!=NULL;finnode=finnode->next, ia++){
 	fnode=finnode->node;
-	if(FF_flog[ia][0]==3) signature |= 0;
-	else if(FF_flog[ia][0]==2) 
-		signature |= initial_ff_state[0][FF_flog[ia][1]]^initial_ff_state[1][FF_flog[ia][1]];
+	if(FF_flag[ia][0]==3) signature |= 0;
+	else if(FF_flag[ia][0]==2)
+		signature |= initial_ff_state[0][FF_flag[ia][1]]^initial_ff_state[1][FF_flag[ia][1]];
 	else signature |= fnode->gdval1 ^ fnode->ftval1;
 		}
 
@@ -588,7 +588,7 @@ else{
 #endif
 
 
-//printf(" signature=%x \n",signature);	
+//printf(" signature=%x \n",signature);
   mask=ITI;
 
   for(ia=0; ia<num_injgate; ia++, mask=mask<<1){
@@ -617,11 +617,11 @@ else{
 
 	if(FF_Signature[ib]&mask){
 				//if(FF_Fault_List[ib][fgnode->num]==0){FF_Fault_List[ib][0]++;FF_Fault_List[ib][fgnode->num]=1;}
-				flog=0;
+				flag=0;
 				for(ic=1;ic<=FF_SA_Fault_List[ib][0];ic++){
-					if(FF_SA_Fault_List[ib][ic]==fgnode->num){flog=1;break; }
+					if(FF_SA_Fault_List[ib][ic]==fgnode->num){flag=1;break; }
 					}
-				if(flog==0){
+				if(flag==0){
 				FF_SA_Fault_List[ib][0]++;
 				FF_SA_Fault_List[ib][FF_SA_Fault_List[ib][0]]=fgnode->num;
 					}
@@ -631,17 +631,17 @@ else{
 
 	if(OBFF_Signature[ib]&mask){
 			//if(Ob_FF_Faults[ib][fgnode->num]==0){Ob_FF_Faults[ib][0]++;Ob_FF_Faults[ib][fgnode->num]=1;}
-					flog=0;
+					flag=0;
 				for(ic=1;ic<=Ob_FF_SA_Faults[ib][0];ic++){
-					if(Ob_FF_SA_Faults[ib][ic]==fgnode->num){flog=1;break; }
+					if(Ob_FF_SA_Faults[ib][ic]==fgnode->num){flag=1;break; }
 					}
-				if(flog==0){
+				if(flag==0){
 					Ob_FF_SA_Faults[ib][0]++;
 					Ob_FF_SA_Faults[ib][Ob_FF_SA_Faults[ib][0]]=fgnode->num;
 						}
 
 			}
-		
+
 
 	}
 #endif
@@ -653,8 +653,8 @@ else{
 #endif
 
   //  }
-   
-} 
+
+}
 
   }//exit(1);
 }
@@ -672,18 +672,18 @@ int ff_state[ffnum];
   FLT_NODE *fgnode;
   FIN_NODE *finnode,*foutnode;
   L_NODE *fnode;
-  int ia, ib, ic, ie,iOB,mask,flog,count=100000;
+  int ia, ib, ic, ie,iOB,mask,flag,count=100000;
   int num_observe;
-int flog1,flog2,flog3,flog4,saflog,GdEvent[cap_freq],FtEvent[cap_freq];
+int flag1,flag2,flag3,flag4,saflag,GdEvent[cap_freq],FtEvent[cap_freq];
   unsigned int signature,signature1;
 int Tra_Faulty_state1,Tra_Faulty_state2,Tra_Fltfree_state1,Tra_Fltfree_state2;
 unsigned int FF_Signature[ffnum],OBFF_Signature[ffnum][cap_freq],All_OB_FF_Signature[ffnum],OBSignature[cap_freq];
 
 num_observe = ffnum * OBSERVE_RATE;
 
-  signature=0;   signature1=0; 
+  signature=0;   signature1=0;
 for(ia=0;ia<ffnum;ia++)OBSignature[ia]=0;
-#if FAULTOB  
+#if FAULTOB
 for(ia=0;ia<ffnum;ia++){
 FF_Signature[ia]=0;All_OB_FF_Signature[ia]=0;
 for(ib=0;ib<cap_freq;ib++){
@@ -701,17 +701,17 @@ if(ia==0)OBSignature[ib]=0;
     }
   }
 #endif
-if(SOControlFlog==1){
+if(SOControlflag==1){
 	if(SoControlMode==0){
   finnode=ffnode.next;
   for(ia=0;finnode!=NULL;finnode=finnode->next, ia++){
 	fnode=finnode->node;
 
-	if(FF_flog[ia][0]==2){ 
+	if(FF_flag[ia][0]==2){
 		signature |= 0;
 		signature1 |= 0;
 		}
-	else{ 
+	else{
 		signature |= fnode->gdval1 ^ fnode->ftval1;
 	        signature1 |= fnode->gdval1 ^ fnode->ftval1;
 		}
@@ -723,11 +723,11 @@ else if(SoControlMode==1){
   	finnode=ffnode.next;
   for(ia=0;finnode!=NULL;finnode=finnode->next, ia++){
 	fnode=finnode->node;
-	if(FF_flog[ia][0]==2){ 
-		signature |= initial_ff_state[0][FF_flog[ia][1]]^initial_ff_state[1][FF_flog[ia][1]];
-		signature1 |= initial_ff_state[0][FF_flog[ia][1]]^initial_ff_state[1][FF_flog[ia][1]];
+	if(FF_flag[ia][0]==2){
+		signature |= initial_ff_state[0][FF_flag[ia][1]]^initial_ff_state[1][FF_flag[ia][1]];
+		signature1 |= initial_ff_state[0][FF_flag[ia][1]]^initial_ff_state[1][FF_flag[ia][1]];
 		}
-	else{ 
+	else{
 		signature |= fnode->gdval1 ^ fnode->ftval1;
 	        signature1 |= fnode->gdval1 ^ fnode->ftval1;
 		}
@@ -739,15 +739,15 @@ else if(SoControlMode==2){
   	finnode=ffnode.next;
   for(ia=0;finnode!=NULL;finnode=finnode->next, ia++){
 	fnode=finnode->node;
-	if(FF_flog[ia][0]==3){ 
+	if(FF_flag[ia][0]==3){
 		signature |= 0;
 		signature1 |= 0;
 		}
-	else if(FF_flog[ia][0]==2){ 
-		signature |= initial_ff_state[0][FF_flog[ia][1]]^initial_ff_state[1][FF_flog[ia][1]];
-		signature1 |= initial_ff_state[0][FF_flog[ia][1]]^initial_ff_state[1][FF_flog[ia][1]];
+	else if(FF_flag[ia][0]==2){
+		signature |= initial_ff_state[0][FF_flag[ia][1]]^initial_ff_state[1][FF_flag[ia][1]];
+		signature1 |= initial_ff_state[0][FF_flag[ia][1]]^initial_ff_state[1][FF_flag[ia][1]];
 		}
-	else{ 
+	else{
 		signature |= fnode->gdval1 ^ fnode->ftval1;
 	     signature1 |= fnode->gdval1 ^ fnode->ftval1;
 		}
@@ -800,7 +800,7 @@ else{
 #endif
 #endif
 
-//printf(" signature=%x \n",signature);	
+//printf(" signature=%x \n",signature);
   mask=ITI;
 
   for(ia=0; ia<num_injgate; ia++, mask=mask<<1){
@@ -817,26 +817,26 @@ else{
 
 /*Tran faultlist ana*/
 //Last capture Detection
-flog=0;
+flag=0;
 	if(((fgnode->back->ftval0[cap_freq-1]&mask)>>(ia))==fgnode->saval){
 				if(signature1&mask){
-			TranFltCount++;	TranFltOBCount++;flog=1;
+			TranFltCount++;	TranFltOBCount++;flag=1;
 			fgnode->TranDetTimes++;
 		#if FAULTOB
-			for(ib=0; (ib<ffnum)&&(ib<num_observe); ib++){	
+			for(ib=0; (ib<ffnum)&&(ib<num_observe); ib++){
 			if(FF_Signature[ib]&mask){
-				flog=0;
+				flag=0;
 				for(ic=1;ic<=FF_Fault_List[ib][0];ic++){
-					if(FF_Fault_List[ib][ic]==fgnode->num){flog=1;break; }
+					if(FF_Fault_List[ib][ic]==fgnode->num){flag=1;break; }
 					}
-				if(flog==0){
+				if(flag==0){
 					FF_Fault_List[ib][0]++;
 					FF_Fault_List[ib][FF_Fault_List[ib][0]]=fgnode->num;
 						}
 					}
 				}
 		#endif
-	
+
    		}
 	}
 //OBFF Detection Tran
@@ -844,16 +844,16 @@ flog=0;
 	for(iOB=SKIP_CAPTURE;iOB<cap_freq;iOB++){
 		if(((fgnode->back->ftval0[iOB-1]&mask)>>(ia))==fgnode->saval){
 		if(OBSignature[iOB]&mask){
-			if(flog==0)TranFltOBCount++;	
+			if(flag==0)TranFltOBCount++;
 			fgnode->TranOBDetTimes++;
 		#if FAULTOB
-			for(ib=0; (ib<ffnum)&&(ib<num_observe); ib++){	
+			for(ib=0; (ib<ffnum)&&(ib<num_observe); ib++){
 			if(OBFF_Signature[ib][iOB]&mask){
-				flog=0;
+				flag=0;
 				for(ic=1;ic<=Ob_FF_Faults[ib][0];ic++){
-					if(Ob_FF_Faults[ib][ic]==fgnode->num){flog=1;break; }
+					if(Ob_FF_Faults[ib][ic]==fgnode->num){flag=1;break; }
 					}
-				if(flog==0){
+				if(flag==0){
 					Ob_FF_Faults[ib][0]++;
 					Ob_FF_Faults[ib][Ob_FF_Faults[ib][0]]=fgnode->num;
 						}
@@ -884,6 +884,3 @@ if((fgnode->TranOBDetTimes)||(fgnode->TranDetTimes)){
 	}
 }
 }
-
-
-

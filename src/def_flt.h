@@ -16,12 +16,9 @@ struct l_node
 {
   int line, type, innum, outnum, OBTimes, addgateflag;
   //toggle gate insertion
-  int toggle_flag;
-  int toggle_br_flag[100];
-  int toggle_br_flag_num;
-  int toggle_cnt;
-  int toggle_cap[MAXCAP];
-  float toggle_rate[MAXCAP];
+  int cp_flag;
+  int toggle_cap[MAXCAP];//toggle number for capture power computing
+  float toggle_rate[MAXCAP];//toggle rate for power computing
   unsigned int gdval1_cap[MAXCAP];
   unsigned int ftval1_cap[MAXCAP];
   unsigned int gdval1_br_cap[MAXCAP];
@@ -31,7 +28,7 @@ struct l_node
   FIN_NODE *finlst, *foutlst;
   unsigned int gdval0, gdval1, ftval0, ftval1;
   char *Name;
-  int sel_flag[20]; //5種類のFF選択法
+  int sel_flag[20]; //FF選択法
 };
 
 struct fin_node
@@ -47,13 +44,7 @@ struct flt_node
   FLT_NODE *next, *prev;
   DINFF *dfflst;
   unsigned int detect[MAXLEN / 32 + 1], activ[MAXLEN / 32 + 1];
-  int first_det_pat_scan, first_det_pat_last, first_det_pat_multi, first_det_pat_total;
-  int first_det_pat_obsel[20];
-  int OBdtime_sel_FF[10];
-  int full_ob_dtime;
-  //unsigned int PreAddPiValue[30];//PI value of inseted fault site for Transition fault sim
-  int dtime, scan_dtime, OBdtime, OBdtime_cap[MAXCAP], last_cap_dtime, TranDetTimes, TranOBDetTimes;
-  int scan_dtime_tmp, OBdetime_tmp;
+  int dtime, TranDetTimes;
 };
 struct dinff
 {
@@ -76,6 +67,7 @@ struct scan_chain
   int lastval;
 };
 
+#if FAULTOB
 struct FF_Pat_Flt_List
 { //パターン毎、FF毎に検出した故障情報を保存する構造体
   //int Total_Det_Faults;
@@ -90,6 +82,8 @@ struct FF_Pat_Flt_List
   unsigned int *OB_Cap_Faults;   //パターン毎、FF毎に中間キャプチャで検出した故障
   unsigned int *Total_Faults;    //パターン毎、FF毎に検出した故障の統計
 };
+FF_PAT_FLT_LIST **Pat_FF_Faults;
+#endif
 
 L_NODE gnode, inode;
 FIN_NODE pinode, ponode, ffnode;
@@ -99,13 +93,7 @@ FIN_NODE add_fin[32][32], add_fout[32], pi_fout[32];
 T_NODE **ff_observe;
 T_NODE **po_observe;
 SCAN_CHAIN *schain;
-FF_PAT_FLT_LIST **Pat_FF_Faults;
-/***
-L_NODE line_tmp[MAXLINE];
-FLT_NODE fltlst_tmp[MAXFLT];
-FIN_NODE fin_tmp[MAXLINE*2];
-int fill_fin_tmp,fill_line_tmp;
-***/
+
 
 /* net list */
 typedef struct element
@@ -117,19 +105,24 @@ typedef struct element
 } ELEMENT;
 
 /*Instance Variable Defination*/
-int MODE_TOOL, TPG_MODE, TAP_NUM, cap_freq, SKIP_CAPTURE, SKIP_CYCLE, FF_SEL_METHOD, TGL_GATE_MODE, clocktime, LBISTMODE, ALPMODE, INTERVAL_CYCLE, TG_FILE, SOControlflag, SoControlMode, FFSelMode, CHAINLENGTH, length,group_tpi;
+int MODE_TOOL, TPG_MODE, TAP_NUM, cap_freq, SKIP_CAPTURE, SKIP_CYCLE, FF_SEL_METHOD, TGL_GATE_MODE, clocktime;
+int LBISTMODE, ALPMODE, INTERVAL_CYCLE, TG_FILE, SOControlflag, SoControlMode, FFSelMode, CHAINLENGTH, length,group_tpi;
 int numout, slist, numgate, n_tpi;
-int lpnt, inpnum, ffnum, sum_flt, remain_flt, sum_Tran_flt, chainnum, interstatecount[2], tgl_gt_cnt;
+int lpnt, inpnum, ffnum, sum_flt, remain_flt, sum_Tran_flt, chainnum, tgl_gt_cnt;
 int **tgl_tpi;
 int flt_cap[MAXCAP];
 
 float Tgl_rate;
 float ff_rate;
+#if POWEREVA
 long double toggle_scn_max, toggle_cap_max, toggle_scn, toggle_scn_in, toggle_scn_out, toggle_cap[MAXCAP];
 double toggle_shift_perpat, toggle_cap_perpat[MAXCAP];
 double WSA[MAXCAP], MaxWSA;
+float ShiftPeak[CHAINNUM];
+#endif
+
 char *ff_select;
-float ShiftPeak[CHAINNUM], OBSERVE_RATE;
+float OBSERVE_RATE;
 int flt_det_num[20];
 int **flt_det_flag;
 //int flt_det_flag[MAXFLT][11];
