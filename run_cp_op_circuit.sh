@@ -7,7 +7,7 @@ function catch {
 trap catch ERR
 
 TPG=0
-TEST_VEC=100000 # Number of Test patterns
+TEST_VEC=20 # Number of Test patterns
 TOOLMODE=4
 CAPTURE=10 #the number of capture cycles
 OBRATE=0.2 #ratio of OP FF
@@ -41,6 +41,10 @@ if [ ! -e ${APP_DIR}/OUTPUTS/CPI/${CAPTURE}_cycles/ ]; then
     mkdir -p ${APP_DIR}/OUTPUTS/CPI/${CAPTURE}_cycles/
 fi
 
+if [ ! -e ${APP_DIR}/OUTPUTS/FLT_DET_LIST ]; then
+    mkdir -p ${APP_DIR}/OUTPUTS/FLT_DET_LIST
+fi
+
 ## FLT_LIST path check
 FLT_LIST_PATH=${APP_DIR}/FLT_LIST
 if [ ! -e ${FLT_LIST_PATH} ]; then
@@ -68,7 +72,7 @@ fi
 
 if [ ${CP_CTRL} -eq 1 ] || [ ${CP_CTRL} -eq 4 ]; then
 	echo "== simulation for Logic CPI =="
-	ln -sf ${CP_PATH}  ${CIRCUIT_NAME}_tgl_gt_input.dat
+	ln -sf ${CP_PATH} ${CIRCUIT_NAME}_tgl_gt_input.dat
 	echo === ${CIRCUIT_NAME}: ${INTERVAL_CYCLE} ===
 	${APP_DIR}/src/simulator/sim ${CIRCUIT_PATH} ${TOOLMODE} ${TPG} ${CP_CTRL} ${LCP_rate} ${CAPTURE} ${INTERVAL_CYCLE} ${SKIP_CAP} 1 ${OBRATE} 1 ${TEST_VEC}
 	echo ===logic CPI simulation process end===
