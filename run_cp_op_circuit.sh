@@ -6,8 +6,17 @@ function catch {
 }
 trap catch ERR
 
+function finally {
+	if [ -e ${APP_DIR}/fault_list.dat ]; then
+    	mv ${APP_DIR}/fault_list.dat ${APP_DIR}/${CIRCUIT_NAME}_fault_list.dat
+		mv ${APP_DIR}/${CIRCUIT_NAME}_fault_list.dat ${FLT_LIST_PATH}
+	fi
+    rm -f ${APP_DIR}/${CIRCUIT_NAME}_lfsr_pi.dat ${APP_DIR}/${CIRCUIT_NAME}_tgl_gt_tpi.dat ${APP_DIR}/${CIRCUIT_NAME}_tgl_gt_input.dat ${APP_DIR}/ff_station_${CIRCUIT_NAME}.dat
+}
+trap finally EXIT
+
 TPG=0
-TEST_VEC=100000 # Number of Test patterns
+TEST_VEC=10 # Number of Test patterns
 TOOLMODE=4
 CAPTURE=10 #the number of capture cycles
 OBRATE=0.2 #ratio of OP FF
@@ -78,10 +87,4 @@ if [ ${CP_CTRL} -eq 1 ] || [ ${CP_CTRL} -eq 4 ]; then
 	echo ===logic CPI simulation process end===
 fi
 
-rm -f ${APP_DIR}/${CIRCUIT_NAME}_lfsr_pi.dat ${APP_DIR}/${CIRCUIT_NAME}_tgl_gt_tpi.dat ${APP_DIR}/${CIRCUIT_NAME}_tgl_gt_input.dat ${APP_DIR}/ff_station_${CIRCUIT_NAME}.dat
-
-if [ -e ${APP_DIR}/fault_list.dat ]; then
-    mv ${APP_DIR}/fault_list.dat ${APP_DIR}/${CIRCUIT_NAME}_fault_list.dat
-	mv ${APP_DIR}/${CIRCUIT_NAME}_fault_list.dat ${FLT_LIST_PATH}
-fi
 
