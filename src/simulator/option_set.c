@@ -31,7 +31,7 @@ char *argv[1];
     for (ia = 0; ia < ffnum; ia++) {
       if (ia < ob_num) {
         fscanf(fin, "%d", &isel);
-        printf("%d, ", isel);
+        // printf("%d, ", isel);
         finnode = ffnode.next;
         for (; finnode != NULL; finnode = finnode->next) {
           fnode = finnode->node;

@@ -30,7 +30,7 @@ read_tpi_list(argv) char *argv[14];
       // for(ia=0;ia<TGL_GT_NUM;ia++){
       fscanf(fin1, "%d\n", &ib);
       toggle_gates[ib + inpnum + numout + ffnum] = 1;
-      printf("-----%d %d\n", ib, ib + inpnum + numout + ffnum);
+      // printf("-----%d %d\n", ib, ib + inpnum + numout + ffnum);
     }
     fclose(fin1);
     // exit(1);

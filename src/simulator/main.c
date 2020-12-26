@@ -6,8 +6,6 @@
 #include "def_flt.h"
 #include "def_gtype.h"
 
-#define FLT_PRN 0  // output the detected fault list
-
 main(argc, argv) int argc;
 char *argv[13];
 {
@@ -142,29 +140,16 @@ char *argv[1];
     fprintf(stderr, "cannot open the detected fault list \n");
     exit(1);
   }
-  printf("\noutput the fault detection table \n");
-  printf("#fault, nodft,");
   int ia, ib;
-  fprintf(flist, "%d\n", sum_flt);
-  if (MODE_TOOL == 3 || MODE_TOOL == 4) {
-    for (ia = 0; ia < FF_FILE; ia++) {
-      printf("op%d,", ia + 1);
-    }
-    printf("full_op");
-  }
-  printf("\n");
+  fprintf(flist, "#Fault, NoDFT, SEQ_OB, Full_OB");
   for (ia = 1; ia <= sum_flt; ia++) {
-    printf("%d,", ia);
     fprintf(flist, "%d,", ia);
     if (MODE_TOOL == 3 || MODE_TOOL == 4) {
       for (ib = 0; ib <= FF_FILE; ib++) {
-        printf("%d,", flt_det_flag[ia][ib]);
         fprintf(flist, "%d,", flt_det_flag[ia][ib]);
       }
-      printf("%d\n", flt_det_flag[ia][10]);
       fprintf(flist, "%d,\n", flt_det_flag[ia][10]);
     } else {
-      printf("%d,\n", flt_det_flag[ia][0]);
       fprintf(flist, "%d,\n", flt_det_flag[ia][0]);
     }
   }

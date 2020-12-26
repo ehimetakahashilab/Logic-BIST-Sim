@@ -98,6 +98,7 @@
 #define Transcycle 1
 #define FIXVALUE 0
 #define SEL_OB_FF_FLT 0
+#define FLT_PRN 1  // output the detected fault list
 
 #define FLT_OUTPUT 0
 #define FLTLIST_PAT 0
