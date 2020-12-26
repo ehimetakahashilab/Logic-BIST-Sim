@@ -8,10 +8,13 @@ read_tpi_list(argv) char *argv[14];
 {
   int i, ia, ib;
   float tmp, gt_cnt = 0.0;
+  char tgl_file[256];
+  sprintf(tgl_file, "%s_tgl_FF_input.dat", basename(argv[1]));
   FILE *fin1;
   for (i = 0; i <= lpnt; i++) {
     toggle_gates[i] = 0;
   }
+  printf("\n\nCPI Number=%d\n", (int)(numgate * atof(argv[5])));
 
   if (atoi(argv[4]) == 1 ||
       atoi(argv[4]) == 4) {  // Structure Based toggle Gate selection
@@ -22,9 +25,6 @@ read_tpi_list(argv) char *argv[14];
       fprintf(stderr, "'%s' is not found!\n", tgl_gt_input_path);
       exit(1);
     }
-    // printf("%d %f
-    // \n",numgate-ffnum-inpnum,GATE_GP_START*(numgate-ffnum-inpnum));
-    // printf("----%d\n", (int)(numgate * atof(argv[5])));
     for (ia = 0; ia < (int)(numgate * atof(argv[5])); ia++) {
       // for(ia=0;ia<TGL_GT_NUM;ia++){
       fscanf(fin1, "%d\n", &ib);
@@ -48,35 +48,31 @@ initial_node(argv) char *argv[1];
 
   sprintf(tgl_file, "%s_tgl_FF_input.dat", basename(argv[1]));
 
-  FILE *fin;
-  // int **gate_toggle;
-  // gate_toggle = (int **)calloc(numgate, sizeof(int *));
-
-  int toggle_FFs[lpnt];
-  for (i = 0; i <= lpnt; i++) toggle_FFs[i] = 0;
-
   if (TGL_GATE_MODE == 1 || TGL_GATE_MODE == 4) {
     // tgl_gt_cnt=TGL_GT_NUM;
     tgl_gt_cnt = numgate * Tgl_rate;
 
-    // printf("%d\n", numgate);
+    // printf("%d\n", numgate); exit(1);
     fnode = gnode.next;
     gt_cnt = 0.0;
-    ib = 0;
     for (; fnode != NULL; fnode = fnode->next) {
-      fnode->toggle_flog = 0;
+      fnode->cp_flag = 0;
 
-      // printf("%d %d \n",fnode->line,toggle_gates[fnode->line]);
-      ib = fnode->line;
-      if (toggle_gates[ib] == 1) {
-        fnode->toggle_flog = 1;
-        // printf("+++%d\n", fnode->line);
-        // printf("----maru\n");
+      if (toggle_gates[fnode->line] == 1) {
+        fnode->cp_flag = 1;
       }
-      for (i = 0; i < MAXCAP; i++) fnode->toggle_rate[i] = 0.0;
+      for (i = 0; i < MAXCAP; i++) {
+        fnode->toggle_rate[i] = 0.0;
+      }
     }
     // exit(1);
   } else if (TGL_GATE_MODE == 2 || TGL_GATE_MODE == 3) {  // FF TPI
+    FILE *fin;
+    int toggle_FFs[lpnt];
+    for (i = 0; i <= lpnt; i++) {
+      toggle_FFs[i] = 0;
+    }
+
     fin = fopen(tgl_file, "r");
     if (fin == NULL) {
       fprintf(stderr, "'tgl_FF_input.dat' is not found!\n");
@@ -101,18 +97,18 @@ initial_node(argv) char *argv[1];
     finnode = ffnode.next;
     for (; finnode != NULL; finnode = finnode->next) {
       fnode = finnode->node;
-      fnode->toggle_flog = 0;
+      fnode->cp_flag = 0;
       ib = fnode->line - inpnum - numout;
       // printf("%d, %d\n", fnode->line, toggle_FFs[fnode->line]);
       if (toggle_FFs[ib] == 1) {
-        fnode->toggle_flog = 1;
+        fnode->cp_flag = 1;
         // printf("%d\n", fnode->line);
         // printf("----maru\n");
       }
       // printf("%d, %d, %d\n",ib,fnode->line,toggle_FFs[ib]);
 
       /*	if(toggle_FFs[fnode->line]==1){
-                fnode->toggle_flog=1;
+                fnode->cp_flag=1;
         }*/
       for (i = 0; i < MAXCAP; i++) fnode->toggle_rate[i] = 0.0;
     }
@@ -173,7 +169,7 @@ sort_node() {
   }
   inode.next = new_head;
 
-#if DEBUG3
+#if DEBUG_NODE
   prn_node(new_head);   /** print PI & FF nodes list **/
   prn_node(gnode.next); /** print the other nodes list **/
 #endif
@@ -193,7 +189,7 @@ sort_node() {
         fnode = fnode->next;
     }
   }
-#if DEBUG3
+#if DEBUG_NODE
   prn_node(new_head);
 #endif
   /** reverse order **/
@@ -233,7 +229,7 @@ sort_node() {
   inode.next->pre=&gnode;
 **/
 
-#if DEBUG3
+#if DEBUG_NODE
   prn_node(gnode.next);
 #endif
 }

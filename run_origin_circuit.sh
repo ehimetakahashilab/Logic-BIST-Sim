@@ -9,9 +9,13 @@ trap catch ERR
 APP_DIR=$(dirname $0)
 
 ## OUTPUT path check
-OUTPUT_PATH=${APP_DIR}/OUTPUTS/MULTI_BIST
-if [ ! -e ${OUTPUT_PATH} ]; then
-    mkdir -p ${OUTPUT_PATH}
+OUTPUT_PATH=${APP_DIR}/OUTPUTS/
+if [ ! -e "${OUTPUT_PATH}MULTI_BIST" ]; then
+    mkdir -p "${OUTPUT_PATH}MULTI_BIST"
+fi
+
+if [ ! -e ${OUTPUT_PATH}FLT_DET_LIST ]; then
+    mkdir -p ${OUTPUT_PATH}FLT_DET_LIST
 fi
 
 ## FLT_LIST path check

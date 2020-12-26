@@ -27,7 +27,7 @@ FLT_NODE *injarray[32];
     inf_back[ni] = flttag->back;
     inj_fwd[ni] = flttag->forwd;
 
-#if DEBUG3
+#if DEBUG_NODE
     if (new_injfwd != NULL)
       printf(" FAULT %d->%d SA-%d injected -1094-\n", new_injback->line,
              new_injfwd->line, flttag->saval);
@@ -63,7 +63,7 @@ FLT_NODE *injarray[32];
     injarray[ni] = flttag;
     fnode = &add_gate[ni];
     fnode->line = ADD_LPNO + ni;
-    fnode->addgateflog = 1;
+    fnode->addgateflag = 1;
     if (new_injback->type == PI || new_injback->type == FF) {
       gnode.next->prev = fnode;
       fnode->next = gnode.next;
@@ -208,42 +208,7 @@ FLT_NODE *injarray[32];
         }
       }
     }
-
-    // int ie;
-
-    // finnode = fnode->finlst;
-    // finnode = finnode->next;
-    // for (; finnode != NULL; finnode = finnode->next)
-    // {
-    //   foutnode = fnode->foutlst;
-    //   for (; foutnode != NULL; foutnode = foutnode->next)
-    //   {
-    //     printf("%d %d\n", finnode->node->line, foutnode->node->line);
-    //     for (ie = 0; ie < foutnode->node->toggle_br_flog_num; ie++)
-    //     {
-    //       if (foutnode->node->toggle_br_flog[ie] == finnode->node->line)
-    //       {
-    //         printf("maru %d %d\n", finnode->node->line,
-    //         foutnode->node->line); fnode->toggle_br_flog[100] =
-    //         finnode->node->line; fnode = &add_gate[ni];
-    //       }
-    //     }
-    //   }
-    // }
   }
-
-  // fnode = gnode.next;
-
-  // for (; fnode != NULL; fnode = fnode->next)
-  // {
-  //   finnode = fnode->finlst;
-  //   for (; finnode != NULL; finnode = finnode->next)
-  //   {
-  //     printf("%6d %6d\n", fnode->line, finnode->node->line);
-  //   }
-  //   printf("\n");
-  // }
-
   startflt->next = flttag;
   return ni;
 }
@@ -257,7 +222,7 @@ int num_injgate;
 
   for (ni = 0; ni < num_injgate; ni++) {
     fnode = &add_gate[ni];
-    fnode->addgateflog = 0;
+    fnode->addgateflag = 0;
     if (fnode->next != NULL) fnode->next->prev = fnode->prev;
     fnode->prev->next = fnode->next;
 

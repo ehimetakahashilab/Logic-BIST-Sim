@@ -9,15 +9,18 @@
 #define PATH_MIDDLE "SIM_RESULT/MIDDLE/"
 #define PATH_TOGGLE "test/TOGGLE_RATE/"
 
+//観測用FFリストの読み込む
 ff_sta_src_read(src_num, ob_num, argv) int src_num;
 int ob_num;
 char *argv[1];
 {
-  int i, ia, ib, ic;
+  int i, ia;
   FILE *fin;
   char PATH[256];
-  int isel[src_num];
+  int isel;
   FIN_NODE *finnode;
+  L_NODE *fnode;
+
   i = 0;
   while (i < src_num) {
     sprintf(PATH, "ff_station_%s.dat", basename(argv[1]));
@@ -27,12 +30,13 @@ char *argv[1];
     }
     for (ia = 0; ia < ffnum; ia++) {
       if (ia < ob_num) {
-        fscanf(fin, "%d", &isel[i]);
-        // printf("%d, ",isel[i]);
+        fscanf(fin, "%d", &isel);
+        // printf("%d, ", isel);
         finnode = ffnode.next;
-        for (ib = 1; finnode != NULL; finnode = finnode->next, ib++) {
-          if (isel[i] == ib) {
-            finnode->node->sel_flog[i] = 1;
+        for (; finnode != NULL; finnode = finnode->next) {
+          fnode = finnode->node;
+          if (isel == (fnode->line - inpnum - numout)) {
+            fnode->sel_flag[i] = 1;
             break;
           }
         }
@@ -42,13 +46,6 @@ char *argv[1];
     fclose(fin);
     memset(PATH, '\0', 30);
   }
-  /*
-          finnode=ffnode.next;ib=0;
-          for(; finnode!=NULL; finnode=finnode->next){
-                  if(finnode->node->sel_flog[0]==1) {ib++;
-                  printf("\n%d, %d",finnode->node->line,ib);
-                          }}
-exit(1);*/
 }
 
 Instance_Get(argc, argv) int argc;
@@ -83,15 +80,16 @@ char *argv[14];
       cap_freq = 1;
 #endif
       break;
-    case 2:
-    case 3:
+    case 2:  // Multi-cycle test
+    case 3:  // Multi-cycle test with SEQ-OB
       TPG_MODE = atoi(argv[3]);
-      if (TPG_MODE == 0)
+      if (TPG_MODE == 0) {
         printf("TPG: %d bit LFSR \n", LFSR_BIT);
-      else
+      } else {
         printf("TPG: In House ATPG\n");
-      cap_freq = atoi(argv[4]);
-      SKIP_CAPTURE = atoi(argv[5]);
+      }
+      cap_freq = atoi(argv[4]);  // read the capture number
+      SKIP_CAPTURE = atoi(argv[5]);  // FFを観測する開始サイクルを指定する
 
       if (MODE_TOOL == 2) {
         printf("Tool: BIST Multi-Cycle Testing Mode\n");
@@ -115,32 +113,22 @@ char *argv[14];
               "Test_vector_generator path\n");
           exit(1);
         }
-        OBSERVE_RATE = atof(argv[6]);
-        FF_FILE = atoi(argv[7]);
+        OBSERVE_RATE =
+            atof(argv[6]);  // read the ratio of observation
+                            // FF:観測率指定→中間観測するFFの数を決定する
+        FF_FILE = atoi(
+            argv[7]);  // specify the number of SEQ-OB
+                       // methods:評価したい中間観測FF選定方法の数を読み込む
         printf(
-            "***************************************\nWarning: You would have "
-            "to check the following setting at 'declare.h'\n");
+            "******\nWarning: You would have to check the following setting at "
+            "'declare.h'\n");
         printf("PO観測:PO_OBSERVE  = %d\n", PO_OBSERVE);
         printf("FF観測モード:SELECT_STATION = %d\n", SELECT_STATION);
         /* 1 when select FF station 0: Full observation*/
-
-        flt_det_flog = (int **)malloc((sum_flt + 2) * sizeof(int *));
-        if (flt_det_flog == NULL) {
-          fprintf(stderr, "memory error @flt_det_flog in flt_info \n");
-          exit(1);
-        }
-
-        for (ia = 0; ia <= sum_flt + 1; ia++) {
-          flt_det_flog[ia] = (int *)malloc(11 * sizeof(int));
-          if (flt_det_flog[ia] == NULL) {
-            fprintf(stderr, "memory error @flt_det_flog \n");
-            exit(1);
-          }
-        }
       }
 
 #if FAULTOB
-      /*2進数でパターンごと、FFごと、キャプチャごとの故障情報を記録する＿＿2015710_王*/
+      // 2進数でパターンごと、FFごと、キャプチャごとの故障情報を記録する＿デバックしていない20201224
       Pat_FF_Faults =
           (FF_PAT_FLT_LIST **)calloc(length + 1, sizeof(FF_PAT_FLT_LIST *));
       if (Pat_FF_Faults == NULL) {
@@ -158,7 +146,6 @@ char *argv[14];
       }
       for (ia = 0; ia < length + 1; ia++)
         for (ib = 0; ib < ffnum; ib++) {
-          printf("here? %d \n\n", ia);
           Pat_FF_Faults[ia][ib].Last_Cap_Faults =
               (unsigned int *)calloc(sum_flt / 32 + 1, sizeof(unsigned int));
           Pat_FF_Faults[ia][ib].OB_Cap_Faults =
@@ -177,16 +164,16 @@ char *argv[14];
       break;
 
     case 4:
-      printf("Tool: Logic CP Insertion MODE\n");
+      printf("Tool: Logic CP Insertion MODE %d\n", MODE_TOOL);
       if (argc > 14) {
-        printf("error: too much arguments!\n");
-        printf(
-            "Please Setting the arguments for \nargv1: Tool "
-            "Mode\nargv2:TPG_MODE\n argv3: Circuit\nargv4: "
-            "Test_vector_generator path\n");
+        fprintf(stderr, "error: too much arguments!\n");
+        fprintf(stderr,
+                "Please Setting the arguments for \nargv1: Tool "
+                "Mode\nargv2:TPG_MODE\n argv3: Circuit\nargv4: "
+                "Test_vector_generator path\n");
         exit(1);
       }
-      TPG_MODE = atoi(argv[3]);
+      TPG_MODE = atoi(argv[3]);  // set the test pattern generator
       if (TPG_MODE == 0) {
         printf("TPG: %d bit LFSR \n", LFSR_BIT);
       } else
@@ -195,17 +182,23 @@ char *argv[14];
       TGL_GATE_MODE = atoi(argv[4]);  //=1: gate TPI, =2:FF TPI
 
       if (TGL_GATE_MODE == 0 || TGL_GATE_MODE == 2 || TGL_GATE_MODE == 3) {
-        ff_rate = atof(argv[5]);
-        cap_freq = atoi(argv[6]);
-        INTERVAL_CYCLE = atoi(argv[7]);
-        SKIP_CYCLE = atoi(argv[8]);
+        //=0: non-cp, =2: FF-CPI by toggling,=3:FF-CPI by random load
+        ff_rate = atof(argv[5]);  // FF-CPI rate:制御するFFの比率(controll_ff =
+                                  // all_ff x ff_rate)
+        cap_freq = atoi(argv[6]);  // read the capture number
+        INTERVAL_CYCLE =
+            atoi(argv[7]);  // interval of control,制御の間隔を指定する
+        SKIP_CYCLE = atoi(argv[8]);  //制御開始サイクル指定
         FF_SEL_METHOD = atoi(argv[9]);
-        FF_FILE = atoi(argv[10]);
+        FF_FILE = atoi(
+            argv[10]);  // specify the number of SEQ-OB
+                        // methods:評価したい中間観測FF選定方法の数を読み込む
         OBSERVE_RATE = atof(argv[11]);
         for (ia = 0; ia < FF_FILE; ia++) flt_det_num[ia] = 0;
         flt_det_num[20] = 0;
         length = atoi(argv[12]);
       } else {
+        //=1: Logic-CPI by toggling,=4:Logic-CPI by random load
         Tgl_rate = atof(argv[5]);
         cap_freq = atoi(argv[6]);
         // TG_FILE = atoi(argv[7]);
@@ -219,10 +212,10 @@ char *argv[14];
         flt_det_num[20] = 0;
       }
 
-      printf("Toggle Gate Insertion Mode : %d\n", TGL_GATE_MODE);
-      printf("Toggle Gate Insertion Rate : %f\n", Tgl_rate);
+      printf("CP Insertion Mode : %d\n", TGL_GATE_MODE);
+      printf("CP Insertion Rate : %f\n", Tgl_rate);
       printf("# of Capture Cycles: %d\n", cap_freq);
-      printf("Toggle INTERVAL_CYCLE: %d\n", INTERVAL_CYCLE);
+      printf("Control INTERVAL_CYCLE: %d\n", INTERVAL_CYCLE);
 
       SKIP_CAPTURE = 0;
       // OBSERVE_RATE=atof(argv[8]);
@@ -642,8 +635,6 @@ Out_Put(argv) char *argv[13];
       fprintf(fout, "\n*************OUTPUT END****************\n");
       fclose(fout);
       printf("\n*************OUTPUT END****************\n");
-      for (ia = 0; ia <= sum_flt + 1; ia++) free(flt_det_flog[ia]);
-      free(flt_det_flog);
       break;
 
     default:

@@ -30,6 +30,7 @@ faultsim(argv) char *argv[13];
   char pt_file2[256];
 
   sprintf(pt_file1, "%s_lfsr_pi.dat", basename(argv[1]));
+  sprintf(pt_file2, "%s_tgl_ff_tpi.dat", basename(argv[1]));
 
   for (ia = 0; ia < MAXCAP; ia++) flt_cap[ia] = 0;
   printf("\n==Simulation Parameter Setting for==\n");
@@ -239,7 +240,7 @@ faultsim(argv) char *argv[13];
   } else {
     test_pat = fopen(pt_file1, "r");
     if (test_pat == NULL) {
-      fprintf(stderr, "%s is not found!\n", argv[2]);
+      fprintf(stderr, "pi pattern %s is not found!\n", argv[2]);
       exit(1);
     }
     fscanf(test_pat, "%d %d", &length, &n_inp);
@@ -249,9 +250,27 @@ faultsim(argv) char *argv[13];
       exit(1);
     }
   }
-  // printf("herer?\n");
+
   if (MODE_TOOL == 4) {
-    if (TGL_GATE_MODE == 4) {  // Toggle Gate TPI by LFSR
+    if (TGL_GATE_MODE == 3) {  // FF_TPI by LFSR
+      tpi_pat = fopen(pt_file2, "r");
+      if (tpi_pat == NULL) {
+        fprintf(stderr, "tgl_ff_tpi.dat is not found!\n");
+        exit(1);
+      }
+      fscanf(tpi_pat, "%d %d", &n_tpi, &n_tpi);
+      printf("%d %d %f %d\n", n_tpi, ffnum, ff_rate, (int)(ffnum * ff_rate));
+      if (n_tpi != (int)(ffnum * ff_rate)) {
+        fprintf(stderr, "test pattern format2 error!\n");
+        exit(1);
+      }
+      // tgl_tpi = (int **) malloc((n_tpi+1)*sizeof(int *));
+      tgl_tpi = (int **)calloc((n_tpi + 1), sizeof(int *));
+      for (ia = 0; ia <= n_tpi; ia++) {
+        tgl_tpi[ia] = (int *)calloc((cap_freq + 1), sizeof(int));
+        // tgl_tpi[ia] = (int *)malloc((cap_freq+1)*sizeof(int));
+      }
+    } else if (TGL_GATE_MODE == 4) {  // Toggle Gate TPI by LFSR
       char tgl_gt_tpi_path[256];
       sprintf(tgl_gt_tpi_path, "%s_tgl_gt_tpi.dat", basename(argv[1]));
       tpi_pat = fopen(tgl_gt_tpi_path, "r");
@@ -267,8 +286,9 @@ faultsim(argv) char *argv[13];
         exit(1);
       }
       tgl_tpi = (int **)malloc((n_tpi + 1) * sizeof(int *));
-      for (ia = 0; ia <= n_tpi; ia++)
+      for (ia = 0; ia <= n_tpi; ia++) {
         tgl_tpi[ia] = (int *)malloc((cap_freq + 1) * sizeof(int));
+      }
     }
   }
 
@@ -276,7 +296,7 @@ faultsim(argv) char *argv[13];
   int pivalset[n_inp];
   int tmp_tpi[n_tpi];
   initialize_detect(fltlst.next, length);
-  // printf("herer?\n");
+
   if (MODE_TOOL == 3 || MODE_TOOL == 4) {
     flt_info(fltlst.next);
   }
@@ -294,10 +314,10 @@ faultsim(argv) char *argv[13];
   // }
   // prn_state_ao2(fp);
   /*Simulation Start*/
-  for (time = 1; time <= length && fltlst.next != NULL &&
-                 ((float)flt_det_num[0] / (float)sum_flt) <= 0.9;
-       time++)
-  // for (time = 1; time <= length && fltlst.next != NULL; time++)
+  // for (time = 1; time <= length && fltlst.next != NULL &&
+  //                ((float)flt_det_num[0] / (float)sum_flt) <= 0.90001;
+  //      time++)
+  for (time = 1; time <= length && fltlst.next != NULL; time++)
   //	for (time = 1; time <= length && fltlst.next != NULL && (1 -
   //(float)remain_flt / (float)sum_flt) <= 0.90001; time++)
   {
@@ -360,22 +380,11 @@ faultsim(argv) char *argv[13];
     // prn_state_ao3(fp, time); //2019/12
 
     for (ia = 1; ia <= cap_freq; ia++) {
-      // prn_state_ao(ffnode.next);
-
       onetimesim(ia);
-
-      // if (cap_freq == ia)
-      // 	fprintf(fout_in, "\n");
-      // if (ia == 5)
-      // {
-      // 	exit(1);
-      // }
       switch (MODE_TOOL) {
         case 3:
         case 4:
 #if SELECT_STATION
-          // ic=0;
-
           finnode = ffnode.next;
           for (ib = 0; finnode != NULL; finnode = finnode->next, ib++) {
             // if(ff_select[ib] == '1'){
@@ -540,19 +549,13 @@ faultsim(argv) char *argv[13];
       }
 
 #if FAULTDROP
-      drop_flt(num_injgate, injarray, time);  //修正あり、2015710_王
+      drop_flt(num_injgate, injarray, time);
 
 #else
       Full_flt_sim(num_injgate, injarray,
                    time);  // 2014_10_21ここ//修正あり、2015710_王
 
 #endif
-
-      //#if TRANSITIONFAULT
-      // drop_flt_TRF(num_injgate, injarray, time,ff_select,ff_state);
-      //#else
-      // drop_flt_SAF(num_injgate, injarray, time,ff_select,ff_state);
-      //#endif
       clear_addgate(num_injgate, add_gate, add_pi);
     }
 #endif
@@ -573,7 +576,7 @@ faultsim(argv) char *argv[13];
       // printf("Fault Coverage: %6.4f \n", (float)flt_det_num[10] /
       // (float)sum_flt * 100.0);
       printf("#Ori FCov: %4.6f \n",
-             (1 - (float)remain_flt / (float)sum_flt) * 100.0);
+             (float)(sum_flt - remain_flt) / sum_flt * 100.0);
 #if FCOVPERPAT
       fprintf(fout_flt_pat, "%d,", time);
 #endif
@@ -629,21 +632,6 @@ faultsim(argv) char *argv[13];
       fprintf(fout_flt_pat, "\n");
     }
 
-#if MAKE_REC
-    remain_flt = count_flt(fltlst.next);
-    fout = fopen("log.dat", "a");
-    fprintf(fout, "%6.3f\t%6.3f", 100.0 - (float)remain_flt / sum_flt * 100.0,
-            toggle_scn / toggle_scn_max * 100.0);
-#if TRANSITIONFAULT
-    for (ia = 1 + SLOW_CK; ia <= cap_freq; ia++)
-      fprintf(fout, "\t%6.3f", toggle_cap[ia] / toggle_cap_max * 100.0);
-#else
-    for (ia = 1; ia <= cap_freq; ia++)
-      fprintf(fout, "\t%6.3f", toggle_cap[ia] / toggle_cap_max * 100.0);
-#endif
-    fprintf(fout, "\n");
-    fclose(fout);
-#endif
 #if OUTPUT_FLIST
     fprintf(flist_out, "\n");
 #endif

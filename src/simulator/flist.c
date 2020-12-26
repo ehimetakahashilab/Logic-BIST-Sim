@@ -123,7 +123,7 @@ make_line_list(argv) char *argv[13];
   fnode = head_node;
   for (; fnode != NULL; fnode = fnode->next) {
     line = fnode->line;
-#if DEBUG3
+#if DEBUG_NODE
     printf(" Line = %d (WI89)\n", line);
 #endif
 
@@ -356,7 +356,7 @@ make_fault_list(address) L_NODE **address;
   }
 
   head_flt->next = NULL;
-#if DEBUG3
+#if DEBUG_NODE
   prn_fltlst(fltlst.next);
 #endif
 }
@@ -388,11 +388,11 @@ make_Tranfault_list(address) L_NODE **address;
         switch (gate[fol].type) {
           case AND:
           case NAND:
-            flttag->typeflog = 1;
+            flttag->typeflag = 1;
             break;
           case OR:
           case NOR:
-            flttag->typeflog = 2;
+            flttag->typeflag = 2;
             break;
           case NOT:  //インバーター出力側のs0,s1故障は、入力のs1とs0と等価
           case TPI:  // TPIの故障を考慮しない
@@ -459,7 +459,7 @@ make_Tranfault_list(address) L_NODE **address;
           flttag->back = address[gate[ni].fil];
         flttag->forwd = address[fol];
         flttag->saval = saval;
-        flttag->typeflog = 0;
+        flttag->typeflag = 0;
         flttag->dfflst = NULL;
         flttag->prev = head_flt;
         head_flt->next = flttag;
@@ -485,7 +485,7 @@ make_Tranfault_list(address) L_NODE **address;
         flttag->back = address[ni];
         flttag->forwd = NULL;
         flttag->saval = saval;
-        flttag->typeflog = 0;
+        flttag->typeflag = 0;
         flttag->dfflst = NULL;
         flttag->prev = head_flt;
         head_flt->next = flttag;
@@ -494,7 +494,7 @@ make_Tranfault_list(address) L_NODE **address;
     }
   }
   head_flt->next = NULL;
-#if DEBUG3
+#if DEBUG_NODE
   prn_fltlst(fltlst.next);
 #endif
 }
@@ -586,6 +586,7 @@ prn_fltlst_format(flttag) FLT_NODE *flttag;
   }
 }
 
+//指定したノードからノードリストの最後まで出力する
 prn_subnode(subnode) FIN_NODE *subnode;
 {
   for (; subnode != NULL; subnode = subnode->next) {
@@ -593,6 +594,8 @@ prn_subnode(subnode) FIN_NODE *subnode;
   }
   printf("|| EOL ||\n");
 }
+
+//ノードリストの最初から最後まで出力する
 prn_node(head_node) L_NODE *head_node;
 {
   L_NODE *fnode;
@@ -718,7 +721,7 @@ readf_ehime(argv) char *argv[13];
   flist = (int *)calloc(lpnt + 1, sizeof(int));
 
   if ((gate == NULL) || (flist == NULL)) {
-    printf(stderr, "memory error @readf\n");
+    fprintf(stderr, "memory error @readf\n");
     exit(1);
   }
 

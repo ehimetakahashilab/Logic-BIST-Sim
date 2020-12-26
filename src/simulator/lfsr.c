@@ -1,7 +1,8 @@
+#include <math.h>
+
 #include "declare.h"
 #include "def_flt.h"
 #include "def_gtype.h"
-#include "math.h"
 
 //#define DEBUG 1 //20140922
 //#define ALPMODE 1 //0:AI-RTPG 1:Basic ALP-RTPG 2:Combination of AI&ALP
@@ -86,7 +87,11 @@ int ff_state[];
   }
   chainnum = (ffnum - 1) / CHAINLENGTH + 1;
 
-  for (ia = 0; ia < chainnum; ia++) ShiftPeak[ia] = 0.0;
+#if POWEREVA
+  for (ia = 0; ia < chainnum; ia++) {
+    ShiftPeak[ia] = 0.0;
+  }
+#endif
 
   schain = (SCAN_CHAIN *)calloc(chainnum, sizeof(SCAN_CHAIN));
   if (schain == NULL) {
@@ -154,7 +159,7 @@ int ff_state[];
 {
   int ia, ib, i;
 
-#if PEAK
+#if POWEREVA && PEAK
   int OrigPatTog[chainnum], TogPerClk[chainnum];
   int Tem_state[ffnum];
   for (ia = 0; ia < ffnum; ia++) Tem_state[ia] = ff_state[ia];

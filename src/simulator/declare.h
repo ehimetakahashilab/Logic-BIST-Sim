@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/times.h>
 
 /* signal value */
 #define X 2
@@ -26,7 +25,7 @@
 //キャプチャ回数,flsrの状態などが表示される
 #define DEBUG1 0
 #define DEBUG2 0
-#define DEBUG3 0
+#define DEBUG_NODE 0
 #define FALSE 0
 #define TRUE 1
 #define PRN_FLT_INT 5
@@ -97,6 +96,7 @@
 #define Transcycle 1
 #define FIXVALUE 0
 #define SEL_OB_FF_FLT 0
+#define FLT_PRN 1  // output the detected fault list
 
 #define FLT_OUTPUT 0
 #define FLTLIST_PAT 0
