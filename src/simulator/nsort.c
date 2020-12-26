@@ -14,8 +14,7 @@ read_tpi_list(argv) char *argv[14];
   for (i = 0; i <= lpnt; i++) {
     toggle_gates[i] = 0;
   }
-  printf("\n\nCPI Number=%d\n-----list,location\n",
-         (int)(numgate * atof(argv[5])));
+  printf("\n\nCPI Number=%d\n", (int)(numgate * atof(argv[5])));
 
   if (atoi(argv[4]) == 1 ||
       atoi(argv[4]) == 4) {  // Structure Based toggle Gate selection
