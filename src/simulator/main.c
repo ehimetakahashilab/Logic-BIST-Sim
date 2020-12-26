@@ -6,7 +6,7 @@
 #include "math.h"
 #include "string.h"
 
-#define FLT_PRN 1  // output the detected fault list
+#define FLT_PRN 0  // output the detected fault list
 
 main(argc, argv) int argc;
 char *argv[13];
