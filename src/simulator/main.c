@@ -145,9 +145,9 @@ char *argv[1];
       for (ib = 0; ib <= FF_FILE; ib++) {
         fprintf(flist, "%d,", flt_det_flag[ia][ib]);
       }
-      fprintf(flist, "%d,\n", flt_det_flag[ia][10]);
+      fprintf(flist, "%d\n", flt_det_flag[ia][10]);
     } else {
-      fprintf(flist, "%d,\n", flt_det_flag[ia][0]);
+      fprintf(flist, "%d\n", flt_det_flag[ia][0]);
     }
   }
   fclose(flist);
