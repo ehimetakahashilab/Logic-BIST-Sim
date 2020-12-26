@@ -249,7 +249,7 @@ faultsim(argv) char *argv[13];
       exit(1);
     }
   }
-  // printf("herer?\n");
+
   if (MODE_TOOL == 4) {
     if (TGL_GATE_MODE == 4) {  // Toggle Gate TPI by LFSR
       char tgl_gt_tpi_path[256];
@@ -267,8 +267,9 @@ faultsim(argv) char *argv[13];
         exit(1);
       }
       tgl_tpi = (int **)malloc((n_tpi + 1) * sizeof(int *));
-      for (ia = 0; ia <= n_tpi; ia++)
+      for (ia = 0; ia <= n_tpi; ia++) {
         tgl_tpi[ia] = (int *)malloc((cap_freq + 1) * sizeof(int));
+      }
     }
   }
 
@@ -276,7 +277,7 @@ faultsim(argv) char *argv[13];
   int pivalset[n_inp];
   int tmp_tpi[n_tpi];
   initialize_detect(fltlst.next, length);
-  // printf("herer?\n");
+
   if (MODE_TOOL == 3 || MODE_TOOL == 4) {
     flt_info(fltlst.next);
   }
@@ -529,19 +530,13 @@ faultsim(argv) char *argv[13];
       }
 
 #if FAULTDROP
-      drop_flt(num_injgate, injarray, time);  //修正あり、2015710_王
+      drop_flt(num_injgate, injarray, time);
 
 #else
       Full_flt_sim(num_injgate, injarray,
                    time);  // 2014_10_21ここ//修正あり、2015710_王
 
 #endif
-
-      //#if TRANSITIONFAULT
-      // drop_flt_TRF(num_injgate, injarray, time,ff_select,ff_state);
-      //#else
-      // drop_flt_SAF(num_injgate, injarray, time,ff_select,ff_state);
-      //#endif
       clear_addgate(num_injgate, add_gate, add_pi);
     }
 #endif

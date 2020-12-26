@@ -164,7 +164,7 @@ char *argv[14];
       break;
 
     case 4:
-      printf("Tool: Logic CP Insertion MODE\n");
+      printf("Tool: Logic CP Insertion MODE %d\n", MODE_TOOL);
       if (argc > 14) {
         fprintf(stderr, "error: too much arguments!\n");
         fprintf(stderr,

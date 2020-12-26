@@ -164,8 +164,6 @@ for(ic=0;ic<FF_FILE;ic++)
       }
 
       if (signature_mul & mask) {
-        // if(signature & mask){
-
 #if TRANSITIONFAULT
         fgnode->TranDetTimes++;
 #else
@@ -200,31 +198,6 @@ for(ic=0;ic<FF_FILE;ic++)
       fgnode->detect[time / 32] |= ITI << (time % 32);
       fgnode->dtime++;
 #else
-      // if(flt_det_flag==FF_FILE){
-      /*if(MODE_TOOL==3||MODE_TOOL==4){
-if(fgnode->dtime){
-if(fgnode->next!=NULL)
-fgnode->next->prev=fgnode->prev;
-fgnode->prev->next=fgnode->next;
-injarray[ia]=NULL;
-}
-}
-else {
-if(fgnode->next!=NULL)
-fgnode->next->prev=fgnode->prev;
-fgnode->prev->next=fgnode->next;
-injarray[ia]=NULL;
-}*/
-
-      // if (fgnode->dtime)
-      // {
-      // 	//printf("%d\n", fgnode->num);
-      // }
-      // if (fgnode->full_ob_dtime)
-      // {
-      // 	printf("--%d\n", fgnode->num);
-      // }
-
       if (fgnode->dtime) {
         if (fgnode->next != NULL) fgnode->next->prev = fgnode->prev;
         fgnode->prev->next = fgnode->next;
