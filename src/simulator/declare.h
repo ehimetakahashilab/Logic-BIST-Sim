@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/times.h>
-#include <sys/sysinfo.h>
 
 /* signal value */
 #define X 2

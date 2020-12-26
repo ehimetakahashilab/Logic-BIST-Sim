@@ -1,6 +1,7 @@
 #include <libgen.h>
 #include <math.h>
 #include <string.h>
+#include <time.h>
 
 #include "declare.h"
 #include "def_flt.h"
@@ -9,10 +10,8 @@
 main(argc, argv) int argc;
 char *argv[13];
 {
-  struct tms cputime;
-  int totime, ia, ib, ic, id;
+  int ia, ib, ic, id;
   int remain_flt;
-  time_t time_1, time_2;
   char path_last[256], path_middle[256], name[256], path_toggle[256];
   FILE *fout;
 
@@ -24,8 +23,8 @@ char *argv[13];
   sort_node();  //回路のノードリストソーティング、故障リストソーティング
   err_check(fltlst.next, 0);  //故障リストが正しく作られているかをチェックする
 
-  // flt_det_flag[][]:異なる中間観測ＦＦ選定手法で選んだＦＦを観測する場合の故障検出数の情報を保存するための配列
-  // flt_det_flag[a][b]: a:故障番号、b:観測ＦＦ選定手法、b=10:
+  // flt_det_flag[][]:異なる中間観測FF選定手法で選んだFFを観測する場合の故障検出数の情報を保存するための配列
+  // flt_det_flag[a][b]: a:故障番号、b:観測FF選定手法、b=10:
   // 全観測の場合の結果
   flt_det_flag = (int **)calloc((sum_flt + 2), sizeof(int *));
   if (flt_det_flag == NULL) {
@@ -66,26 +65,24 @@ char *argv[13];
 #endif
 
   // fltlist_print(fltlst.next);exit(1);
-  times(&cputime);
-  totime = cputime.tms_utime;  //シミュレーション時間計測
-  time_1 = time((time_t *)0);
 
+  clock_t start = clock();
   faultsim(argv);  //論理・故障シミュレーション
+  clock_t end = clock();
+
   //  fltlist_print(fltlst.next);
   Out_Put(argv);  //シミュレーション結果出力
-  times(&cputime);
-  totime = cputime.tms_utime - totime;
+  printf(" ***  cpu time = %.3lf[sec] *** \n",
+         (double)(end - start) / CLOCKS_PER_SEC);
 
 #if FLT_PRN
   prn_flt(flt_det_flag, argv);
 #endif
 
-  for (ia = 0; ia <= sum_flt + 1; ia++) free(flt_det_flag[ia]);
+  for (ia = 0; ia < sum_flt + 2; ia++) {
+    free(flt_det_flag[ia]);
+  }
   free(flt_det_flag);
-
-  printf(" ***  cputime = %.3f[sec] *** \n\n", (double)totime / 100);
-  time_2 = time((time_t *)0);
-  printf(" CPU-time %.2f(sec)\n", difftime(time_2, time_1));
 }
 
 count_flt(flttag) FLT_NODE *flttag;
