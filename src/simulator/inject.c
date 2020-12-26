@@ -63,7 +63,7 @@ FLT_NODE *injarray[32];
     injarray[ni] = flttag;
     fnode = &add_gate[ni];
     fnode->line = ADD_LPNO + ni;
-    fnode->addgateflog = 1;
+    fnode->addgateflag = 1;
     if (new_injback->type == PI || new_injback->type == FF) {
       gnode.next->prev = fnode;
       fnode->next = gnode.next;
@@ -219,12 +219,12 @@ FLT_NODE *injarray[32];
     //   for (; foutnode != NULL; foutnode = foutnode->next)
     //   {
     //     printf("%d %d\n", finnode->node->line, foutnode->node->line);
-    //     for (ie = 0; ie < foutnode->node->toggle_br_flog_num; ie++)
+    //     for (ie = 0; ie < foutnode->node->toggle_br_flag_num; ie++)
     //     {
-    //       if (foutnode->node->toggle_br_flog[ie] == finnode->node->line)
+    //       if (foutnode->node->toggle_br_flag[ie] == finnode->node->line)
     //       {
     //         printf("maru %d %d\n", finnode->node->line,
-    //         foutnode->node->line); fnode->toggle_br_flog[100] =
+    //         foutnode->node->line); fnode->toggle_br_flag[100] =
     //         finnode->node->line; fnode = &add_gate[ni];
     //       }
     //     }
@@ -257,7 +257,7 @@ int num_injgate;
 
   for (ni = 0; ni < num_injgate; ni++) {
     fnode = &add_gate[ni];
-    fnode->addgateflog = 0;
+    fnode->addgateflag = 0;
     if (fnode->next != NULL) fnode->next->prev = fnode->prev;
     fnode->prev->next = fnode->next;
 

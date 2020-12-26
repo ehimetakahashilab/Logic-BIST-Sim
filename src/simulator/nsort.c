@@ -48,13 +48,6 @@ initial_node(argv) char *argv[1];
 
   sprintf(tgl_file, "%s_tgl_FF_input.dat", basename(argv[1]));
 
-  FILE *fin;
-  // int **gate_toggle;
-  // gate_toggle = (int **)calloc(numgate, sizeof(int *));
-
-  int toggle_FFs[lpnt];
-  for (i = 0; i <= lpnt; i++) toggle_FFs[i] = 0;
-
   if (TGL_GATE_MODE == 1 || TGL_GATE_MODE == 4) {
     // tgl_gt_cnt=TGL_GT_NUM;
     tgl_gt_cnt = numgate * Tgl_rate;
@@ -62,21 +55,24 @@ initial_node(argv) char *argv[1];
     // printf("%d\n", numgate);
     fnode = gnode.next;
     gt_cnt = 0.0;
-    ib = 0;
     for (; fnode != NULL; fnode = fnode->next) {
-      fnode->toggle_flog = 0;
+      fnode->toggle_flag = 0;
 
-      // printf("%d %d \n",fnode->line,toggle_gates[fnode->line]);
-      ib = fnode->line;
-      if (toggle_gates[ib] == 1) {
-        fnode->toggle_flog = 1;
-        // printf("+++%d\n", fnode->line);
-        // printf("----maru\n");
+      if (toggle_gates[fnode->line] == 1) {
+        fnode->toggle_flag = 1;
       }
-      for (i = 0; i < MAXCAP; i++) fnode->toggle_rate[i] = 0.0;
+      for (i = 0; i < MAXCAP; i++) {
+        fnode->toggle_rate[i] = 0.0;
+      }
     }
     // exit(1);
   } else if (TGL_GATE_MODE == 2 || TGL_GATE_MODE == 3) {  // FF TPI
+    FILE *fin;
+    int toggle_FFs[lpnt];
+    for (i = 0; i <= lpnt; i++) {
+      toggle_FFs[i] = 0;
+    }
+
     fin = fopen(tgl_file, "r");
     if (fin == NULL) {
       fprintf(stderr, "'tgl_FF_input.dat' is not found!\n");
@@ -101,18 +97,18 @@ initial_node(argv) char *argv[1];
     finnode = ffnode.next;
     for (; finnode != NULL; finnode = finnode->next) {
       fnode = finnode->node;
-      fnode->toggle_flog = 0;
+      fnode->toggle_flag = 0;
       ib = fnode->line - inpnum - numout;
       // printf("%d, %d\n", fnode->line, toggle_FFs[fnode->line]);
       if (toggle_FFs[ib] == 1) {
-        fnode->toggle_flog = 1;
+        fnode->toggle_flag = 1;
         // printf("%d\n", fnode->line);
         // printf("----maru\n");
       }
       // printf("%d, %d, %d\n",ib,fnode->line,toggle_FFs[ib]);
 
       /*	if(toggle_FFs[fnode->line]==1){
-                fnode->toggle_flog=1;
+                fnode->toggle_flag=1;
         }*/
       for (i = 0; i < MAXCAP; i++) fnode->toggle_rate[i] = 0.0;
     }

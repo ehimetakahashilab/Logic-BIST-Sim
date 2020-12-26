@@ -55,7 +55,7 @@ int time;
     fnode = finnode->node;
     // printf("FF_%d:",ia+1);
     // for(ic=0;ic<FF_FILE;ic++)
-    //		printf("%d ",finnode->node->sel_flog[ic]);
+    //		printf("%d ",finnode->node->sel_flag[ic]);
     // printf("\n");
     signature |= fnode->gdval1 ^ fnode->ftval1;
     signature_mul |= fnode->gdval1 ^ fnode->ftval1;
@@ -96,7 +96,7 @@ for(ic=0;ic<FF_FILE;ic++)
         if (MODE_TOOL == 3) {
 #if SELECT_STATION
           for (ic = 0; ic < FF_FILE; ic++) {
-            if (finnode->node->sel_flog[ic])
+            if (finnode->node->sel_flag[ic])
               ob_sel_FF_Signature[ic] |=
                   ff_observe[ia][ib].gdval1 ^ ff_observe[ia][ib].ftval1;
 
@@ -110,13 +110,13 @@ for(ic=0;ic<FF_FILE;ic++)
 #if FF_OBSERVE
 #if SELECT_STATION
           for (ic = 0; ic < FF_FILE; ic++) {
-            if (finnode->node->sel_flog[ic])
+            if (finnode->node->sel_flag[ic])
               ob_sel_FF_Signature[ic] |=
                   ff_observe[ia][ib].gdval1 ^ ff_observe[ia][ib].ftval1;
 
             // if (ib < cap_freq - 1)
             // {
-            // 	if (finnode->node->sel_flog[ic])
+            // 	if (finnode->node->sel_flag[ic])
             // 		ob_sel_FF_Signature[ic] |= ff_observe[ia][ib].gdval1 ^
             // ff_observe[ia][ib].ftval1;
             // }
@@ -158,7 +158,7 @@ for(ic=0;ic<FF_FILE;ic++)
 printf("%d ",fgnode->OBdtime_sel_FF[ib]);
 printf("\n");
 */
-      // flt_det_flog=0;
+      // flt_det_flag=0;
       // ic=fgnode->num;
       fgnode->full_ob_dtime++;
 
@@ -167,15 +167,15 @@ printf("\n");
 #if SELECT_STATION
         for (ib = 0; ib < FF_FILE; ib++) {
           if (ob_sel_FF_Signature[ib] & mask) {
-            if (flt_det_flog[fgnode->num][ib] == 0) {
-              flt_det_flog[fgnode->num][ib] = 1;
+            if (flt_det_flag[fgnode->num][ib] == 0) {
+              flt_det_flag[fgnode->num][ib] = 1;
               // printf("%d\n", fgnode->num);
             }
           }
         }
 
-        if (flt_det_flog[fgnode->num][10] == 0) {
-          flt_det_flog[fgnode->num][10] = 1;
+        if (flt_det_flag[fgnode->num][10] == 0) {
+          flt_det_flag[fgnode->num][10] = 1;
           // printf("+++%d\n", fgnode->num);
         }
 
@@ -217,7 +217,7 @@ printf("\n");
       fgnode->detect[time / 32] |= ITI << (time % 32);
       fgnode->dtime++;
 #else
-      // if(flt_det_flog==FF_FILE){
+      // if(flt_det_flag==FF_FILE){
       /*if(MODE_TOOL==3||MODE_TOOL==4){
 if(fgnode->dtime){
 if(fgnode->next!=NULL)
@@ -325,7 +325,7 @@ int time;
         // printf("ia=%d ib=%d\n",ia,ib);
 #if SELECT_STATION
         for (ic = 0; ic < FF_FILE; ic++) {
-          if (finnode->node->sel_flog[ic]) {
+          if (finnode->node->sel_flag[ic]) {
             ob_sel_FF_Signature[ic] |=
                 ff_observe[ia][ib].gdval1 ^ ff_observe[ia][ib].ftval1;
             signature |= ff_observe[ia][ib].gdval1 ^ ff_observe[ia][ib].ftval1;

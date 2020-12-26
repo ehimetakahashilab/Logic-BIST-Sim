@@ -388,11 +388,11 @@ make_Tranfault_list(address) L_NODE **address;
         switch (gate[fol].type) {
           case AND:
           case NAND:
-            flttag->typeflog = 1;
+            flttag->typeflag = 1;
             break;
           case OR:
           case NOR:
-            flttag->typeflog = 2;
+            flttag->typeflag = 2;
             break;
           case NOT:  //インバーター出力側のs0,s1故障は、入力のs1とs0と等価
           case TPI:  // TPIの故障を考慮しない
@@ -459,7 +459,7 @@ make_Tranfault_list(address) L_NODE **address;
           flttag->back = address[gate[ni].fil];
         flttag->forwd = address[fol];
         flttag->saval = saval;
-        flttag->typeflog = 0;
+        flttag->typeflag = 0;
         flttag->dfflst = NULL;
         flttag->prev = head_flt;
         head_flt->next = flttag;
@@ -485,7 +485,7 @@ make_Tranfault_list(address) L_NODE **address;
         flttag->back = address[ni];
         flttag->forwd = NULL;
         flttag->saval = saval;
-        flttag->typeflog = 0;
+        flttag->typeflag = 0;
         flttag->dfflst = NULL;
         flttag->prev = head_flt;
         head_flt->next = flttag;

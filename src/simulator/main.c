@@ -108,7 +108,7 @@ FLT_NODE *flttag;
 
 count_flt(flttag) FLT_NODE *flttag;
 {
-  int sumflt = 0, sumTDflt = 0, count = 0;
+  int sumflt = 0, sumTDflt = 0;
   int ia, ib;
 #if TRANSITIONFAULT
   for (; flttag != NULL; flttag = flttag->next) {
@@ -122,26 +122,17 @@ count_flt(flttag) FLT_NODE *flttag;
 #endif
 
   for (; flttag != NULL; flttag = flttag->next) {
-    count++;
-    if (!flttag->dtime) sumflt++;
-    /*#if SELECT_STATION
-        if(MODE_TOOL==4){
-        for(ia=0;ia<FF_FILE;ia++) {
-                if(flttag->OBdtime_sel_FF[ia]==1) flt_det_num[ia]++;
-                }
-        if(flttag->full_ob_dtime==1) flt_det_num[20]++;
-        }
-        #endif*/
-    // printf("%d ",flttag->OBdtime_sel_FF[ia]);
-    // printf("\n");
+    if (!flttag->dtime) {
+      sumflt++;
+    }
   }
   if (MODE_TOOL == 3 || MODE_TOOL == 4) {
     for (ia = 0; ia <= sum_flt; ia++) {
       for (ib = 0; ib < FF_FILE; ib++) {
-        if (flt_det_flog[ia][ib]) flt_det_num[ib]++;
+        if (flt_det_flag[ia][ib]) flt_det_num[ib]++;
       }
 
-      if (flt_det_flog[ia][10]) flt_det_num[10]++;
+      if (flt_det_flag[ia][10]) flt_det_num[10]++;
     }
   }
   /*	#if SELECT_STATION
@@ -178,27 +169,29 @@ fault_det_cap(fflist, totalflts, argv) int fflist[ffnum][40000];
 int totalflts;
 char *argv[10];
 {
-  int ia, ib, ic, id, flog;
+  int ia, ib, ic, id, flag;
   float FF_TCov[ffnum], FF_Only_Flt[ffnum];
   FILE *FF_flt_list;
   for (ia = 0; ia < ffnum; ia++) {
     FF_Only_Flt[ia] = 0.0;
     FF_TCov[ia] = (float)fflist[ia][0] / totalflts * 100;
     for (ib = 1; ib <= fflist[ia][0]; ib++) {
-      flog = 0;
+      flag = 0;
       for (ic = 0; ic < ffnum; ic++) {
         if (ia == ic) continue;
         for (id = 1; id <= fflist[ic][0]; id++) {
           if (fflist[ia][ib] == fflist[ic][id]) {
-            flog = 1;
+            flag = 1;
             break;
           }
         }
-        if (flog == 1) break;
+        if (flag == 1) break;
       }
     }
 
-    if (flog == 0) FF_Only_Flt[ia]++;
+    if (flag == 0) {
+      FF_Only_Flt[ia]++;
+    }
   }
   FF_flt_list = fopen("TCov_of_FFs.txt", "a");
   fprintf(FF_flt_list, "%s  %s  %s\n", basename(argv[1]), argv[3], argv[4]);
