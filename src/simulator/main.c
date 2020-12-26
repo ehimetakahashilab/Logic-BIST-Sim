@@ -141,7 +141,7 @@ char *argv[1];
     exit(1);
   }
   int ia, ib;
-  fprintf(flist, "#Fault, NoDFT, SEQ_OB, Full_OB");
+  fprintf(flist, "#Fault, NoDFT, SEQ_OB, Full_OB\n");
   for (ia = 1; ia <= sum_flt; ia++) {
     fprintf(flist, "%d,", ia);
     if (MODE_TOOL == 3 || MODE_TOOL == 4) {
