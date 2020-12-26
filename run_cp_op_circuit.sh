@@ -16,7 +16,7 @@ function finally {
 trap finally EXIT
 
 TPG=0
-TEST_VEC=10 # Number of Test patterns
+TEST_VEC=100000 # Number of Test patterns
 TOOLMODE=4
 CAPTURE=10 #the number of capture cycles
 OBRATE=0.2 #ratio of OP FF
