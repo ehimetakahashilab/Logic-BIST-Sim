@@ -1,10 +1,10 @@
 #include <libgen.h>
+#include <math.h>
+#include <string.h>
 
 #include "declare.h"
 #include "def_flt.h"
 #include "def_gtype.h"
-#include "math.h"
-#include "string.h"
 
 #define FLT_PRN 0  // output the detected fault list
 
@@ -135,7 +135,8 @@ char *argv[1];
 {
   FILE *flist;
   char file_name[256];
-  sprintf(file_name, "./OUTPUTS/FLT_DET_LIST/flt_det_list_%s.csv", basename(argv[1]));
+  sprintf(file_name, "./OUTPUTS/FLT_DET_LIST/flt_det_list_%s.csv",
+          basename(argv[1]));
   flist = fopen(file_name, "w");
   if (flist == NULL) {
     fprintf(stderr, "cannot open the detected fault list \n");

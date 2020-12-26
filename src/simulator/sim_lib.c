@@ -205,15 +205,19 @@ update_nextstate_ft(capture) int capture;
                   tgl_val);  // printf(" %d: %x
                              // %x\n",fnode->line,fnode->gdval0,fnode->gdval1);
                              // fnode->gdval1= ~fnode->gdval1;
-            } else
+            } else {
               fnode->ftval1 = tmp[ia];
-          } else
+            }
+          } else {
             fnode->ftval1 = tmp[ia];
+          }
         }
-      } else
+      } else {
         fnode->ftval1 = tmp[ia];
-    } else
+      }
+    } else {
       fnode->ftval1 = tmp[ia];
+    }
   }
 }
 

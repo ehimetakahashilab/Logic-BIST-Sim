@@ -8,6 +8,8 @@ read_tpi_list(argv) char *argv[14];
 {
   int i, ia, ib;
   float tmp, gt_cnt = 0.0;
+  char tgl_file[256];
+  sprintf(tgl_file, "%s_tgl_FF_input.dat", basename(argv[1]));
   FILE *fin1;
   for (i = 0; i <= lpnt; i++) {
     toggle_gates[i] = 0;
