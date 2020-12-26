@@ -721,7 +721,7 @@ readf_ehime(argv) char *argv[13];
   flist = (int *)calloc(lpnt + 1, sizeof(int));
 
   if ((gate == NULL) || (flist == NULL)) {
-    printf(stderr, "memory error @readf\n");
+    fprintf(stderr, "memory error @readf\n");
     exit(1);
   }
 
