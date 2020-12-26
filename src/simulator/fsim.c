@@ -142,7 +142,7 @@ faultsim(argv) char *argv[13];
       num_observe = ffnum * OBSERVE_RATE;
       printf("Partial FF observation mode: %f \n", OBSERVE_RATE);
       printf("Station rate = %.0f[%]\n", (float)(OBSERVE_RATE * 100));
-      ff_sta_src_read(FF_FILE, num_observe);
+      ff_sta_src_read(FF_FILE, num_observe, argv);
 #else
       ff_select = (char *)calloc(ffnum, sizeof(char));
       printf("Fully Observation Mode \n");
