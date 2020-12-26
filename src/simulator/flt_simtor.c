@@ -110,21 +110,11 @@ for(ic=0;ic<FF_FILE;ic++)
 #if FF_OBSERVE
 #if SELECT_STATION
           for (ic = 0; ic < FF_FILE; ic++) {
-            if (finnode->node->sel_flag[ic])
+            if (finnode->node->sel_flag[ic]) {
               ob_sel_FF_Signature[ic] |=
                   ff_observe[ia][ib].gdval1 ^ ff_observe[ia][ib].ftval1;
+            }
 
-            // if (ib < cap_freq - 1)
-            // {
-            // 	if (finnode->node->sel_flag[ic])
-            // 		ob_sel_FF_Signature[ic] |= ff_observe[ia][ib].gdval1 ^
-            // ff_observe[ia][ib].ftval1;
-            // }
-            // else
-            // {
-            // 	ob_sel_FF_Signature[ic] |= ff_observe[ia][ib].gdval1 ^
-            // ff_observe[ia][ib].ftval1;
-            // }
             signature |= ob_sel_FF_Signature[ic];
           }
 #else
@@ -154,22 +144,13 @@ for(ic=0;ic<FF_FILE;ic++)
   for (ia = 0; ia < num_injgate; ia++, mask = mask << 1) {
     if (signature_full & mask) {
       fgnode = injarray[ia];
-      /*for(ib=0;ib<FF_FILE;ib++)
-printf("%d ",fgnode->OBdtime_sel_FF[ib]);
-printf("\n");
-*/
-      // flt_det_flag=0;
-      // ic=fgnode->num;
-      fgnode->full_ob_dtime++;
 
-#if FF_OBSERVE
       if (MODE_TOOL == 3 || MODE_TOOL == 4) {
 #if SELECT_STATION
         for (ib = 0; ib < FF_FILE; ib++) {
           if (ob_sel_FF_Signature[ib] & mask) {
-            if (flt_det_flag[fgnode->num][ib] == 0) {
-              flt_det_flag[fgnode->num][ib] = 1;
-              // printf("%d\n", fgnode->num);
+            if (flt_det_flag[fgnode->num][ib + 1] == 0) {
+              flt_det_flag[fgnode->num][ib + 1] = 1;
             }
           }
         }
@@ -181,7 +162,6 @@ printf("\n");
 
 #endif
       }
-#endif
 
       if (signature_mul & mask) {
         // if(signature & mask){
@@ -190,6 +170,9 @@ printf("\n");
         fgnode->TranDetTimes++;
 #else
         fgnode->dtime++;
+        if (flt_det_flag[fgnode->num][0] == 0) {
+          flt_det_flag[fgnode->num][0] = 1;
+        }
 #endif
       }
 
@@ -357,89 +340,11 @@ int time;
     if (signature & mask) {
       fgnode = injarray[ia];
 
-      if (MODE_TOOL == 3) {
-#if SELECT_STATION
-        for (ib = 0; ib < FF_FILE; ib++) {
-          if (ob_sel_FF_Signature[ib] & mask) {
-            if (!fgnode->OBdtime_sel_FF[ib]) fgnode->OBdtime_sel_FF[ib]++;
-          }
-        }
-#endif
-      }
-
 #if TRANSITIONFAULT
       fgnode->TranDetTimes++;
 #else
       fgnode->dtime++;
 #endif
-
-      /*			if (MODE_TOOL == 2 || MODE_TOOL == 3)
-                              {
-
-      #if FAULTOB
-      /2進数でパターンごと、FFごと、キャプチャごとの故障情報を記録する＿＿2015710_王
-                                      finnode = ffnode.next;
-                                      for (ib = 0; finnode != NULL; finnode =
-      finnode->next, ib++)
-                                      {
-                                              if (Last_FF_Signature[ib] & mask)
-                                              {
-                                                      if
-      (!(Pat_FF_Faults[time][ib].Last_Cap_Faults[fgnode->num / 32 + 1] & (ITI <<
-      (32 - (fgnode->num % 32)))))
-                                                      {
-                                                              Pat_FF_Faults[time][ib].Last_Cap_Faults[0]++;
-                                                              Pat_FF_Faults[time][ib].Last_Cap_Faults[fgnode->num
-      / 32 + 1] |= ITI << (32 - (fgnode->num % 32));
-                                                      }
-                                                      if
-      (!(Pat_FF_Faults[time][ib].Total_Faults[fgnode->num / 32 + 1] & (ITI <<
-      (32 - (fgnode->num % 32)))))
-                                                      {
-                                                              Pat_FF_Faults[time][ib].Total_Faults[0]
-      += 1; Pat_FF_Faults[time][ib].Total_Faults[fgnode->num / 32 + 1] |= ITI <<
-      (32 - (fgnode->num % 32));
-                                                      }
-                                                      if
-      (!(Pat_FF_Faults[0][ib].Total_Faults[fgnode->num / 32 + 1] & (ITI << (32 -
-      (fgnode->num % 32)))))
-                                                      {
-                                                              Pat_FF_Faults[0][ib].Total_Faults[0]
-      += 1; Pat_FF_Faults[0][ib].Total_Faults[fgnode->num / 32 + 1] |= ITI <<
-      (32 - (fgnode->num % 32));
-                                                      }
-                                              }
-                                              if (OBFF_Signature[ib] & mask)
-                                              {
-                                                      if
-      (!(Pat_FF_Faults[time][ib].OB_Cap_Faults[fgnode->num / 32 + 1] & (ITI <<
-      (32 - (fgnode->num % 32)))))
-                                                      {
-                                                              Pat_FF_Faults[time][ib].OB_Cap_Faults[0]++;
-                                                              Pat_FF_Faults[time][ib].OB_Cap_Faults[fgnode->num
-      / 32 + 1] |= ITI << (32 - (fgnode->num % 32));
-                                                      }
-                                                      if
-      (!(Pat_FF_Faults[time][ib].Total_Faults[fgnode->num / 32 + 1] & (ITI <<
-      (32 - (fgnode->num % 32)))))
-                                                      {
-                                                              Pat_FF_Faults[time][ib].Total_Faults[0]
-      += 1; Pat_FF_Faults[time][ib].Total_Faults[fgnode->num / 32 + 1] |= ITI <<
-      (32 - (fgnode->num % 32));
-                                                      }
-                                                      if
-      (!(Pat_FF_Faults[0][ib].Total_Faults[fgnode->num / 32 + 1] & (ITI << (32 -
-      (fgnode->num % 32)))))
-                                                      {
-                                                              Pat_FF_Faults[0][ib].Total_Faults[0]
-      += 1; Pat_FF_Faults[0][ib].Total_Faults[fgnode->num / 32 + 1] |= ITI <<
-      (32 - (fgnode->num % 32));
-                                                      }
-                                              }
-                                      }
-      #endif
-                              }
-                      */
 
 #if DEBUG1 || PRNT_DET_FLT
       printf(" DETECT FAULT %d", fgnode->back->line);

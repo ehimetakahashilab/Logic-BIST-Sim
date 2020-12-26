@@ -618,21 +618,6 @@ faultsim(argv) char *argv[13];
       fprintf(fout_flt_pat, "\n");
     }
 
-#if MAKE_REC
-    remain_flt = count_flt(fltlst.next);
-    fout = fopen("log.dat", "a");
-    fprintf(fout, "%6.3f\t%6.3f", 100.0 - (float)remain_flt / sum_flt * 100.0,
-            toggle_scn / toggle_scn_max * 100.0);
-#if TRANSITIONFAULT
-    for (ia = 1 + SLOW_CK; ia <= cap_freq; ia++)
-      fprintf(fout, "\t%6.3f", toggle_cap[ia] / toggle_cap_max * 100.0);
-#else
-    for (ia = 1; ia <= cap_freq; ia++)
-      fprintf(fout, "\t%6.3f", toggle_cap[ia] / toggle_cap_max * 100.0);
-#endif
-    fprintf(fout, "\n");
-    fclose(fout);
-#endif
 #if OUTPUT_FLIST
     fprintf(flist_out, "\n");
 #endif

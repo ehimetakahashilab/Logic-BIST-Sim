@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/times.h>
+#include <sys/sysinfo.h>
 
 /* signal value */
 #define X 2
@@ -26,7 +27,7 @@
 //キャプチャ回数,flsrの状態などが表示される
 #define DEBUG1 0
 #define DEBUG2 0
-#define DEBUG3 0
+#define DEBUG_NODE 0
 #define FALSE 0
 #define TRUE 1
 #define PRN_FLT_INT 5

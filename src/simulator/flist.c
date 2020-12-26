@@ -123,7 +123,7 @@ make_line_list(argv) char *argv[13];
   fnode = head_node;
   for (; fnode != NULL; fnode = fnode->next) {
     line = fnode->line;
-#if DEBUG3
+#if DEBUG_NODE
     printf(" Line = %d (WI89)\n", line);
 #endif
 
@@ -356,7 +356,7 @@ make_fault_list(address) L_NODE **address;
   }
 
   head_flt->next = NULL;
-#if DEBUG3
+#if DEBUG_NODE
   prn_fltlst(fltlst.next);
 #endif
 }
@@ -494,7 +494,7 @@ make_Tranfault_list(address) L_NODE **address;
     }
   }
   head_flt->next = NULL;
-#if DEBUG3
+#if DEBUG_NODE
   prn_fltlst(fltlst.next);
 #endif
 }
@@ -586,6 +586,7 @@ prn_fltlst_format(flttag) FLT_NODE *flttag;
   }
 }
 
+//指定したノードからノードリストの最後まで出力する
 prn_subnode(subnode) FIN_NODE *subnode;
 {
   for (; subnode != NULL; subnode = subnode->next) {
@@ -593,6 +594,8 @@ prn_subnode(subnode) FIN_NODE *subnode;
   }
   printf("|| EOL ||\n");
 }
+
+//ノードリストの最初から最後まで出力する
 prn_node(head_node) L_NODE *head_node;
 {
   L_NODE *fnode;

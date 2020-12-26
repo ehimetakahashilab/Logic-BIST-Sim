@@ -86,7 +86,11 @@ int ff_state[];
   }
   chainnum = (ffnum - 1) / CHAINLENGTH + 1;
 
-  for (ia = 0; ia < chainnum; ia++) ShiftPeak[ia] = 0.0;
+#if POWEREVA
+  for (ia = 0; ia < chainnum; ia++) {
+    ShiftPeak[ia] = 0.0;
+  }
+#endif
 
   schain = (SCAN_CHAIN *)calloc(chainnum, sizeof(SCAN_CHAIN));
   if (schain == NULL) {
@@ -154,7 +158,7 @@ int ff_state[];
 {
   int ia, ib, i;
 
-#if PEAK
+#if POWEREVA && PEAK
   int OrigPatTog[chainnum], TogPerClk[chainnum];
   int Tem_state[ffnum];
   for (ia = 0; ia < ffnum; ia++) Tem_state[ia] = ff_state[ia];

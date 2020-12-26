@@ -6,105 +6,89 @@
 #include "math.h"
 #include "string.h"
 
+#define FLT_PRN 0  // output the detected fault list
+
 main(argc, argv) int argc;
 char *argv[13];
-
 {
   struct tms cputime;
   int totime, ia, ib, ic, id;
-  int remain_flt, faultnum;
-  float Shift_rate;
+  int remain_flt;
   time_t time_1, time_2;
   char path_last[256], path_middle[256], name[256], path_toggle[256];
-  FILE *fout, *fout1, *fout2, *fout3;
+  FILE *fout;
 
-  //  if(argc<13){
-  //   printf("error: too less arguments!\n");
-  //   exit(1);
-  //  }
+  Instance_Get(
+      argc,
+      argv);  // shellからツールモード、回路テーブルパス、キャプチャ回数などのargvを読み込む
+  make_line_list(
+      argv);  //回路テーブル読み込む、回路リスト作成、故障リスト作成、
+  sort_node();  //回路のノードリストソーティング、故障リストソーティング
+  err_check(fltlst.next, 0);  //故障リストが正しく作られているかをチェックする
 
-  /*::::::::::when using ATPG, set the test length :::::::::::::*/
-  // length=read_pival_01x(argv,pivalset);
-  //#if DEBUG3
-  //  printf(" Test Pattern are %d Patterns by ATPG\n",length);
-  //#endif
-  Instance_Get(argc, argv);
-  make_line_list(argv);
-  sort_node();
-  // fnode = gnode.next;
-  // for (; fnode != NULL; fnode = fnode->next)
-  // {
-  //   printf("%d\n", fnode->line);
-  // }
-  err_check(fltlst.next, 0);
-  faultnum = sum_flt;
-  // printf("\nfaultnumber=%d %d\n",sum_flt,length);exit(1);
-
-  flt_out(fltlst.next, argv);
+  // flt_det_flag[][]:異なる中間観測ＦＦ選定手法で選んだＦＦを観測する場合の故障検出数の情報を保存するための配列
+  // flt_det_flag[a][b]: a:故障番号、b:観測ＦＦ選定手法、b=10:
+  // 全観測の場合の結果
+  flt_det_flag = (int **)calloc((sum_flt + 2), sizeof(int *));
+  if (flt_det_flag == NULL) {
+    fprintf(stderr, "memory error @flt_det_flag in flt_info \n");
+    exit(1);
+  }
+  for (ia = 0; ia <= sum_flt + 1; ia++) {
+    if (MODE_TOOL == 1 || MODE_TOOL == 2) {
+      flt_det_flag[ia] = (int *)calloc(2, sizeof(int));
+    } else {
+      flt_det_flag[ia] = (int *)calloc(11, sizeof(int));
+    }
+    if (flt_det_flag[ia] == NULL) {
+      fprintf(stderr, "memory error @flt_det_flag \n");
+      exit(1);
+    }
+  }
 
 #if FLT_OUTPUT
+  // output the fault list to file
   printf("\nOutput Fault List\n");
   flt_out(fltlst.next, argv);
   exit(1);
 #endif
 
-#if DEBUG3
-  prn_fltlst(fltlst.next);
-  prn_fltlst_format(fltlst.next);
-  prn_node(gnode.next);
-  prn_subnode(pinode.next);
-  prn_subnode(ffnode.next);
-  (ponode.next);
-  printf(" === Sum of Faults %d %d (ko) ===\n", sum_flt, sum_Tran_flt);
+#if DEBUG_NODE
+  prn_fltlst(fltlst.next);  //故障リストの情報を出力する
+  //  prn_fltlst_format(fltlst.next);//故障リストの情報を出力する
+  prn_node(gnode.next);      //ゲートnodeリストの情報を出力する
+  prn_subnode(pinode.next);  //外部入力PIノード
+  prn_subnode(ffnode.next);  // FFノード
+  prn_subnode(ponode.next);  //外部出力POノード
+#if TRANSITIONFAULT
+  printf(" === Sum of Transition Faults %d (ko) ===\n", sum_Tran_flt);
+#else
+  printf(" === Sum of Stuck-at Faults %d (ko) ===\n", sum_flt);
+#endif
 #endif
 
+  // fltlist_print(fltlst.next);exit(1);
   times(&cputime);
-  totime = cputime.tms_utime;
+  totime = cputime.tms_utime;  //シミュレーション時間計測
   time_1 = time((time_t *)0);
 
-  /*#if MAKE_REC
-  fout = fopen("fault coverage.log", "a");
-  fprintf(fout, "%s\n", basename(argv[1]));
-        fprintf(fout, "Fcov(%) ShiftRate(%) capturerate(%)\n");
-  fclose(fout);
-#endif*/
-
-  faultsim(argv);  //←bug 2014_08_23 ===================
-
-#if FLT_PER_PAT
-  fclose(fout_fpp);
-#endif
-  // printf("HEHRE???\n");
-  Out_Put(argv);
-  /// printf("HEHRE???\n");
+  faultsim(argv);  //論理・故障シミュレーション
+  //  fltlist_print(fltlst.next);
+  Out_Put(argv);  //シミュレーション結果出力
   times(&cputime);
   totime = cputime.tms_utime - totime;
+
+#if FLT_PRN
+  prn_flt(flt_det_flag, argv);
+#endif
+
+  for (ia = 0; ia <= sum_flt + 1; ia++) free(flt_det_flag[ia]);
+  free(flt_det_flag);
+
   printf(" ***  cputime = %.3f[sec] *** \n\n", (double)totime / 100);
   time_2 = time((time_t *)0);
-  /*   printf(" CPU-time %.2f(sec)\n",difftime(time_2,time_1)); */
+  printf(" CPU-time %.2f(sec)\n", difftime(time_2, time_1));
 }
-/*
-count_flt(flttag)
-FLT_NODE *flttag;
-{
-  int sumflt=0,sumTDflt=0;
- #if TRANSITIONFAULT
- for( ;flttag!=NULL;flttag=flttag->next){
-
-    if(!flttag->TranDetTimes)
-      sumTDflt++;
-  }
-  return sumTDflt;
-#else
- for( ;flttag!=NULL;flttag=flttag->next){
-
-    if(!flttag->dtime)
-      sumflt++;
-  }
-  return sumflt;
-#endif
-}
-*/
 
 count_flt(flttag) FLT_NODE *flttag;
 {
@@ -112,12 +96,16 @@ count_flt(flttag) FLT_NODE *flttag;
   int ia, ib;
 #if TRANSITIONFAULT
   for (; flttag != NULL; flttag = flttag->next) {
-    if (!flttag->TranDetTimes) sumTDflt++;
+    if (!flttag->TranDetTimes) {
+      sumTDflt++;
+    }
   }
   return sumTDflt;
 #else
 #if SELECT_STATION
-  for (ia = 0; ia < FF_FILE; ia++) flt_det_num[ia] = 0;
+  for (ia = 0; ia < FF_FILE; ia++) {
+    flt_det_num[ia] = 0;
+  }
   flt_det_num[10] = 0;
 #endif
 
@@ -129,30 +117,122 @@ count_flt(flttag) FLT_NODE *flttag;
   if (MODE_TOOL == 3 || MODE_TOOL == 4) {
     for (ia = 0; ia <= sum_flt; ia++) {
       for (ib = 0; ib < FF_FILE; ib++) {
-        if (flt_det_flag[ia][ib]) flt_det_num[ib]++;
+        if (flt_det_flag[ia][ib]) {
+          flt_det_num[ib]++;
+        }
       }
-
-      if (flt_det_flag[ia][10]) flt_det_num[10]++;
+      if (flt_det_flag[ia][10]) {
+        flt_det_num[10]++;
+      }
     }
   }
-  /*	#if SELECT_STATION
-        for(ia=0;ia<FF_FILE;ia++)
-                flt_det_num[ia]+=sum_flt-sumflt;
-        flt_det_num[20]+=sum_flt-sumflt;
-#endif*/
-
   return sumflt;
 #endif
 }
 
+void prn_flt(flt_table, argv) int **flt_table;
+char *argv[1];
+{
+  FILE *flist;
+  char file_name[256];
+  sprintf(file_name, "./OUTPUTS/FLT_DET_LIST/flt_det_list_%s.csv", basename(argv[1]));
+  flist = fopen(file_name, "w");
+  if (flist == NULL) {
+    fprintf(stderr, "cannot open the detected fault list \n");
+    exit(1);
+  }
+  printf("\noutput the fault detection table \n");
+  printf("#fault, nodft,");
+  int ia, ib;
+  fprintf(flist, "%d\n", sum_flt);
+  if (MODE_TOOL == 3 || MODE_TOOL == 4) {
+    for (ia = 0; ia < FF_FILE; ia++) {
+      printf("op%d,", ia + 1);
+    }
+    printf("full_op");
+  }
+  printf("\n");
+  for (ia = 1; ia <= sum_flt; ia++) {
+    printf("%d,", ia);
+    fprintf(flist, "%d,", ia);
+    if (MODE_TOOL == 3 || MODE_TOOL == 4) {
+      for (ib = 0; ib <= FF_FILE; ib++) {
+        printf("%d,", flt_det_flag[ia][ib]);
+        fprintf(flist, "%d,", flt_det_flag[ia][ib]);
+      }
+      printf("%d\n", flt_det_flag[ia][10]);
+      fprintf(flist, "%d,\n", flt_det_flag[ia][10]);
+    } else {
+      printf("%d,\n", flt_det_flag[ia][0]);
+      fprintf(flist, "%d,\n", flt_det_flag[ia][0]);
+    }
+  }
+  fclose(flist);
+}
+
+fltlist_print(flttag) FLT_NODE *flttag;
+{
+  int sumflt = 0, sumTDflt = 0;
+  int ia, ib;
+  printf("\noutput the fault detection table \n");
+  printf("#fault, nodft,");
+  if (MODE_TOOL == 3 || MODE_TOOL == 4) {
+    for (ia = 0; ia < FF_FILE; ia++) {
+      printf("op%d,", ia + 1);
+    }
+    printf("full_op");
+  }
+  printf("\n");
+
+  for (; flttag != NULL; flttag = flttag->next) {
+    printf("%d,", flttag->num);
+#if TRANSITIONFAULT
+    if (!flttag->TranDetTimes) {
+      printf("0,");
+    } else {
+      printf("1,");
+    }
+
+#else
+    if (!flttag->dtime) {
+      printf("0,");
+    } else {
+      printf("1,");
+    }
+
+    if (MODE_TOOL == 3 || MODE_TOOL == 4) {
+      for (ia = 0; ia <= sum_flt; ia++) {
+        for (ib = 0; ib < FF_FILE; ib++) {
+          if (flt_det_flag[ia][ib]) {
+            printf("1,");
+          } else {
+            printf("0,");
+          }
+        }
+        if (flt_det_flag[ia][10]) {
+          printf("1,");  //全観測
+        } else {
+          printf("0,");
+        }
+      }
+    }
+    printf("\n");
+#endif
+  }
+}
+
+//縮退故障リストをチェックする、全体の縮退故障数を返し
 saf_list_check(flttag) FLT_NODE *flttag;
 {
   int count = 0;
-  for (; flttag != NULL; flttag = flttag->next) count++;
+  for (; flttag != NULL; flttag = flttag->next) {
+    count++;
+  }
 
   return count;
 }
 
+//故障リストが正しく作られているかをチェックする
 err_check(flttag, time) FLT_NODE *flttag;
 int time;
 {
@@ -165,8 +245,12 @@ int time;
   }
 }
 
-fault_det_cap(fflist, totalflts, argv) int fflist[ffnum][40000];
-int totalflts;
+#if FLT_OUTPUT
+//個々ＦＦで検出した故障リストを作る
+fault_det_cap(
+    fflist, totalflts,
+    argv) int fflist[ffnum][40000];  // FF毎に検出した故障情報を保存する配列
+int totalflts;                       //故障総数
 char *argv[10];
 {
   int ia, ib, ic, id, flag;
@@ -178,14 +262,18 @@ char *argv[10];
     for (ib = 1; ib <= fflist[ia][0]; ib++) {
       flag = 0;
       for (ic = 0; ic < ffnum; ic++) {
-        if (ia == ic) continue;
+        if (ia == ic) {
+          continue;
+        }
         for (id = 1; id <= fflist[ic][0]; id++) {
           if (fflist[ia][ib] == fflist[ic][id]) {
             flag = 1;
             break;
           }
         }
-        if (flag == 1) break;
+        if (flag == 1) {
+          break;
+        }
       }
     }
 
@@ -195,9 +283,13 @@ char *argv[10];
   }
   FF_flt_list = fopen("TCov_of_FFs.txt", "a");
   fprintf(FF_flt_list, "%s  %s  %s\n", basename(argv[1]), argv[3], argv[4]);
-  for (ia = 0; ia < ffnum; ia++) fprintf(FF_flt_list, "%4.3f ", FF_TCov[ia]);
+  for (ia = 0; ia < ffnum; ia++) {
+    fprintf(FF_flt_list, "%4.3f ", FF_TCov[ia]);
+  }
   fprintf(FF_flt_list, "\n");
-  for (ia = 0; ia < ffnum; ia++) fprintf(FF_flt_list, "%d ", FF_Only_Flt[ia]);
+  for (ia = 0; ia < ffnum; ia++) {
+    fprintf(FF_flt_list, "%d ", FF_Only_Flt[ia]);
+  }
   fprintf(FF_flt_list, "\n");
 
   fclose(FF_flt_list);
@@ -231,28 +323,4 @@ char *argv[11];
   fclose(flstout);
 }
 
-/*
-err_check(flttag,time)
-FLT_NODE *flttag;
-int time;
-{
-  while(flttag!=NULL){
-    if(flttag->dfflst!=NULL){
-      printf(" error fault %d  time %d\n",flttag->back->line,time);
-      exit(1);
-    }
-    flttag=flttag->next;
-  }
-}
-
-err_occur(buf)
-char buf[];
-{
-  if(strcmp(buf, "mem") == 0)
-    fprintf(stdout, "memory allocate error!\n");
-  else
-    fprintf(stdout, "'%s' is not found!\n", buf);
-
-  exit(1);
-}
-*/
+#endif
