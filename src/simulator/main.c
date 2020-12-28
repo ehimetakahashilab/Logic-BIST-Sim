@@ -27,15 +27,22 @@ char *argv[13];
   // flt_det_flag[a][b]: a:故障番号、b:観測FF選定手法、b=10:
   // 全観測の場合の結果
   flt_det_flag = (int **)calloc((sum_flt + 2), sizeof(int *));
+  flt_det_num = (int *)calloc(FF_FILE + 2, sizeof(int));
+
   if (flt_det_flag == NULL) {
     fprintf(stderr, "memory error @flt_det_flag in flt_info \n");
     exit(1);
   }
+  if (flt_det_num == NULL) {
+    fprintf(stderr, "memory error @flt_det_num in flt_info \n");
+    exit(1);
+  }
+
   for (ia = 0; ia <= sum_flt + 1; ia++) {
     if (MODE_TOOL == 1 || MODE_TOOL == 2) {
       flt_det_flag[ia] = (int *)calloc(2, sizeof(int));
     } else {
-      flt_det_flag[ia] = (int *)calloc(11, sizeof(int));
+      flt_det_flag[ia] = (int *)calloc(FF_FILE + 2, sizeof(int));
     }
     if (flt_det_flag[ia] == NULL) {
       fprintf(stderr, "memory error @flt_det_flag \n");
@@ -83,6 +90,7 @@ char *argv[13];
     free(flt_det_flag[ia]);
   }
   free(flt_det_flag);
+  free(flt_det_num);
 }
 
 count_flt(flttag) FLT_NODE *flttag;
@@ -98,10 +106,9 @@ count_flt(flttag) FLT_NODE *flttag;
   return sumTDflt;
 #else
 #if SELECT_STATION
-  for (ia = 0; ia < FF_FILE; ia++) {
+  for (ia = 0; ia <= FF_FILE + 1; ia++) {
     flt_det_num[ia] = 0;
   }
-  flt_det_num[10] = 0;
 #endif
 
   for (; flttag != NULL; flttag = flttag->next) {
@@ -111,13 +118,13 @@ count_flt(flttag) FLT_NODE *flttag;
   }
   if (MODE_TOOL == 3 || MODE_TOOL == 4) {
     for (ia = 0; ia <= sum_flt; ia++) {
-      for (ib = 0; ib < FF_FILE; ib++) {
+      for (ib = 0; ib <= FF_FILE; ib++) {
         if (flt_det_flag[ia][ib]) {
           flt_det_num[ib]++;
         }
       }
-      if (flt_det_flag[ia][10]) {
-        flt_det_num[10]++;
+      if (flt_det_flag[ia][FF_FILE + 1]) {
+        flt_det_num[FF_FILE + 1]++;
       }
     }
   }
@@ -142,10 +149,10 @@ char *argv[1];
   for (ia = 1; ia <= sum_flt; ia++) {
     fprintf(flist, "%d,", ia);
     if (MODE_TOOL == 3 || MODE_TOOL == 4) {
-      for (ib = 0; ib <= FF_FILE; ib++) {
+      for (ib = 0; ib <= FF_FILE + 1; ib++) {
         fprintf(flist, "%d,", flt_det_flag[ia][ib]);
       }
-      fprintf(flist, "%d\n", flt_det_flag[ia][10]);
+      fprintf(flist, "\n");
     } else {
       fprintf(flist, "%d\n", flt_det_flag[ia][0]);
     }
