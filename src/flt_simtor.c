@@ -168,9 +168,9 @@ int time;
 					}
 				}
 
-				if (flt_det_flag[fgnode->num][10] == 0)
+				if (flt_det_flag[fgnode->num][FF_FILE+1] == 0)
 				{
-					flt_det_flag[fgnode->num][10] = 1;
+					flt_det_flag[fgnode->num][FF_FILE+1] = 1;
 					//printf("+++%d\n", fgnode->num);
 				}
 

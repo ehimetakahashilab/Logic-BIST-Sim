@@ -336,7 +336,7 @@ Out_Put(argv) char *argv[13];
 		fprintf(fout, "#Test Pat.,	#Faults,	#Det. Flts,	#UnDet.Flts,	Fcov.\n");
 		printf("%10d,%10d", length, sum_flt);
 		fprintf(fout, "%10d,%10d", length, sum_flt);
-		for (ia = 0; ia < FF_FILE; ia++)
+		for (ia = 0; ia <=FF_FILE+1; ia++)
 		{
 			printf(",%10d,%10d,%4.6f", flt_det_num[ia], sum_flt - flt_det_num[ia], (float)flt_det_num[ia] / (float)sum_flt * 100.0);
 			fprintf(fout, ",%10d,%10d,%4.6f", flt_det_num[ia], sum_flt - flt_det_num[ia], (float)flt_det_num[ia] / (float)sum_flt * 100.0);
@@ -350,7 +350,7 @@ Out_Put(argv) char *argv[13];
 		if ((fout = fopen(outpath, "w")) == NULL)
 			printf("MULTI_OB_BIST output file is not exist!\n"), exit(1);
 		printf("\n*************OUTPUT RESULTS****************\n");
-		printf("#Test Pat.,	#Faults,	#Det. Flts,	#UnDet.Flts,	Fcov.\n");
+		printf("#Test Pat.,	#Faults, #Det. Flts,	#UnDet.Flts,	Fcov.\n");
 		fprintf(fout, "#Test Pat.,	#Faults,	#Det. Flts,	#UnDet.Flts,	Fcov.\n");
 		printf("%10d,%10d,%10d,%10d,%4.6f\n", length, sum_flt, sum_flt - remain_flt, remain_flt, (1 - (float)remain_flt / (float)sum_flt) * 100.0);
 		fprintf(fout, "%10d,%10d,%10d,%10d,%4.6f\n", length, sum_flt, sum_flt - remain_flt, remain_flt, (1 - (float)remain_flt / (float)sum_flt) * 100.0);

@@ -3,7 +3,7 @@
 #include "def_flt.h"
 #include "string.h"
 #include "math.h"
-#define FLT_PRN 0 // output the detected fault list
+#define FLT_PRN 1 // output the detected fault list
 
 main(argc, argv) int argc;
 char *argv[13];
@@ -23,14 +23,18 @@ char *argv[13];
   //flt_det_flag[][]:異なる中間観測ＦＦ選定手法で選んだＦＦを観測する場合の故障検出数の情報を保存するための配列
   //flt_det_flag[a][b]: a:故障番号、b:観測ＦＦ選定手法、b=10: 全観測の場合の結果
   flt_det_flag = (int **)calloc((sum_flt + 2), sizeof(int *));
+  flt_det_num = (int *)calloc(FF_FILE+2, sizeof(int));
+
   if (flt_det_flag == NULL)
     printf("memory error @flt_det_flag in flt_info \n"), exit(1);
+if (flt_det_num == NULL)
+      printf("memory error @flt_det_num in flt_info \n"), exit(1);
   for (ia = 0; ia <= sum_flt + 1; ia++)	{
     if(MODE_TOOL==1||MODE_TOOL==2)   {
         flt_det_flag[ia] = (int *)calloc(2, sizeof(int));
       }
     else{
-      flt_det_flag[ia] = (int *)calloc(11, sizeof(int));
+      flt_det_flag[ia] = (int *)calloc(FF_FILE+2, sizeof(int));
     }
     if (flt_det_flag[ia] == NULL)  printf("memory error @flt_det_flag \n"), exit(1);
   }
@@ -74,7 +78,7 @@ char *argv[13];
 for (ia = 0; ia <= sum_flt + 1; ia++)
   free(flt_det_flag[ia]);
   free(flt_det_flag);
-
+  free(flt_det_num);
   printf(" ***  cputime = %.3f[sec] *** \n\n", (double)totime / 100);
   time_2=time((time_t *)0);
  printf(" CPU-time %.2f(sec)\n",difftime(time_2,time_1));
@@ -94,9 +98,9 @@ count_flt(flttag)
   return sumTDflt;
 #else
 #if SELECT_STATION
-  for (ia = 0; ia < FF_FILE; ia++)
+  for (ia = 0; ia <=FF_FILE+1; ia++){
     flt_det_num[ia] = 0;
-  flt_det_num[10] = 0;
+  }
 #endif
 
   for (; flttag != NULL; flttag = flttag->next)
@@ -106,10 +110,10 @@ count_flt(flttag)
   }
   if ( MODE_TOOL == 3 || MODE_TOOL == 4){
     for (ia = 0; ia <= sum_flt; ia++) {
-      for (ib = 0; ib < FF_FILE; ib++){
+      for (ib = 0; ib <= FF_FILE; ib++){
         if (flt_det_flag[ia][ib]) flt_det_num[ib]++;
       }
-      if (flt_det_flag[ia][10])  flt_det_num[10]++;
+      if (flt_det_flag[ia][FF_FILE+1])  flt_det_num[FF_FILE+1]++;
     }
   }
   return sumflt;
@@ -141,12 +145,12 @@ char *argv[1];
     printf("%d,",ia);
     fprintf(flist, "%d,",ia);
     if ( MODE_TOOL == 3 || MODE_TOOL == 4){
-      for(ib=0;ib<=FF_FILE;ib++)  {
+      for(ib=0;ib<=FF_FILE+1;ib++)  {
         printf("%d,",flt_det_flag[ia][ib]);
         fprintf(flist, "%d,",flt_det_flag[ia][ib]);
       }
-      printf("%d\n",flt_det_flag[ia][10]);
-      fprintf(flist, "%d,\n",flt_det_flag[ia][10]);
+      printf("\n");
+      fprintf(flist, "\n");
     }
     else{
       printf("%d,\n",flt_det_flag[ia][0]);

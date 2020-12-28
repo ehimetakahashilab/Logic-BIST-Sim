@@ -261,7 +261,7 @@ break;
 	if (MODE_TOOL == 3 || MODE_TOOL == 4)
 		flt_info(fltlst.next);
 
-	printf("fault List initialization over \n");
+	printf("\nfault List initialization over \n");
 
 	remain_flt = count_flt(fltlst.next);
 
@@ -603,13 +603,13 @@ break;
 			{
 #if SELECT_STATION
 
-				for (ia = 0; ia < FF_FILE; ia++)
+				for (ia = 1; ia <=FF_FILE; ia++)
 				{
 					printf("#DFT FCov: %4.6f\n", (float)flt_det_num[ia] / (float)sum_flt * 100.0);
 					fprintf(fout_flt_pat, ",%4.6f", (float)flt_det_num[ia] / (float)sum_flt * 100.0);
 				}
-				fprintf(fout_flt_pat, ",%4.6f", (float)flt_det_num[10] / (float)sum_flt * 100.0);
-				printf("#Max FCov: %4.6f\n", (float)flt_det_num[10] / (float)sum_flt * 100.0);
+				fprintf(fout_flt_pat, ",%4.6f", (float)flt_det_num[FF_FILE+1] / (float)sum_flt * 100.0);
+				printf("#Max FCov: %4.6f\n", (float)flt_det_num[FF_FILE+1] / (float)sum_flt * 100.0);
 #endif
 			}
 			fprintf(fout_flt_pat, "\n");

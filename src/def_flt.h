@@ -123,7 +123,7 @@ float ShiftPeak[CHAINNUM];
 
 char *ff_select;
 float OBSERVE_RATE;
-int flt_det_num[20];
+int *flt_det_num;
 int **flt_det_flag;
 //int flt_det_flag[MAXFLT][11];
 int FF_FILE;
