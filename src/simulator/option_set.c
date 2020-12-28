@@ -52,6 +52,12 @@ Instance_Get(argc, argv) int argc;
 char *argv[14];
 {
   int ia, ib, ic;
+  flt_det_num = (int *)calloc(FF_FILE + 2, sizeof(int));
+  if (flt_det_num == NULL) {
+    fprintf(stderr, "memory error @flt_det_num in flt_info \n");
+    exit(1);
+  }
+
   /*External Parameter Setting*/
   printf("External Parameter Setting\n");
   MODE_TOOL = atoi(argv[2]);
@@ -194,8 +200,9 @@ char *argv[14];
             argv[10]);  // specify the number of SEQ-OB
                         // methods:評価したい中間観測FF選定方法の数を読み込む
         OBSERVE_RATE = atof(argv[11]);
-        for (ia = 0; ia < FF_FILE; ia++) flt_det_num[ia] = 0;
-        flt_det_num[20] = 0;
+        for (ia = 0; ia <= FF_FILE + 1; ia++) {
+          flt_det_num[ia] = 0;
+        }
         length = atoi(argv[12]);
       } else {
         //=1: Logic-CPI by toggling,=4:Logic-CPI by random load
@@ -208,8 +215,9 @@ char *argv[14];
         OBSERVE_RATE = atof(argv[10]);
         group_tpi = atoi(argv[11]);
 
-        for (ia = 0; ia < FF_FILE; ia++) flt_det_num[ia] = 0;
-        flt_det_num[20] = 0;
+        for (ia = 0; ia <= FF_FILE + 1; ia++) {
+          flt_det_num[ia] = 0;
+        }
       }
 
       printf("CP Insertion Mode : %d\n", TGL_GATE_MODE);
