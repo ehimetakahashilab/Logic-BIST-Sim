@@ -389,7 +389,7 @@ Out_Put(argv) char *argv[13];
               "#UnDet.Flts,	Fcov.\n");
       printf("%10d,%10d", length, sum_flt);
       fprintf(fout, "%10d,%10d", length, sum_flt);
-      for (ia = 0; ia < FF_FILE; ia++) {
+      for (ia = 0; ia <= FF_FILE + 1; ia++) {
         printf(",%10d,%10d,%4.6f", flt_det_num[ia], sum_flt - flt_det_num[ia],
                (float)flt_det_num[ia] / (float)sum_flt * 100.0);
         fprintf(fout, ",%10d,%10d,%4.6f", flt_det_num[ia],
