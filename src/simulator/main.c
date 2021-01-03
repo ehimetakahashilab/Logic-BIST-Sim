@@ -157,7 +157,11 @@ char *argv[1];
     fprintf(flist, "%d,", ia);
     if (MODE_TOOL == 3 || MODE_TOOL == 4) {
       for (ib = 0; ib <= FF_FILE + 1; ib++) {
-        fprintf(flist, "%d,", flt_det_flag[ia][ib]);
+        if (ib < FF_FILE + 1) {
+          fprintf(flist, "%d,", flt_det_flag[ia][ib]);
+        } else {
+          fprintf(flist, "%d", flt_det_flag[ia][ib]);
+        }
       }
       fprintf(flist, "\n");
     } else {
