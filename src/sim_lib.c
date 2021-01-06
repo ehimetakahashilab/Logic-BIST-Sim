@@ -62,6 +62,71 @@ pi_valset(pivalset) int pivalset[];
 #endif
 }
 
+
+update_nextstate_ff_inv_cp(capture) int capture;
+{
+  FIN_NODE *finnode;
+  L_NODE *fnode;
+  int ia;
+  unsigned int tmp[ffnum];
+  unsigned int val1;
+
+  finnode = ffnode.next;
+  for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
+  {
+    fnode = finnode->node;
+    tmp[ia] = fnode->finlst->node->gdval1;
+  }
+  finnode = ffnode.next;
+
+  for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
+  {
+    fnode = finnode->node;
+    /*#if WSA_REC
+ if(capture==1) MaxWSA+=(1+fnode->outnum);
+#endif
+*/
+
+    if (fnode->gdval1 != tmp[ia])
+    {
+      fnode->gdval1 = tmp[ia];
+#if POWEREVA
+      toggle_cap[capture]++;
+      toggle_cap_perpat[capture]++;
+#if FF_CAP
+      fnode->toggle_cap[capture]++;
+#endif
+
+#endif
+      /*#if WSA_REC
+	WSA[capture]+=(1+fnode->outnum);
+#endif*/
+    }
+    else  {
+      if (capture < SKIP_CYCLE - 1 || capture >= cap_freq) continue;
+      if (fnode->cp_flag != 1) continue;
+          //if (capture >= SKIP_CYCLE - 1)
+      if (capture % INTERVAL_CYCLE == 0){
+                //if(fnode->gdval0==fnode->gdval1)
+                fnode->gdval1 = ~fnode->gdval1;
+                //fnode->gdval1= ~fnode->gdval1;
+            }
+    }
+
+#if TRANSITIONFAULT
+    if (capture == SLOW_CK)
+      fnode->gdval_slow = fnode->gdval1;
+#endif
+  }
+
+#if DEBUG
+  //for(ia=1;ia<=capture;ia++)
+  printf("toggle_cap %d = %.0f %.0f\n", capture, toggle_cap[capture], toggle_cap_perpat[capture]);
+#endif
+}
+
+
+
 update_nextstate(capture) int capture;
 {
   FIN_NODE *finnode;
@@ -89,7 +154,7 @@ update_nextstate(capture) int capture;
     if (fnode->gdval1 != tmp[ia])
     {
       fnode->gdval1 = tmp[ia];
-#if POWEREVA 
+#if POWEREVA
       toggle_cap[capture]++;
       toggle_cap_perpat[capture]++;
 #if FF_CAP
@@ -97,43 +162,12 @@ update_nextstate(capture) int capture;
 #endif
 
 #endif
-      /*#if WSA_REC
-	WSA[capture]+=(1+fnode->outnum);
-#endif*/
     }
-    else
-    {
-
-      if (MODE_TOOL == 4)
-      {
-
-        if (TGL_GATE_MODE == 2)
-        {
-
-          //if (capture >= SKIP_CYCLE - 1)
-          if (capture >= SKIP_CYCLE - 1 && capture < cap_freq)
-          {
-            if (capture % INTERVAL_CYCLE == 0)
-            {
-              if (fnode->cp_flag == 1)
-              {
-                //if(fnode->gdval0==fnode->gdval1)
-                fnode->gdval1 = ~fnode->gdval1;
-
-                //fnode->gdval1= ~fnode->gdval1;
-              }
-            }
-          }
-        }
-      }
-    }
-
 #if TRANSITIONFAULT
     if (capture == SLOW_CK)
       fnode->gdval_slow = fnode->gdval1;
 #endif
   }
-
 #if DEBUG
   //for(ia=1;ia<=capture;ia++)
   printf("toggle_cap %d = %.0f %.0f\n", capture, toggle_cap[capture], toggle_cap_perpat[capture]);
@@ -191,7 +225,8 @@ tpi_ff_state_load_ft(capture) int capture;
   }
 }
 
-update_nextstate_ft(capture) int capture;
+
+update_nextstate_ft_ff_inv_cp(capture) int capture;
 {
   FIN_NODE *finnode;
   L_NODE *fnode;
@@ -204,42 +239,33 @@ update_nextstate_ft(capture) int capture;
     fnode = finnode->node;
     tmp[ia] = fnode->finlst->node->ftval1;
   }
-
   finnode = ffnode.next;
   for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
   {
     fnode = finnode->node;
-    if (MODE_TOOL == 4)
-    {
-      if (TGL_GATE_MODE == 2)
-      {
-        if (capture < SKIP_CYCLE - 1 || capture == cap_freq)
-        {
-          fnode->ftval1 = tmp[ia];
-        }
-        else
-        {
-          if (capture % INTERVAL_CYCLE == 0)
-          {
-            tgl_val = fnode->ftval1 ^ tmp[ia];
-            if (fnode->cp_flag == 1)
-            {
-              //if(fnode->gdval0==fnode->gdval1)
-              fnode->ftval1 = ~(tmp[ia] ^ tgl_val); //printf(" %d: %x %x\n",fnode->line,fnode->gdval0,fnode->gdval1);
-                                                    //fnode->gdval1= ~fnode->gdval1;
-            }
-            else
-              fnode->ftval1 = tmp[ia];
-          }
-          else
-            fnode->ftval1 = tmp[ia];
-        }
-      }
-      else
-        fnode->ftval1 = tmp[ia];
+    fnode->ftval1 = tmp[ia];
+    if (capture < SKIP_CYCLE - 1 || capture == cap_freq) continue;
+    if (capture % INTERVAL_CYCLE ) continue;
+    if (fnode->cp_flag != 1) continue;
+    tgl_val = fnode->ftval1 ^ tmp[ia];
+      //if(fnode->gdval0==fnode->gdval1)
+    fnode->ftval1 = ~(tmp[ia] ^ tgl_val);
+      //printf(" %d: %x %x\n",fnode->line,fnode->gdval0,fnode->gdval1);
     }
-    else
-      fnode->ftval1 = tmp[ia];
+}
+
+update_nextstate_ft(capture) int capture;
+{
+  FIN_NODE *finnode;
+  L_NODE *fnode;
+  int ia;
+  unsigned int tmp[ffnum];
+  finnode = ffnode.next;
+  for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
+  {
+    fnode = finnode->node;
+    tmp[ia] = fnode->finlst->node->ftval1;
+    fnode->ftval1 = tmp[ia];
   }
 }
 
@@ -782,8 +808,202 @@ int length;
   }
 }
 
-onetimesim(capture) int capture;
-{
+onetimesim_cp_jst(capture) int capture;
+{ //just toggle cp
+  L_NODE *fnode;
+  FIN_NODE *finnode;
+  int tpi_cnt;
+  unsigned int val1;
+#if WSA_REC
+  unsigned int tmp_val;
+  double MaxTemp = 0.0, temp = 0.0;
+#endif
+  unsigned int tgl_val,  new_val1;
+  //printf("\nhere?\n ");
+  fnode = gnode.next;
+  tpi_cnt = 0;
+  for (; fnode != NULL; fnode = fnode->next)
+  {
+
+    finnode = fnode->finlst;
+    new_val1 = finnode->node->gdval1;
+#if WSA_REC
+    tmp_val = fnode->gdval1; //printf(" %d: %x \n",fnode->line,fnode->gdval1);
+#endif
+
+    finnode = finnode->next;
+    //printf("%d %d\n", fnode->line, fnode->type);
+    //printf("target2 :Line %d val1 %x %x \n", fnode->line, fnode->gdval1, new_val1);
+    for (; finnode != NULL; finnode = finnode->next)
+    {
+      //printf("input   :Line %d %x %X \n", finnode->node->line, finnode->node->gdval1, new_val1);
+      val1 = finnode->node->gdval1;
+      // printf("--%d %d\n", finnode->node->line, finnode->node->line);
+      switch (fnode->type)
+      {
+      case AND:
+      case NAND:
+        new_val1 &= val1;
+        break;
+      case OR:
+      case NOR:
+        new_val1 |= val1;
+        break;
+      default:
+        printf(" error type %d -284-\n", fnode->type);
+        exit(1);
+      }
+    }
+    //printf("output1 :Line %d val %x newval %x \n", fnode->line, fnode->gdval1, new_val1);
+    if (fnode->type == NAND || fnode->type == NOR || fnode->type == NOT)
+    {
+      //printf("反転\n");
+      fnode->gdval1 = ~new_val1;
+      // if(capture==cap_freq-Transcycle) fnode->gdval0 = fnode->gdval1;
+    }
+    else
+    {
+      fnode->gdval1 = new_val1;
+    }
+    //printf("output1 :Line %d val %x newval %x \n\n", fnode->line, fnode->gdval1, new_val1);
+#if WSA_REC
+    if (capture == 1)
+    {
+      MaxWSA += (1 + fnode->outnum);
+      MaxTemp += (1 + fnode->outnum);
+    }
+    if (fnode->gdval1 != tmp_val)
+    {
+      WSA[capture] += (1 + fnode->outnum);
+      //temp+=fnode->outnum;
+      //Wsa_for_Peak[cap_cycle]+=fnode->outnum;
+    }
+#endif
+    if(capture == 1 ) {
+      fnode->tff_org_gval=fnode->gdval1;
+      fnode->tff_trans_gval=fnode->tff_org_gval;
+    }
+    if (capture < SKIP_CYCLE - 1 || fnode->cp_flag != 1 || capture % INTERVAL_CYCLE) continue;
+    if (CP_CTR_MODE == LCP_TOG){
+            //tgl_val = tmp2_val ^ fnode->gdval1;
+            fnode->gdval1 = ~fnode->tff_trans_gval;
+            fnode->tff_trans_gval=fnode->gdval1;
+            //printf(" %d: %x %x\n",fnode->line,tmp2_val,fnode->gdval1);
+    }
+    else if (CP_CTR_MODE == LCP_RAN){
+      if (tgl_tpi[tpi_cnt][capture] == 1)
+        fnode->gdval1 = ALL_F;
+      else if (tgl_tpi[tpi_cnt][capture] == 0)
+        fnode->gdval1 = 0;
+      else if (tgl_tpi[tpi_cnt][capture] == X)
+        printf("error: Not support X value\n"), exit(1);
+      tpi_cnt++;
+    }
+#if DEBUG_NODE
+    //if(capture>cap_freq-Transcycle)
+    printf(" Line %d val1 %x %x -298-\n", fnode->line, fnode->gdval0, fnode->gdval1);
+#endif
+  }
+  //printf("\nhere?\n ");
+}
+
+onetimesim_cp_inversion(capture) int capture;
+{//inversion control point
+  L_NODE *fnode;
+  FIN_NODE *finnode;
+  int tpi_cnt;
+  unsigned int val1;
+#if WSA_REC
+  unsigned int tmp_val;
+  double MaxTemp = 0.0, temp = 0.0;
+#endif
+  unsigned int tgl_val,  new_val1;
+  //printf("\nhere?\n ");
+  fnode = gnode.next;
+  tpi_cnt = 0;
+  for (; fnode != NULL; fnode = fnode->next)
+  {
+
+    finnode = fnode->finlst;
+    new_val1 = finnode->node->gdval1;
+#if WSA_REC
+    tmp_val = fnode->gdval1; //printf(" %d: %x \n",fnode->line,fnode->gdval1);
+#endif
+
+    finnode = finnode->next;
+    //printf("%d %d\n", fnode->line, fnode->type);
+    //printf("target2 :Line %d val1 %x %x \n", fnode->line, fnode->gdval1, new_val1);
+    for (; finnode != NULL; finnode = finnode->next)
+    {
+      //printf("input   :Line %d %x %X \n", finnode->node->line, finnode->node->gdval1, new_val1);
+      val1 = finnode->node->gdval1;
+      // printf("--%d %d\n", finnode->node->line, finnode->node->line);
+      switch (fnode->type)
+      {
+      case AND:
+      case NAND:
+        new_val1 &= val1;
+        break;
+      case OR:
+      case NOR:
+        new_val1 |= val1;
+        break;
+      default:
+        printf(" error type %d -284-\n", fnode->type);
+        exit(1);
+      }
+    }
+    //printf("output1 :Line %d val %x newval %x \n", fnode->line, fnode->gdval1, new_val1);
+    if (fnode->type == NAND || fnode->type == NOR || fnode->type == NOT)
+    {
+      //printf("反転\n");
+      fnode->gdval1 = ~new_val1;
+      // if(capture==cap_freq-Transcycle) fnode->gdval0 = fnode->gdval1;
+    }
+    else
+    {
+      fnode->gdval1 = new_val1;
+    }
+    //printf("output1 :Line %d val %x newval %x \n\n", fnode->line, fnode->gdval1, new_val1);
+#if WSA_REC
+    if (capture == 1)
+    {
+      MaxWSA += (1 + fnode->outnum);
+      MaxTemp += (1 + fnode->outnum);
+    }
+    if (fnode->gdval1 != tmp_val)
+    {
+      WSA[capture] += (1 + fnode->outnum);
+      //temp+=fnode->outnum;
+      //Wsa_for_Peak[cap_cycle]+=fnode->outnum;
+    }
+#endif
+
+    if (capture < SKIP_CYCLE - 1 || fnode->cp_flag != 1 || capture % INTERVAL_CYCLE) continue;
+    if (CP_CTR_MODE == LCP_TOG){
+            //tgl_val = tmp2_val ^ fnode->gdval1;
+            fnode->gdval1 = ~fnode->gdval1;
+            //printf(" %d: %x %x\n",fnode->line,tmp2_val,fnode->gdval1);
+    }
+    else if (CP_CTR_MODE == LCP_RAN){
+      if (tgl_tpi[tpi_cnt][capture] == 1)
+        fnode->gdval1 = ALL_F;
+      else if (tgl_tpi[tpi_cnt][capture] == 0)
+        fnode->gdval1 = 0;
+      else if (tgl_tpi[tpi_cnt][capture] == X)
+        printf("error: Not support X value\n"), exit(1);
+      tpi_cnt++;
+    }
+#if DEBUG_NODE
+    //if(capture>cap_freq-Transcycle)
+    printf(" Line %d val1 %x %x -298-\n", fnode->line, fnode->gdval0, fnode->gdval1);
+#endif
+  }
+  //printf("\nhere?\n ");
+}
+
+onetimesim_cp_tdt(capture) int capture;
+{//transition driven toggle cotrol point
   L_NODE *fnode;
   FIN_NODE *finnode;
   int tpi_cnt;
@@ -802,6 +1022,102 @@ onetimesim(capture) int capture;
     finnode = fnode->finlst;
     new_val1 = finnode->node->gdval1;
     tmp2_val = fnode->gdval1;
+#if WSA_REC
+    tmp_val = fnode->gdval1; //printf(" %d: %x \n",fnode->line,fnode->gdval1);
+#endif
+
+    finnode = finnode->next;
+    //printf("%d %d\n", fnode->line, fnode->type);
+    //printf("target2 :Line %d val1 %x %x \n", fnode->line, fnode->gdval1, new_val1);
+    for (; finnode != NULL; finnode = finnode->next)
+    {
+      //printf("input   :Line %d %x %X \n", finnode->node->line, finnode->node->gdval1, new_val1);
+      val1 = finnode->node->gdval1;
+      // printf("--%d %d\n", finnode->node->line, finnode->node->line);
+      switch (fnode->type)
+      {
+      case AND:
+      case NAND:
+        new_val1 &= val1;
+        break;
+      case OR:
+      case NOR:
+        new_val1 |= val1;
+        break;
+      default:
+        printf(" error type %d -284-\n", fnode->type);
+        exit(1);
+      }
+    }
+    //printf("output1 :Line %d val %x newval %x \n", fnode->line, fnode->gdval1, new_val1);
+    if (fnode->type == NAND || fnode->type == NOR || fnode->type == NOT)
+    {
+      //printf("反転\n");
+      fnode->gdval1 = ~new_val1;
+      // if(capture==cap_freq-Transcycle) fnode->gdval0 = fnode->gdval1;
+    }
+    else
+    {
+      fnode->gdval1 = new_val1;
+    }
+    //printf("output1 :Line %d val %x newval %x \n\n", fnode->line, fnode->gdval1, new_val1);
+#if WSA_REC
+    if (capture == 1)
+    {
+      MaxWSA += (1 + fnode->outnum);
+      MaxTemp += (1 + fnode->outnum);
+    }
+    if (fnode->gdval1 != tmp_val)
+    {
+      WSA[capture] += (1 + fnode->outnum);
+      //temp+=fnode->outnum;
+      //Wsa_for_Peak[cap_cycle]+=fnode->outnum;
+    }
+#endif
+
+    if (capture < SKIP_CYCLE - 1 || fnode->cp_flag != 1 || capture % INTERVAL_CYCLE) continue;
+    if (CP_CTR_MODE == LCP_TOG){
+            tgl_val = tmp2_val ^ fnode->gdval1;
+            fnode->gdval1 = ~(fnode->gdval1 ^ tgl_val);
+            //printf(" %d: %x %x\n",fnode->line,tmp2_val,fnode->gdval1);
+    }
+    else if (CP_CTR_MODE == LCP_RAN){
+      if (tgl_tpi[tpi_cnt][capture] == 1)
+        fnode->gdval1 = ALL_F;
+      else if (tgl_tpi[tpi_cnt][capture] == 0)
+        fnode->gdval1 = 0;
+      else if (tgl_tpi[tpi_cnt][capture] == X)
+        printf("error: Not support X value\n"), exit(1);
+      tpi_cnt++;
+    }
+#if DEBUG_NODE
+    //if(capture>cap_freq-Transcycle)
+    printf(" Line %d val1 %x %x -298-\n", fnode->line, fnode->gdval0, fnode->gdval1);
+#endif
+  }
+  //printf("\nhere?\n ");
+}
+
+
+onetimesim(capture) int capture;
+{
+  L_NODE *fnode;
+  FIN_NODE *finnode;
+  int tpi_cnt;
+  unsigned int val1;
+#if WSA_REC
+  unsigned int tmp_val;
+  double MaxTemp = 0.0, temp = 0.0;
+#endif
+  unsigned int tgl_val,  new_val1;
+  //printf("\nhere?\n ");
+  fnode = gnode.next;
+  tpi_cnt = 0;
+  for (; fnode != NULL; fnode = fnode->next)
+  {
+
+    finnode = fnode->finlst;
+    new_val1 = finnode->node->gdval1;
 #if WSA_REC
     tmp_val = fnode->gdval1; //printf(" %d: %x \n",fnode->line,fnode->gdval1);
 #endif
@@ -837,45 +1153,7 @@ onetimesim(capture) int capture;
       fnode->gdval1 = ~new_val1;
       // if(capture==cap_freq-Transcycle) fnode->gdval0 = fnode->gdval1;
     }
-    // else if (fnode->type == TPI)
-    // {
-    //   if (MODE_TOOL == 4)
-    //   {
-    //     if (TGL_GATE_MODE == 1)
-    //     {
-    //       if (capture >= SKIP_CYCLE - 1)
-    //       {
-    //         if (capture % INTERVAL_CYCLE == 0)
-    //         {
-    //           tgl_val = tmp2_val ^ new_val1;
-    //           fnode->gdval1 = ~(fnode->gdval1 ^ tgl_val);
-    //           //printf(" %d: %x %x\n",fnode->line,tmp2_val,fnode->gdval1);
-    //         }
-    //       }
-    //       else
-    //       {
-    //         fnode->gdval1 = new_val1;
-    //       }
-    //     }
-    //     else if (TGL_GATE_MODE == 4)
-    //     {
-    //       if (capture >= SKIP_CYCLE - 1)
-    //       {
-    //         if (tgl_tpi[tpi_cnt][capture] == 1)
-    //           fnode->gdval1 = ALL_F;
-    //         else if (tgl_tpi[tpi_cnt][capture] == 0)
-    //           fnode->gdval1 = 0;
-    //         else if (tgl_tpi[tpi_cnt][capture] == X)
-    //           printf("error: Not support X value\n"), exit(1);
-    //         tpi_cnt++;
-    //       }
-    //       else
-    //       {
-    //         fnode->gdval1 = new_val1;
-    //       }
-    //     }
-    //   }
-    // }
+
     else
     {
       fnode->gdval1 = new_val1;
@@ -895,41 +1173,6 @@ onetimesim(capture) int capture;
     }
 #endif
 
-    if (MODE_TOOL == 4)
-    {
-      if (TGL_GATE_MODE == 1)
-      {
-        if (capture >= SKIP_CYCLE - 1)
-        {
-          if (capture % INTERVAL_CYCLE == 0)
-          {
-            tgl_val = tmp2_val ^ fnode->gdval1;
-            if (fnode->cp_flag == 1)
-            {
-              fnode->gdval1 = ~(fnode->gdval1 ^ tgl_val);
-              //printf(" %d: %x %x\n",fnode->line,tmp2_val,fnode->gdval1);
-            }
-          }
-        }
-      }
-      else if (TGL_GATE_MODE == 4)
-      {
-        if (capture >= SKIP_CYCLE - 1)
-        {
-          if (fnode->cp_flag == 1)
-          {
-            if (tgl_tpi[tpi_cnt][capture] == 1)
-              fnode->gdval1 = ALL_F;
-            else if (tgl_tpi[tpi_cnt][capture] == 0)
-              fnode->gdval1 = 0;
-            else if (tgl_tpi[tpi_cnt][capture] == X)
-              printf("error: Not support X value\n"), exit(1);
-            tpi_cnt++;
-          }
-        }
-      }
-    }
-
 #if DEBUG_NODE
     //if(capture>cap_freq-Transcycle)
     printf(" Line %d val1 %x %x -298-\n", fnode->line, fnode->gdval0, fnode->gdval1);
@@ -938,14 +1181,14 @@ onetimesim(capture) int capture;
   //printf("\nhere?\n ");
 }
 
-ftvalsim(capture) int capture;
-{
+ftvalsim_cp_jst(capture) int capture;
+{//just toggle cpi
   L_NODE *fnode;
   FIN_NODE *finnode;
   unsigned int val1;
   int ia;
   int count1 = 0;
-  unsigned int tgl_val, tmp_val, new_val1;
+  unsigned int tgl_val, new_val1;
   int tpi_cnt = 0;
   fnode = gnode.next;
   for (; fnode != NULL; fnode = fnode->next)
@@ -954,8 +1197,8 @@ ftvalsim(capture) int capture;
     finnode = fnode->finlst;
     new_val1 = finnode->node->ftval1;
     finnode = finnode->next;
-    tmp_val = fnode->ftval1;
-//if(TGL_GATE_MODE==1&&fnode->cp_flag==1){
+
+//if(CP_CTR_MODE==1&&fnode->cp_flag==1){
 // tgl_val= fnode->ftval1; printf(" %d: %x %x\n",fnode->line,fnode->gdval1,fnode->ftval1);
 //}
 #if DEBUG1
@@ -988,44 +1231,256 @@ ftvalsim(capture) int capture;
     {
       fnode->ftval1 = new_val1;
     }
-    if (MODE_TOOL == 4)
-    {
-      if (TGL_GATE_MODE == 1)
-      {
-        if (capture >= SKIP_CYCLE - 1)
-        {
-          if (capture % INTERVAL_CYCLE == 0)
-          {
 
-            tgl_val = tmp_val ^ fnode->ftval1;
-            if (fnode->cp_flag == 1)
-            {
-              //printf(" %x ",fnode->ftval1);
-              //if(fnode->ftval0==fnode->ftval1)
-              fnode->ftval1 = ~(fnode->ftval1 ^ tgl_val); //printf(" %d: %x %x\n",fnode->line,tmp_val,fnode->ftval1);
-            }
+
+    if(capture == 1 ) fnode->tff_trans_fval=fnode->tff_org_gval;
+  //  printf(" %d: %x \n",fnode->line, fnode->tff_trans_fval);
+    if (capture < SKIP_CYCLE - 1 || !fnode->cp_flag  || capture % INTERVAL_CYCLE) continue;
+    if (CP_CTR_MODE == LCP_TOG){
+            //tgl_val = tmp2_val ^ fnode->gdval1;
+            fnode->ftval1 = ~fnode->tff_trans_fval;
+            fnode->tff_trans_fval=fnode->ftval1;
+    //  if(fnode->line == 3931)
+        //   printf("%d %d: %x %x %x\n", capture,fnode->line, fnode->ftval1,fnode->tff_trans_fval,fnode->tff_org_gval);
           }
-        }
-      }
-      else if (TGL_GATE_MODE == 4)
-      {
-        if (capture >= SKIP_CYCLE - 1)
-        {
-          if (fnode->cp_flag == 1)
-          {
-            if (tgl_tpi[tpi_cnt][capture] == 1)
-              fnode->ftval1 = ALL_F;
-            else if (tgl_tpi[tpi_cnt][capture] == 0)
-              fnode->ftval1 = 0;
-            else if (tgl_tpi[tpi_cnt][capture] == X)
-              printf("error: Not support X value\n"), exit(1);
-            tpi_cnt++;
-          }
-        }
-      }
+    else if (CP_CTR_MODE == LCP_RAN){
+      if (tgl_tpi[tpi_cnt][capture] == 1)
+        fnode->ftval1 = ALL_F;
+      else if (tgl_tpi[tpi_cnt][capture] == 0)
+        fnode->ftval1 = 0;
+      else if (tgl_tpi[tpi_cnt][capture] == X)
+        printf("error: Not support X value\n"), exit(1);
+      tpi_cnt++;
     }
 
-    /*if(TGL_GATE_MODE==1&& fnode->cp_flag==1){
+    /*if(CP_CTR_MODE==1&& fnode->cp_flag==1){
+if(tgl_val==fnode->ftval1)
+  fnode->ftval1= ~fnode->ftval1;printf(" %d: %x %x\n",fnode->line,fnode->gdval1,fnode->ftval1);
+}*/
+
+#if DEBUG_NODE
+    if (fnode->line == 380)
+      printf(" Line %d gdval %x ftval %x %d\n", fnode->line, fnode->gdval_slow, fnode->ftval1, count1);
+#endif
+  }
+  //printf("%d ",count1);
+  //exit(1);
+}
+
+ftvalsim_cp_inversion(capture) int capture;
+{//inversion cpi
+  L_NODE *fnode;
+  FIN_NODE *finnode;
+  unsigned int val1;
+  int ia;
+  int count1 = 0;
+  unsigned int tgl_val, new_val1;
+  int tpi_cnt = 0;
+  fnode = gnode.next;
+  for (; fnode != NULL; fnode = fnode->next)
+  {
+    count1++;
+    finnode = fnode->finlst;
+    new_val1 = finnode->node->ftval1;
+    finnode = finnode->next;
+
+//if(CP_CTR_MODE==1&&fnode->cp_flag==1){
+// tgl_val= fnode->ftval1; printf(" %d: %x %x\n",fnode->line,fnode->gdval1,fnode->ftval1);
+//}
+#if DEBUG1
+    if (fnode->line == 38)
+      printf(" Faulty val In-line %x\n", new_val1);
+#endif
+    for (; finnode != NULL; finnode = finnode->next)
+    {
+      val1 = finnode->node->ftval1;
+      switch (fnode->type)
+      {
+      case AND:
+      case NAND:
+        new_val1 &= val1;
+        break;
+      case OR:
+      case NOR:
+        new_val1 |= val1;
+        break;
+      default:
+        printf(" error type %d -284-\n", fnode->type);
+        exit(1);
+      }
+    }
+    if (fnode->type == NAND || fnode->type == NOR || fnode->type == NOT)
+    {
+      fnode->ftval1 = ~new_val1;
+    }
+    else
+    {
+      fnode->ftval1 = new_val1;
+    }
+
+    if (capture < SKIP_CYCLE - 1 || fnode->cp_flag != 1 || capture % INTERVAL_CYCLE) continue;
+    if (CP_CTR_MODE == LCP_TOG){
+            fnode->ftval1 = ~fnode->ftval1;
+            //printf(" %d: %x %x\n",fnode->line, fnode->ftval1,fnode->gdval1);
+    }
+    else if (CP_CTR_MODE == LCP_RAN){
+      if (tgl_tpi[tpi_cnt][capture] == 1)
+        fnode->ftval1 = ALL_F;
+      else if (tgl_tpi[tpi_cnt][capture] == 0)
+        fnode->ftval1 = 0;
+      else if (tgl_tpi[tpi_cnt][capture] == X)
+        printf("error: Not support X value\n"), exit(1);
+      tpi_cnt++;
+    }
+
+    /*if(CP_CTR_MODE==1&& fnode->cp_flag==1){
+if(tgl_val==fnode->ftval1)
+  fnode->ftval1= ~fnode->ftval1;printf(" %d: %x %x\n",fnode->line,fnode->gdval1,fnode->ftval1);
+}*/
+
+#if DEBUG_NODE
+    if (fnode->line == 380)
+      printf(" Line %d gdval %x ftval %x %d\n", fnode->line, fnode->gdval_slow, fnode->ftval1, count1);
+#endif
+  }
+  //printf("%d ",count1);
+  //exit(1);
+}
+
+
+ftvalsim_cp_tdt(capture) int capture;
+{//transition driven toggle cpi
+  L_NODE *fnode;
+  FIN_NODE *finnode;
+  unsigned int val1;
+  int ia;
+  int count1 = 0;
+  unsigned int tgl_val, tmp_val, new_val1;
+  int tpi_cnt = 0;
+  fnode = gnode.next;
+  for (; fnode != NULL; fnode = fnode->next)
+  {
+    count1++;
+    finnode = fnode->finlst;
+    new_val1 = finnode->node->ftval1;
+    finnode = finnode->next;
+    tmp_val = fnode->ftval1;
+//if(CP_CTR_MODE==1&&fnode->cp_flag==1){
+// tgl_val= fnode->ftval1; printf(" %d: %x %x\n",fnode->line,fnode->gdval1,fnode->ftval1);
+//}
+#if DEBUG1
+    if (fnode->line == 38)
+      printf(" Faulty val In-line %x\n", new_val1);
+#endif
+    for (; finnode != NULL; finnode = finnode->next)
+    {
+      val1 = finnode->node->ftval1;
+      switch (fnode->type)
+      {
+      case AND:
+      case NAND:
+        new_val1 &= val1;
+        break;
+      case OR:
+      case NOR:
+        new_val1 |= val1;
+        break;
+      default:
+        printf(" error type %d -284-\n", fnode->type);
+        exit(1);
+      }
+    }
+    if (fnode->type == NAND || fnode->type == NOR || fnode->type == NOT)
+    {
+      fnode->ftval1 = ~new_val1;
+    }
+    else
+    {
+      fnode->ftval1 = new_val1;
+    }
+
+    if (capture < SKIP_CYCLE - 1 || fnode->cp_flag != 1 || capture % INTERVAL_CYCLE) continue;
+    if (CP_CTR_MODE == LCP_TOG){
+            tgl_val = tmp_val ^ fnode->ftval1;
+            fnode->ftval1 = ~(fnode->ftval1 ^ tgl_val);
+            //printf(" %d: %x %x\n",fnode->line,tmp2_val,fnode->gdval1);
+    }
+    else if (CP_CTR_MODE == LCP_RAN){
+      if (tgl_tpi[tpi_cnt][capture] == 1)
+        fnode->ftval1 = ALL_F;
+      else if (tgl_tpi[tpi_cnt][capture] == 0)
+        fnode->ftval1 = 0;
+      else if (tgl_tpi[tpi_cnt][capture] == X)
+        printf("error: Not support X value\n"), exit(1);
+      tpi_cnt++;
+    }
+
+    /*if(CP_CTR_MODE==1&& fnode->cp_flag==1){
+if(tgl_val==fnode->ftval1)
+  fnode->ftval1= ~fnode->ftval1;printf(" %d: %x %x\n",fnode->line,fnode->gdval1,fnode->ftval1);
+}*/
+
+#if DEBUG_NODE
+    if (fnode->line == 380)
+      printf(" Line %d gdval %x ftval %x %d\n", fnode->line, fnode->gdval_slow, fnode->ftval1, count1);
+#endif
+  }
+  //printf("%d ",count1);
+  //exit(1);
+}
+
+
+ftvalsim(capture) int capture;
+{
+  L_NODE *fnode;
+  FIN_NODE *finnode;
+  unsigned int val1;
+  int ia;
+  int count1 = 0;
+  unsigned int tgl_val, tmp_val, new_val1;
+  int tpi_cnt = 0;
+  fnode = gnode.next;
+  for (; fnode != NULL; fnode = fnode->next)
+  {
+    count1++;
+    finnode = fnode->finlst;
+    new_val1 = finnode->node->ftval1;
+    finnode = finnode->next;
+    tmp_val = fnode->ftval1;
+//if(CP_CTR_MODE==1&&fnode->cp_flag==1){
+// tgl_val= fnode->ftval1; printf(" %d: %x %x\n",fnode->line,fnode->gdval1,fnode->ftval1);
+//}
+#if DEBUG1
+    if (fnode->line == 38)
+      printf(" Faulty val In-line %x\n", new_val1);
+#endif
+    for (; finnode != NULL; finnode = finnode->next)
+    {
+      val1 = finnode->node->ftval1;
+      switch (fnode->type)
+      {
+      case AND:
+      case NAND:
+        new_val1 &= val1;
+        break;
+      case OR:
+      case NOR:
+        new_val1 |= val1;
+        break;
+      default:
+        printf(" error type %d -284-\n", fnode->type);
+        exit(1);
+      }
+    }
+    if (fnode->type == NAND || fnode->type == NOR || fnode->type == NOT)
+    {
+      fnode->ftval1 = ~new_val1;
+    }
+    else
+    {
+      fnode->ftval1 = new_val1;
+    }
+    /*if(CP_CTR_MODE==1&& fnode->cp_flag==1){
 if(tgl_val==fnode->ftval1)
   fnode->ftval1= ~fnode->ftval1;printf(" %d: %x %x\n",fnode->line,fnode->gdval1,fnode->ftval1);
 }*/

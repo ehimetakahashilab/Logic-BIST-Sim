@@ -3,7 +3,7 @@
 #include "def_flt.h"
 #include "string.h"
 #include "math.h"
-#define FLT_PRN 1 // output the detected fault list
+#define FLT_PRN 0 // output the detected fault list
 
 main(argc, argv) int argc;
 char *argv[13];
@@ -108,7 +108,7 @@ count_flt(flttag)
     if (!flttag->dtime)
       sumflt++;
   }
-  if ( MODE_TOOL == 3 || MODE_TOOL == 4){
+  if ( MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP){
     for (ia = 0; ia <= sum_flt; ia++) {
       for (ib = 0; ib <= FF_FILE; ib++){
         if (flt_det_flag[ia][ib]) flt_det_num[ib]++;
@@ -136,7 +136,7 @@ char *argv[1];
   printf("#fault, nodft,");
   int ia,ib;
   fprintf(flist, "%d\n",sum_flt );
-  if ( MODE_TOOL == 3 || MODE_TOOL == 4){
+  if ( MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP){
     for(ia=0;ia<FF_FILE;ia++) printf("op%d,",ia+1);
       printf("full_op");
   }
@@ -144,7 +144,7 @@ char *argv[1];
   for(ia=1;ia<=sum_flt;ia++){
     printf("%d,",ia);
     fprintf(flist, "%d,",ia);
-    if ( MODE_TOOL == 3 || MODE_TOOL == 4){
+    if ( MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP){
       for(ib=0;ib<=FF_FILE+1;ib++)  {
         printf("%d,",flt_det_flag[ia][ib]);
         fprintf(flist, "%d,",flt_det_flag[ia][ib]);
@@ -185,7 +185,7 @@ for(; flttag != NULL; flttag = flttag->next){
   if ( !flttag->dtime ) printf("0,");
   else printf("1,");
 
-  if ( MODE_TOOL == 3 || MODE_TOOL == 4){
+  if ( MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP){
     for (ia = 0; ia <= sum_flt; ia++){
       for (ib = 0; ib < FF_FILE; ib++)
       {

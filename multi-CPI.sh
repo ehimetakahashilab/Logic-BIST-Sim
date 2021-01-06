@@ -18,6 +18,14 @@ TPG=0 #=0:LFSR,=1:ATPG
 TEST_VEC=10 #0 00 # Number of Test patterns
 TOOLMODE=4 #=1:Normal Scan test, =2:Multi-cycle Test, =3: Multi-cycle test with Seq OB, =4:Toggle Gate TPI
 
+	CAPTURE=10 #the number of capture cycles
+  OBRATE=0.2 #ratio of OP FF
+  LCP_rate=0.01 #the ratio of Logic CPs in all logic gates
+  CP_GROUP=1 #=1: the number of CPs selected at each iteration
+  CP_TYPE=1 #control point types =1: TDT, =2: Inversion, =3: Just Toggle
+	FFCP_rate=0.0	#the ration of FF-CPs in all FFs
+  SKIP_CAP=3 #SKIP_CAP=3, the CP control starts from the third capture cycle.
+  INTERVAL_CYCLE=1 #=1: the number of interval cycles
 
 ulimit -s unlimited
 rm -f *.dat
@@ -44,23 +52,16 @@ rm -f ${CIRCUIT}_tgl_ff_tpi.dat
     mkdir -p ${OP_LIST_DIR}/${CIRCUIT}
   fi
 
-
-	CAPTURE=5 #the number of capture cycles
-   OBRATE=0.2 #ratio of OP FF
-  LCP_rate=0.01 #the ratio of Logic CPs in all logic gates
-  CP_GROUP=1 #=1: the number of CPs selected at each iteration
-
-	FFCP_rate=0.1	#the ration of FF-CPs in all FFs
-  SKIP_CAP=3 #SKIP_CAP=3, the CP control starts from the third capture cycle.
-  INTERVAL_CYCLE=1 #=1: the number of interval cycles
-
   if [ ! -e ${User_DIR}/OUTPUTS/CPI/${CAPTURE}_cycles/ ]; then
     mkdir -p ${User_DIR}/OUTPUTS/CPI/${CAPTURE}_cycles/
   fi
 
-	 cnt1=0
-	  for ff_sta_file in  ./FF_STATION/$CIRCUIT/TOPSIS #./FF_STATION/$CIRCUIT/BRANCH ./FF_STATION/$CIRCUIT/COMPLEX ./FF_STATION/$CIRCUIT/TYPE_1 ./FF_STATION/$CIRCUIT/TYPE_2 ./FF_STATION/$CIRCUIT/TYPE_3 ./FF_STATION/$CIRCUIT/TOPSIS
+
+#	  for ff_sta_file in  ./FF_STATION/$CIRCUIT/TOPSIS #./FF_STATION/$CIRCUIT/BRANCH ./FF_STATION/$CIRCUIT/COMPLEX ./FF_STATION/$CIRCUIT/TYPE_1 ./FF_STATION/$CIRCUIT/TYPE_2 ./FF_STATION/$CIRCUIT/TYPE_3 ./FF_STATION/$CIRCUIT/TOPSIS
 # you can evaluate multiple FF OP list in one simulation by specifying the path of OB-FF List
+	 cnt1=0
+ for ff_sta_file in  ~/renesas/tpi4share/OPI/$CIRCUIT/TOPSIS
+  #  for ff_sta_file in  ~/renesas/Renesas-TPI/Seq_FF_OPI/DATA/cp_$CIRCUIT/FF_STATION/TOPSIS
 	   do
 
 		if [ -e $ff_sta_file ];
@@ -100,10 +101,13 @@ do
 
   #  CP_LIST=0 # =0: normal
 
-  ln -s ${CP_LIST_DIR}/LCP/${CIRCUIT}/rlcp_$CP_GROUP  tgl_gt_input.dat
+# ln -s ${CP_LIST_DIR}/LCP/${CIRCUIT}/rlcp_$CP_GROUP  tgl_gt_input.dat
+ #ln -s ../nakaoka_cp/20201106_2/CP_STATION/${CIRCUIT} tgl_gt_input.dat
+
+ln -s ~/renesas/tpi4share/Logic-CPI_by_rtpi/${CIRCUIT}/DC202002 tgl_gt_input.dat
 
 	echo ===$CIRCUIT: $CP_GROUP $INTERVAL_CYCLE===========
-			time ./lbistsim $CIRCUIT $TOOLMODE $TPG $CP_CTRL $LCP_rate $CAPTURE $INTERVAL_CYCLE $SKIP_CAP $cnt1 $OBRATE $CP_GROUP $TEST_VEC #>> Switch_ctr.txt
+			time ./lbistsim $CIRCUIT $TOOLMODE $TPG $CP_CTRL $LCP_rate $CAPTURE $INTERVAL_CYCLE $SKIP_CAP $cnt1 $OBRATE $CP_GROUP $TEST_VEC $CP_TYPE #>> ${User_DIR}/$CIRCUIT.log
   echo ===logic CPI simulation process end=== #>> $LOG_FILE
 	rm -rf tgl_gt_input.dat
 
@@ -124,9 +128,7 @@ do
 done
 rm -f ${CIRCUIT}_tgl_FF_input.dat
 rm -f ${CIRCUIT}_tgl_ff_tpi.dat
-rm -f ff_station_*.dat
-done
-
+rm -f ff_station_*
     if [ -e fault_list.dat ];
       then
       mv fault_list.dat "$CIRCUIT"_fault_list.dat
@@ -139,3 +141,4 @@ done
 #if exist fault list file -end-
 #rm -f #ff_station* tgl_* nfs*
 rm -f $CIRCUIT lfsr.dat *~ tmp*  ff_station.dat ATPG.dat *lfsr_pi.dat
+done

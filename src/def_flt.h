@@ -26,7 +26,7 @@ struct l_node
   //
   L_NODE *next, *prev;
   FIN_NODE *finlst, *foutlst;
-  unsigned int gdval0, gdval1, ftval0, ftval1;
+  unsigned int gdval0, gdval1, ftval0, ftval1, tff_org_gval, tff_trans_gval,tff_trans_fval;
   char *Name;
   int sel_flag[20]; //FF選択法
 };
@@ -105,7 +105,7 @@ typedef struct element
 } ELEMENT;
 
 /*Instance Variable Defination*/
-int MODE_TOOL, TPG_MODE, TAP_NUM, cap_freq, SKIP_CAPTURE, SKIP_CYCLE, FF_SEL_METHOD, TGL_GATE_MODE, clocktime;
+int MODE_TOOL, TPG_MODE, TAP_NUM, cap_freq, SKIP_CAPTURE, SKIP_CYCLE, FF_SEL_METHOD, CP_CTR_MODE, CP_TYPE, clocktime;
 int LBISTMODE, ALPMODE, INTERVAL_CYCLE, TG_FILE, SOControlflag, SoControlMode, FFSelMode, CHAINLENGTH, length,group_tpi;
 int numout, slist, numgate, n_tpi;
 int lpnt, inpnum, ffnum, sum_flt, remain_flt, sum_Tran_flt, chainnum, tgl_gt_cnt;
