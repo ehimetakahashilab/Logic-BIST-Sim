@@ -48,7 +48,7 @@ initial_node(argv) char *argv[1];
 
   sprintf(tgl_file, "%s_tgl_FF_input.dat", basename(argv[1]));
 
-  if (TGL_GATE_MODE == 1 || TGL_GATE_MODE == 4) {
+  if (CP_CTR_MODE == LCP_TOG || CP_CTR_MODE == LCP_RAN) {
     // tgl_gt_cnt=TGL_GT_NUM;
     tgl_gt_cnt = numgate * Tgl_rate;
 
@@ -66,7 +66,7 @@ initial_node(argv) char *argv[1];
       }
     }
     // exit(1);
-  } else if (TGL_GATE_MODE == 2 || TGL_GATE_MODE == 3) {  // FF TPI
+  } else if (CP_CTR_MODE == FCP_TOG || CP_CTR_MODE == FCP_RAN) {  // FF TPI
     FILE *fin;
     int toggle_FFs[lpnt];
     for (i = 0; i <= lpnt; i++) {

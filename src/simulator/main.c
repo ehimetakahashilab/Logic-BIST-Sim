@@ -111,7 +111,7 @@ count_flt(flttag) FLT_NODE *flttag;
       sumflt++;
     }
   }
-  if (MODE_TOOL == 3 || MODE_TOOL == 4) {
+  if (MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP) {
     for (ia = 0; ia <= sum_flt; ia++) {
       for (ib = 0; ib <= FF_FILE; ib++) {
         if (flt_det_flag[ia][ib]) {
@@ -142,11 +142,11 @@ char *argv[1];
   int ia, ib;
 
   switch (MODE_TOOL) {
-    case 2:
+    case MULTITEST:
       fprintf(flist, "#Fault, NoDFT\n");
       break;
-    case 3:
-    case 4:
+    case MULTI_OP:
+    case MULTI_CP:
       fprintf(flist, "#Fault, NoDFT, SEQ_OB, Full_OB\n");
       break;
     default:
@@ -155,7 +155,7 @@ char *argv[1];
 
   for (ia = 1; ia <= sum_flt; ia++) {
     fprintf(flist, "%d,", ia);
-    if (MODE_TOOL == 3 || MODE_TOOL == 4) {
+    if (MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP) {
       for (ib = 0; ib <= FF_FILE + 1; ib++) {
         if (ib < FF_FILE + 1) {
           fprintf(flist, "%d,", flt_det_flag[ia][ib]);
@@ -177,7 +177,7 @@ fltlist_print(flttag) FLT_NODE *flttag;
   int ia, ib;
   printf("\noutput the fault detection table \n");
   printf("#fault, nodft,");
-  if (MODE_TOOL == 3 || MODE_TOOL == 4) {
+  if (MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP) {
     for (ia = 0; ia < FF_FILE; ia++) {
       printf("op%d,", ia + 1);
     }
@@ -201,7 +201,7 @@ fltlist_print(flttag) FLT_NODE *flttag;
       printf("1,");
     }
 
-    if (MODE_TOOL == 3 || MODE_TOOL == 4) {
+    if (MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP) {
       for (ia = 0; ia <= sum_flt; ia++) {
         for (ib = 0; ib < FF_FILE; ib++) {
           if (flt_det_flag[ia][ib]) {

@@ -157,7 +157,7 @@ faultsim(argv) char *argv[13];
 #if FCOVPERPAT
       // if(MODE_TOOL==4){
       char cpi_sim_outpath[200];
-      switch (TGL_GATE_MODE) {
+      switch (CP_CTR_MODE) {
         case 0:  // Non Toggle gate insertion
           sprintf(cpi_sim_outpath, "./OUTPUTS/CPI/%d_cycles/Non_%s.csv",
                   cap_freq, basename(argv[1]));
@@ -166,7 +166,7 @@ faultsim(argv) char *argv[13];
           // cap_freq, SKIP_CYCLE, basename(argv[1]), OBSERVE_RATE,
           // FF_SEL_METHOD, ff_rate);
           break;
-        case 1:  // toggle gate insert by toggling
+        case LCP_TOG:  // toggle gate insert by toggling
           sprintf(cpi_sim_outpath,
                   "./OUTPUTS/CPI/%dcycles/%dSKIP/%s_LCPI_TGL_%d_%.2f.csv",
                   cap_freq, SKIP_CYCLE, basename(argv[1]), INTERVAL_CYCLE,
@@ -176,19 +176,19 @@ faultsim(argv) char *argv[13];
                   cap_freq, basename(argv[1]), INTERVAL_CYCLE, SKIP_CYCLE,
                   Tgl_rate);
           break;
-        case 4:
+        case LCP_RAN:
           sprintf(cpi_sim_outpath,
                   "./OUTPUTS/CPI/%d_cycles/%s_LCPI_RAN_%d_%d_%.2f.csv",
                   cap_freq, basename(argv[1]), INTERVAL_CYCLE, SKIP_CYCLE,
                   Tgl_rate);
           break;
-        case 2:  // toggle FF  insert by toggling
+        case FCP_TOG:  // toggle FF  insert by toggling
           sprintf(cpi_sim_outpath,
                   "./OUTPUTS/CPI/%d_cycles/%s_FFCPI_TGL_%d_%d_%.2f.csv",
                   cap_freq, basename(argv[1]), INTERVAL_CYCLE, SKIP_CYCLE,
                   ff_rate);
           break;
-        case 3:
+        case FCP_RAN:
           sprintf(cpi_sim_outpath,
                   "./OUTPUTS/CPI/%d_cycles/%s_FFCPI_RAN_%d_%d_%.2f.csv",
                   cap_freq, basename(argv[1]), INTERVAL_CYCLE, SKIP_CYCLE,
@@ -251,8 +251,8 @@ faultsim(argv) char *argv[13];
     }
   }
 
-  if (MODE_TOOL == 4) {
-    if (TGL_GATE_MODE == 3) {  // FF_TPI by LFSR
+  if (MODE_TOOL == MULTI_CP) {
+    if (CP_CTR_MODE == FCP_RAN) {  // FF_TPI by LFSR
       tpi_pat = fopen(pt_file2, "r");
       if (tpi_pat == NULL) {
         fprintf(stderr, "tgl_ff_tpi.dat is not found!\n");
@@ -270,7 +270,7 @@ faultsim(argv) char *argv[13];
         tgl_tpi[ia] = (int *)calloc((cap_freq + 1), sizeof(int));
         // tgl_tpi[ia] = (int *)malloc((cap_freq+1)*sizeof(int));
       }
-    } else if (TGL_GATE_MODE == 4) {  // Toggle Gate TPI by LFSR
+    } else if (CP_CTR_MODE == LCP_RAN) {  // Toggle Gate TPI by LFSR
       char tgl_gt_tpi_path[256];
       sprintf(tgl_gt_tpi_path, "%s_tgl_gt_tpi.dat", basename(argv[1]));
       tpi_pat = fopen(tgl_gt_tpi_path, "r");
@@ -297,7 +297,7 @@ faultsim(argv) char *argv[13];
   int tmp_tpi[n_tpi];
   initialize_detect(fltlst.next, length);
 
-  if (MODE_TOOL == 3 || MODE_TOOL == 4) {
+  if (MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP) {
     flt_info(fltlst.next);
   }
 
@@ -349,8 +349,8 @@ faultsim(argv) char *argv[13];
     pi_valset(pivalset);
 
     ///////TPI Pattern Set////////////////
-    if (MODE_TOOL == 4) {
-      if (TGL_GATE_MODE == 3 || TGL_GATE_MODE == 4) {  // TPI by LFSR
+    if (MODE_TOOL == MULTI_CP) {
+      if (CP_CTR_MODE == FCP_RAN || CP_CTR_MODE == LCP_RAN) {  // TPI by LFSR
         // for (ib = 1; ib <= cap_freq - SKIP_CYCLE; ib++)
         for (ib = SKIP_CYCLE - 1; ib <= cap_freq; ib++) {
           for (ia = 0; ia < n_tpi; ia++) {
@@ -380,52 +380,62 @@ faultsim(argv) char *argv[13];
     // prn_state_ao3(fp, time); //2019/12
 
     for (ia = 1; ia <= cap_freq; ia++) {
-      onetimesim(ia);
       switch (MODE_TOOL) {
-        case 3:
-        case 4:
-#if SELECT_STATION
-          finnode = ffnode.next;
-          for (ib = 0; finnode != NULL; finnode = finnode->next, ib++) {
-            // if(ff_select[ib] == '1'){
-            fnode = finnode->node;
-
-            // ff_observe[ic][ia-1].gdval1 = fnode->gdval1;
-            ff_observe[ib][ia - 1].gdval1 = fnode->finlst->node->gdval1;
-
-            // ff_observe[ic][ia-1].gdval1 = fnode->finlst->node->gdval1;
-            // ic++;
-            // }
+        case SCTEST:
+        case MULTITEST:
+        case MULTI_OP:
+          onetimesim(ia);
+          break;
+        case MULTI_CP:
+          switch (CP_TYPE) {
+            case CP_TDT:
+              onetimesim_cp_tdt(ia);
+              break;
+            case CP_INV:
+              onetimesim_cp_inversion(ia);
+              break;
+            case CP_JST:
+              onetimesim_cp_jst(ia);
+              break;
+            default:
+              onetimesim(ia);
+              break;
           }
+          break;
+        default:
+          onetimesim(ia);
+          break;
+      }
 
-#else
+      switch (MODE_TOOL) {
+        case MULTI_OP:
+        case MULTI_CP:
           finnode = ffnode.next;
           for (ib = 0; ib < ffnum; finnode = finnode->next, ib++) {
             fnode = finnode->node;
             // ff_observe[ib][ia-1].gdval1 = fnode->gdval1;
             ff_observe[ib][ia - 1].gdval1 = fnode->finlst->node->gdval1;
           }
-#endif
+      }
 
 #if PO_OBSERVE
-          finnode = ponode.next;
-          for (ib = 0; finnode != NULL; finnode = finnode->next, ib++) {
-            fnode = finnode->node;
-            po_observe[ib][ia - 1].gdval1 = fnode->gdval1;
-            // po_observe[ib][ia-1].gdval1 =  fnode->finlst->node->gdval1;
-          }
-#endif
+      finnode = ponode.next;
+      for (ib = 0; finnode != NULL; finnode = finnode->next, ib++) {
+        fnode = finnode->node;
+        po_observe[ib][ia - 1].gdval1 = fnode->gdval1;
+        // po_observe[ib][ia-1].gdval1 =  fnode->finlst->node->gdval1;
       }
+#endif
 
-      update_nextstate(ia);
-
-      if (MODE_TOOL == 4 && TGL_GATE_MODE == 3 && ia >= SKIP_CYCLE - 1 &&
-          ia < cap_freq) {
-        // printf("%d,%d,%d\n", MODE_TOOL, TGL_GATE_MODE, ia);
+      if (MODE_TOOL == MULTI_CP && CP_CTR_MODE == FCP_RAN &&
+          ia >= SKIP_CYCLE - 1 && ia < cap_freq) {
+        // printf("%d,%d,%d\n", MODE_TOOL, CP_CTR_MODE, ia);
+        update_nextstate_ff_inv_cp(ia);
         tpi_ff_state_load(ia);
         // printf("+++++++++++++%d\n", fnode->line);
+      } else {
+        update_nextstate(ia);
       }
-
       //	prn_state_ao(fp, ia); //2019/12
 
 #if DEBUG1 || PRNT_FF
@@ -452,7 +462,7 @@ faultsim(argv) char *argv[13];
       cop + typey_state();  // last slow capture value loading
       for (ia = SLOW_CK + 1; ia <= cap_freq; ia++) {
         ftvalsim(ia);
-        if (MODE_TOOL == 3 || MODE_TOOL == 4) {
+        if (MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP) {
 #if SELECT_STATION
           // ic=0;
           finnode = ffnode.next;
@@ -504,46 +514,60 @@ faultsim(argv) char *argv[13];
       // injarray[0]->saval); //2019/12
 
       for (ia = 1; ia <= cap_freq; ia++) {
-        //	fprintf(fp, "cycle %d,", ia); //2019/12
+        switch (MODE_TOOL) {
+          case SCTEST:
+          case MULTITEST:
+          case MULTI_OP:
+            ftvalsim(ia);
+            break;
+          case MULTI_CP:
+            switch (CP_TYPE) {
+              case CP_TDT:
+                ftvalsim_cp_tdt(ia);
+                break;
+              case CP_INV:
+                ftvalsim_cp_inversion(ia);
+                break;
+              case CP_JST:
+                ftvalsim_cp_jst(ia);
+                break;
+              default:
+                ftvalsim(ia);
+                break;
+            }
+            break;
+          default:
+            onetimesim(ia);
+            break;
+        }
 
-        ftvalsim(ia);
-        if (MODE_TOOL == 3 || MODE_TOOL == 4) {
-
-#if SELECT_STATION
-          // ic=0;
-          finnode = ffnode.next;
-          for (ib = 0; finnode != NULL; finnode = finnode->next, ib++) {
-            // if(ff_select[ib] == '1'){
-            fnode = finnode->node;
-            // ff_observe[ic][ia-1].ftval1 = fnode->ftval1;
-            ff_observe[ib][ia - 1].ftval1 = fnode->finlst->node->ftval1;
-            // ff_observe[ic][ia-1].ftval1 =fnode->finlst->node->ftval1;
-            // ic++;
-            // }
-          }
-#else
-          finnode = ffnode.next;
-          for (ib = 0; ib < ffnum; finnode = finnode->next, ib++) {
-            fnode = finnode->node;
-            // ff_observe[ib][ia-1].ftval1 = fnode->ftval1;
-            ff_observe[ib][ia - 1].ftval1 = fnode->finlst->node->ftval1;
-          }
-#endif
+        switch (MODE_TOOL) {
+          case MULTI_OP:
+          case MULTI_CP:
+            finnode = ffnode.next;
+            for (ib = 0; ib < ffnum; finnode = finnode->next, ib++) {
+              fnode = finnode->node;
+              // ff_observe[ib][ia-1].gdval1 = fnode->gdval1;
+              ff_observe[ib][ia - 1].ftval1 = fnode->finlst->node->ftval1;
+            }
+        }
 
 #if PO_OBSERVE
-          finnode = ponode.next;
-          for (ib = 0; finnode != NULL; finnode = finnode->next, ib++) {
-            fnode = finnode->node;
-            po_observe[ib][ia - 1].ftval1 = fnode->ftval1;
-          }
-#endif
+        finnode = ponode.next;
+        for (ib = 0; finnode != NULL; finnode = finnode->next, ib++) {
+          fnode = finnode->node;
+          po_observe[ib][ia - 1].ftval1 = fnode->ftval1;
+          // po_observe[ib][ia-1].gdval1 =  fnode->finlst->node->gdval1;
         }
-        update_nextstate_ft(ia);
+#endif
 
-        // if (MODE_TOOL == 4 && TGL_GATE_MODE == 3 && ia >= SKIP_CYCLE - 1)
-        if (MODE_TOOL == 4 && TGL_GATE_MODE == 3 && ia >= SKIP_CYCLE - 1 &&
-            ia < cap_freq) {
+        // if (MODE_TOOL == 4 && CP_CTR_MODE == 3 && ia >= SKIP_CYCLE - 1)
+        if (MODE_TOOL == MULTI_CP && CP_CTR_MODE == FCP_RAN &&
+            ia >= SKIP_CYCLE - 1 && ia < cap_freq) {
+          update_nextstate_ft_ff_inv_cp(ia);
           tpi_ff_state_load_ft(ia);
+        } else {
+          update_nextstate_ft(ia);
         }
         // prn_state_ao_ft(fp, ia); //2019/12
       }
@@ -614,7 +638,7 @@ faultsim(argv) char *argv[13];
 
       fprintf(fout_flt_pat, ",%4.6f",
               (1 - (float)remain_flt / (float)sum_flt) * 100.0);
-      if (MODE_TOOL == 4 || MODE_TOOL == 3) {
+      if (MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP) {
 #if SELECT_STATION
 
         for (ia = 1; ia <= FF_FILE; ia++) {
@@ -652,7 +676,7 @@ faultsim(argv) char *argv[13];
   // fclose(fout_flt_in);
 #endif
 
-  if (MODE_TOOL == 3 || MODE_TOOL == 4) {
+  if (MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP) {
 #if SELECT_STATION
     for (ia = 0; ia < num_observe; ia++) free(ff_observe[ia]);
     free(ff_observe);
@@ -663,7 +687,8 @@ faultsim(argv) char *argv[13];
   }
 
   fclose(test_pat);
-  if (MODE_TOOL == 4 && (TGL_GATE_MODE == 3 || TGL_GATE_MODE == 4)) {
+  if (MODE_TOOL == MULTI_CP &&
+      (CP_CTR_MODE == FCP_RAN || CP_CTR_MODE == LCP_RAN)) {
     fclose(tpi_pat);
     // printf("hehre1?\n");
     for (ia = 0; ia <= n_tpi; ia++) free(tgl_tpi[ia]);
