@@ -52,18 +52,12 @@ Instance_Get(argc, argv) int argc;
 char *argv[14];
 {
   int ia, ib, ic;
-  flt_det_num = (int *)calloc(FF_FILE + 2, sizeof(int));
-  if (flt_det_num == NULL) {
-    fprintf(stderr, "memory error @flt_det_num in flt_info \n");
-    exit(1);
-  }
-
   /*External Parameter Setting*/
   printf("External Parameter Setting\n");
   MODE_TOOL = atoi(argv[2]);
   printf("TOOL_MODE=%d\n", MODE_TOOL);
   switch (MODE_TOOL) {
-    case 1:
+    case SCTEST:
       printf("Tool: Normal BIST Testing Mode\n");
       if (argc > 5) {
         printf("error: too much arguments!\n");
@@ -86,8 +80,8 @@ char *argv[14];
       cap_freq = 1;
 #endif
       break;
-    case 2:  // Multi-cycle test
-    case 3:  // Multi-cycle test with SEQ-OB
+    case MULTITEST:  // Multi-cycle test
+    case MULTI_OP:   // Multi-cycle test with SEQ-OB
       TPG_MODE = atoi(argv[3]);
       if (TPG_MODE == 0) {
         printf("TPG: %d bit LFSR \n", LFSR_BIT);
@@ -169,7 +163,7 @@ char *argv[14];
 
       break;
 
-    case 4:
+    case MULTI_CP:
       printf("Tool: Logic CP Insertion MODE %d\n", MODE_TOOL);
       if (argc > 14) {
         fprintf(stderr, "error: too much arguments!\n");
@@ -182,12 +176,13 @@ char *argv[14];
       TPG_MODE = atoi(argv[3]);  // set the test pattern generator
       if (TPG_MODE == 0) {
         printf("TPG: %d bit LFSR \n", LFSR_BIT);
-      } else
+      } else {
         printf("TPG: In House ATPG\n");
+      }
 
-      TGL_GATE_MODE = atoi(argv[4]);  //=1: gate TPI, =2:FF TPI
+      CP_CTR_MODE = atoi(argv[4]);  //=1: gate TPI, =2:FF TPI
 
-      if (TGL_GATE_MODE == 0 || TGL_GATE_MODE == 2 || TGL_GATE_MODE == 3) {
+      if (!CP_CTR_MODE || CP_CTR_MODE == FCP_TOG || CP_CTR_MODE == FCP_RAN) {
         //=0: non-cp, =2: FF-CPI by toggling,=3:FF-CPI by random load
         ff_rate = atof(argv[5]);  // FF-CPI rate:制御するFFの比率(controll_ff =
                                   // all_ff x ff_rate)
@@ -200,9 +195,6 @@ char *argv[14];
             argv[10]);  // specify the number of SEQ-OB
                         // methods:評価したい中間観測FF選定方法の数を読み込む
         OBSERVE_RATE = atof(argv[11]);
-        for (ia = 0; ia <= FF_FILE + 1; ia++) {
-          flt_det_num[ia] = 0;
-        }
         length = atoi(argv[12]);
       } else {
         //=1: Logic-CPI by toggling,=4:Logic-CPI by random load
@@ -214,13 +206,12 @@ char *argv[14];
         FF_FILE = atoi(argv[9]);
         OBSERVE_RATE = atof(argv[10]);
         group_tpi = atoi(argv[11]);
-
-        for (ia = 0; ia <= FF_FILE + 1; ia++) {
-          flt_det_num[ia] = 0;
-        }
+        length = atoi(argv[12]);
+        CP_TYPE = atoi(argv[13]);  // control point types =1: TDT, =2:
+                                   // Inversion, =3: Just Toggle
       }
 
-      printf("CP Insertion Mode : %d\n", TGL_GATE_MODE);
+      printf("CP Insertion Mode : %d\n", CP_CTR_MODE);
       printf("CP Insertion Rate : %f\n", Tgl_rate);
       printf("# of Capture Cycles: %d\n", cap_freq);
       printf("Control INTERVAL_CYCLE: %d\n", INTERVAL_CYCLE);
@@ -257,7 +248,7 @@ Out_Put(argv) char *argv[13];
   FILE *fout;
   int ia, ib, ic, id;
   switch (MODE_TOOL) {
-    case 1:
+    case SCTEST:
       remain_flt = count_flt(fltlst.next);
       sprintf(outpath, "./OUTPUTS/BIST/%s.txt", basename(argv[1]));
       if ((fout = fopen(outpath, "w")) == NULL) {
@@ -302,7 +293,7 @@ Out_Put(argv) char *argv[13];
       fclose(fout);
       printf("*************OUTPUT END****************\n");
       break;
-    case 2:
+    case MULTITEST:
       remain_flt = count_flt(fltlst.next);
       // printf("here?\n"); exit(1);
       sprintf(outpath, "./OUTPUTS/MULTI_BIST/%s.txt", basename(argv[1]));
@@ -380,7 +371,7 @@ Out_Put(argv) char *argv[13];
       printf("\n*************OUTPUT END****************\n");
       break;
 
-    case 3:
+    case MULTI_OP:
 #if SELECT_STATION
       count_flt(fltlst.next);
       sprintf(outpath, "./OUTPUTS/MULTI_BIST_OB/%s.txt", basename(argv[1]));
@@ -545,22 +536,22 @@ Out_Put(argv) char *argv[13];
 
       break;
 
-    case 4:
+    case MULTI_CP:
       remain_flt = count_flt(fltlst.next);
 
-      switch (TGL_GATE_MODE) {
+      switch (CP_CTR_MODE) {
         case 0:  // Non Toggle gate insertion
           sprintf(outpath, "./OUTPUTS/CPI/%dcycles/Non_%s.txt", cap_freq,
                   basename(argv[1]));
           break;
-        case 1:  // toggle gate insert
-        case 4:
+        case LCP_TOG:  // toggle gate insert
+        case LCP_RAN:
 
           sprintf(outpath, "./OUTPUTS/CPI/%d_cycles/%s_LogicCPI.txt", cap_freq,
                   basename(argv[1]));
           break;
-        case 2:  // toggle FF insert
-        case 3:
+        case FCP_RAN:  // toggle FF insert
+        case FCP_TOG:
           sprintf(outpath, "./OUTPUTS/CPI/%d_cycles/%s_FFCPI.txt", cap_freq,
                   basename(argv[1]));
           break;
@@ -569,7 +560,7 @@ Out_Put(argv) char *argv[13];
           break;
       }
 
-      /*	if(TGL_GATE_MODE==1) {
+      /*	if(CP_CTR_MODE==1) {
               switch (TG_FILE){
                       case 0: sprintf(outpath,
       "./OUTPUTS/TGL_GATE/%dcycles/%dSKIP/%s_Prob_IND_%d_%d.txt",
@@ -593,7 +584,7 @@ Out_Put(argv) char *argv[13];
       }
       printf("\n\n*************OUTPUT RESULTS****************\n");
       fprintf(fout, "*************OUTPUT RESULTS****************\n");
-      if (TGL_GATE_MODE == 1) {
+      if (CP_CTR_MODE == LCP_TOG) {
         printf("#gate, #tgl_gt\n%d, %d \n", numgate, tgl_gt_cnt);
         fprintf(fout, "#gate, #tgl_gt\n%d, %d \n", numgate, tgl_gt_cnt);
       }

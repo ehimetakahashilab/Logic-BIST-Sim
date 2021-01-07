@@ -101,6 +101,20 @@
 #define FLT_OUTPUT 0
 #define FLTLIST_PAT 0
 
+#define SCTEST 1     // SCAN Test
+#define MULTITEST 2  // Multi-cycle test
+#define MULTI_OP 3   // multi-cycle test with Seq-OB
+#define MULTI_CP 4   // Multi-cycle test with CPI
+
+#define FCP_TOG 2  // FF CPI by toggling
+#define FCP_RAN 3  // FF CPI by Random load
+#define LCP_TOG 1  // Logic CPI by toggling
+#define LCP_RAN 4  // Logic CPI by Random load
+
+#define CP_TDT 1  // transition driven toggle CP
+#define CP_INV 2  // inversion CP by EX_OR
+#define CP_JST 3  // Just Toggle CP
+
 #if FLTLIST_PAT
 FILE *FLST_OUT;
 #endif
