@@ -118,7 +118,7 @@ count_flt(flttag) FLT_NODE *flttag;
       sumflt++;
     }
   }
-  printf("cnt=%d, sumflt=%d\n",cnt,sumflt);
+  // printf("cnt=%d, sumflt=%d\n",cnt,sumflt);
   
   if (MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP) {
     for (ia = 0; ia <= sum_flt; ia++) {

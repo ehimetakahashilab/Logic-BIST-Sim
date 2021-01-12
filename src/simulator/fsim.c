@@ -304,7 +304,7 @@ faultsim(argv) char *argv[13];
   printf("fault List initialization over \n");
 
   remain_flt = count_flt(fltlst.next);
-  printf("%d\n\n", remain_flt);
+  // printf("%d\n\n", remain_flt);
 
   for (time = 1; time <= length && fltlst.next != NULL; time++)
   //	for (time = 1; time <= length && fltlst.next != NULL && (1 -
