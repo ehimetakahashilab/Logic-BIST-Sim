@@ -30,7 +30,7 @@
 #define DEBUG_NODE 0
 #define FALSE 0
 #define TRUE 1
-#define PRN_FLT_INT 5
+#define PRN_FLT_INT 1
 #define SAMPLE 0
 #define ALL_F 0xffffffff
 #define ITI 0x1

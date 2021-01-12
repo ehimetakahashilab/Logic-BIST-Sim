@@ -26,7 +26,8 @@ struct l_node
   //
   L_NODE *next, *prev;
   FIN_NODE *finlst, *foutlst;
-  unsigned int gdval0, gdval1, ftval0, ftval1, tff_org_gval, tff_trans_gval,tff_trans_fval;
+  unsigned int gdval0, gdval1, ftval0, ftval1;
+  unsigned int tff_org_gval, tff_trans_gval,tff_trans_fval;
   char *Name;
   int sel_flag[20]; //FF選択法
 };

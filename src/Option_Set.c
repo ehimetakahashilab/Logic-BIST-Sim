@@ -90,7 +90,7 @@ char *argv[14];
 		cap_freq = atoi(argv[4]);//read the capture number
 		SKIP_CAPTURE = atoi(argv[5]);//ＦＦを観測する開始サイクルを指定する
 
-		if (MODE_TOOL == 2){
+		if (MODE_TOOL == MULTITEST){
 			printf("Tool: BIST Multi-Cycle Testing Mode\n");
 			if (argc > 6){
 				printf("error: too much arguments!\n");

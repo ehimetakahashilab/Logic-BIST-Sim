@@ -26,7 +26,7 @@ int time;
 	signature_mul = 0;
 	signature_full = 0;
 
-	if (MODE_TOOL == 2 || MODE_TOOL == 3 || MODE_TOOL == 4)
+	if (MODE_TOOL == MULTITEST || MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP)
 	{ /*Multi-cycle test or Multi-Cycle test with Observation*/
 #if FAULTOB
 		unsigned int Last_FF_Signature[ffnum], OBFF_Signature[ffnum], OBFF_CAP_Signature[ffnum][cap_freq], First_Cap_Signature = 0, Last_Cap_Signature = 0;
@@ -57,53 +57,35 @@ int time;
 	for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
 	{
 		fnode = finnode->node;
-		//printf("FF_%d:",ia+1);
-		//for(ic=0;ic<FF_FILE;ic++)
-		//		printf("%d ",finnode->node->sel_flag[ic]);
-		//printf("\n");
-		signature |= fnode->gdval1 ^ fnode->ftval1;
-		signature_mul |= fnode->gdval1 ^ fnode->ftval1;
-		signature_full |= fnode->gdval1 ^ fnode->ftval1;
+		signature |= fnode->gdval1^fnode->ftval1;
+		signature_mul |= fnode->gdval1^fnode->ftval1;
+		signature_full |= fnode->gdval1^fnode->ftval1;
 		OB_CAP_Signature[cap_freq] |= fnode->gdval1 ^ fnode->ftval1;
 
-		if (MODE_TOOL == 2 || MODE_TOOL == 3 || MODE_TOOL == 4)
-		{
 #if FAULTOB
+	if (MODE_TOOL == MULTITEST || MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP)
+		{
 			Last_FF_Signature[ia] |= fnode->gdval1 ^ fnode->ftval1;
 			Last_Cap_Signature = signature;
-#endif
-			/*if(MODE_TOOL==3||MODE_TOOL==4){
-		#if SELECT_STATION
-		for(ic=0;ic<FF_FILE;ic++)
-			ob_sel_FF_Signature[ic] |= fnode->gdval1 ^ fnode->ftval1;
-		#endif
-		}*/
-
 		}
+	#endif
 	}
 
-	if (MODE_TOOL == 3 || MODE_TOOL == 4)
+	if (MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP)
 	{
-#if SELECT_STATION
-		for (ic = 0; ic < FF_FILE; ic++)
-			ob_sel_FF_Signature[ic] |= signature_mul;
-#endif
-	}
 
-	if (MODE_TOOL == 3 || MODE_TOOL == 4)
-	{
+		#if SELECT_STATION
+				for (ic = 0; ic < FF_FILE; ic++)
+					ob_sel_FF_Signature[ic] |= signature_mul;
+		#endif
 
 		finnode = ffnode.next;
-		//printf("aaa\n");//2014_10_21 選択手法を用いたテストでのバグ箇所
-		//printf("%d\n",ff_observe[2][0].gdval1);
-		//printf("%d\n",ff_observe[2][0].ftval1);
 		for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
 			for (ib = SKIP_CAPTURE; ib < cap_freq; ib++)
 			{
 				OB_CAP_Signature[ib] |= ff_observe[ia][ib].gdval1 ^ ff_observe[ia][ib].ftval1;
 				signature_full |= ff_observe[ia][ib].gdval1 ^ ff_observe[ia][ib].ftval1;
-				//printf("SKIP_CAPTURE=%d \n",SKIP_CAPTURE);
-				if (MODE_TOOL == 3)
+				if (MODE_TOOL == MULTI_OP)
 				{
 #if SELECT_STATION
 					for (ic = 0; ic < FF_FILE; ic++)
@@ -117,7 +99,7 @@ int time;
 					signature |= ff_observe[ia][ib].gdval1 ^ ff_observe[ia][ib].ftval1;
 #endif
 				}
-				if (MODE_TOOL == 4)
+				if (MODE_TOOL == MULTI_CP)
 				{
 #if FF_OBSERVE
 #if SELECT_STATION
@@ -153,7 +135,7 @@ int time;
 
 			fgnode = injarray[ia];
 
-			if ( MODE_TOOL == 3 || MODE_TOOL == 4)
+			if ( MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP)
 			{
 #if SELECT_STATION
 				for (ib = 0; ib < FF_FILE; ib++)
@@ -177,22 +159,20 @@ int time;
 #endif
 			}
 
-
-			if (signature_mul & mask)
-			{
-
-#if TRANSITIONFAULT
+		if (signature_mul & mask)
+		{
+			#if TRANSITIONFAULT
 				fgnode->TranDetTimes++;
-#else
+			#else
 				fgnode->dtime++;
 				if (flt_det_flag[fgnode->num][0] == 0)
 				{
 					flt_det_flag[fgnode->num][0] = 1;
 				}
-#endif
-			}
+			#endif
+		 }
 
-			if (MODE_TOOL == 3 || MODE_TOOL == 4)
+			if (MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP)
 			{
 				for (ib = 0; ib < cap_freq; ib++)
 				{
@@ -219,8 +199,8 @@ int time;
 			fgnode->detect[time / 32] |= ITI << (time % 32);
 			fgnode->dtime++;
 #else
-if (fgnode->dtime)
-			{
+if (fgnode->dtime){
+//	printf("fltnum=%d \n",fgnode->num);
 				if (fgnode->next != NULL)
 					fgnode->next->prev = fgnode->prev;
 				fgnode->prev->next = fgnode->next;
@@ -293,13 +273,14 @@ int time;
 			if (MODE_TOOL == 3)
 			{
 #if SELECT_STATION
+			unsigned int ob_sel_FF_Signature[FF_FILE];
 				for (ic = 0; ic < FF_FILE; ic++)
 					ob_sel_FF_Signature[ic] |= fnode->gdval1 ^ fnode->ftval1;
 #endif
 			}
 	}
 
-	if (MODE_TOOL == 3)
+	if (MODE_TOOL == MULTI_OP)
 	{
 		finnode = ffnode.next;
 		//printf("aaa\n");//2014_10_21 選択手法を用いたテストでのバグ箇所
@@ -310,6 +291,7 @@ int time;
 			{
 				//printf("ia=%d ib=%d\n",ia,ib);
 #if SELECT_STATION
+			unsigned int ob_sel_FF_Signature[FF_FILE];
 					for (ic = 0; ic < FF_FILE; ic++)
 					{
 						if (finnode->node->sel_flag[ic])

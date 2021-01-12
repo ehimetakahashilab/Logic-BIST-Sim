@@ -82,11 +82,6 @@ update_nextstate_ff_inv_cp(capture) int capture;
   for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
   {
     fnode = finnode->node;
-    /*#if WSA_REC
- if(capture==1) MaxWSA+=(1+fnode->outnum);
-#endif
-*/
-
     if (fnode->gdval1 != tmp[ia])
     {
       fnode->gdval1 = tmp[ia];
@@ -98,9 +93,6 @@ update_nextstate_ff_inv_cp(capture) int capture;
 #endif
 
 #endif
-      /*#if WSA_REC
-	WSA[capture]+=(1+fnode->outnum);
-#endif*/
     }
     else  {
       if (capture < SKIP_CYCLE - 1 || capture >= cap_freq) continue;
@@ -125,34 +117,27 @@ update_nextstate_ff_inv_cp(capture) int capture;
 #endif
 }
 
-
-
 update_nextstate(capture) int capture;
 {
   FIN_NODE *finnode;
   L_NODE *fnode;
   int ia;
   unsigned int tmp[ffnum];
-  unsigned int val1;
 
   finnode = ffnode.next;
   for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
   {
     fnode = finnode->node;
     tmp[ia] = fnode->finlst->node->gdval1;
+  //  if(fnode->line==202 ||fnode->line==201) printf("ff-%d= %x,%x\n",fnode->line,fnode->gdval1,fnode->finlst->node->gdval1);
   }
-  finnode = ffnode.next;
 
+  finnode = ffnode.next;
   for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
   {
     fnode = finnode->node;
-    /*#if WSA_REC
- if(capture==1) MaxWSA+=(1+fnode->outnum);
-#endif
-*/
-
     if (fnode->gdval1 != tmp[ia])
-    {
+    {// printf("%d,%d \n",ia, fnode->line);
       fnode->gdval1 = tmp[ia];
 #if POWEREVA
       toggle_cap[capture]++;
@@ -167,11 +152,10 @@ update_nextstate(capture) int capture;
     if (capture == SLOW_CK)
       fnode->gdval_slow = fnode->gdval1;
 #endif
+//if(fnode->line==202 ||fnode->line==201) printf("ff-%d= %x,%x\n",fnode->line,fnode->gdval1,fnode->finlst->node->gdval1);
+
   }
-#if DEBUG
-  //for(ia=1;ia<=capture;ia++)
-  printf("toggle_cap %d = %.0f %.0f\n", capture, toggle_cap[capture], toggle_cap_perpat[capture]);
-#endif
+//  exit(1);
 }
 
 tpi_ff_state_load(capture) int capture;
@@ -261,12 +245,19 @@ update_nextstate_ft(capture) int capture;
   int ia;
   unsigned int tmp[ffnum];
   finnode = ffnode.next;
+  for (ia = 0; finnode != NULL; finnode = finnode->next, ia++){
+    fnode = finnode->node;
+    tmp[ia] = fnode->finlst->node->ftval1;
+    //fnode->ftval1 = tmp[ia];
+  //  fnode->ftval1 = fnode->finlst->node->ftval1;
+  }
+  finnode = ffnode.next;
   for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
   {
     fnode = finnode->node;
-    tmp[ia] = fnode->finlst->node->ftval1;
     fnode->ftval1 = tmp[ia];
-  }
+    }
+
 }
 
 initial_state(int ff_state[])
@@ -1070,8 +1061,6 @@ onetimesim_cp_tdt(capture) int capture;
     if (fnode->gdval1 != tmp_val)
     {
       WSA[capture] += (1 + fnode->outnum);
-      //temp+=fnode->outnum;
-      //Wsa_for_Peak[cap_cycle]+=fnode->outnum;
     }
 #endif
 
@@ -1079,7 +1068,6 @@ onetimesim_cp_tdt(capture) int capture;
     if (CP_CTR_MODE == LCP_TOG){
             tgl_val = tmp2_val ^ fnode->gdval1;
             fnode->gdval1 = ~(fnode->gdval1 ^ tgl_val);
-            //printf(" %d: %x %x\n",fnode->line,tmp2_val,fnode->gdval1);
     }
     else if (CP_CTR_MODE == LCP_RAN){
       if (tgl_tpi[tpi_cnt][capture] == 1)
@@ -1095,7 +1083,6 @@ onetimesim_cp_tdt(capture) int capture;
     printf(" Line %d val1 %x %x -298-\n", fnode->line, fnode->gdval0, fnode->gdval1);
 #endif
   }
-  //printf("\nhere?\n ");
 }
 
 
@@ -1173,12 +1160,7 @@ onetimesim(capture) int capture;
     }
 #endif
 
-#if DEBUG_NODE
-    //if(capture>cap_freq-Transcycle)
-    printf(" Line %d val1 %x %x -298-\n", fnode->line, fnode->gdval0, fnode->gdval1);
-#endif
   }
-  //printf("\nhere?\n ");
 }
 
 ftvalsim_cp_jst(capture) int capture;
@@ -1403,7 +1385,7 @@ ftvalsim_cp_tdt(capture) int capture;
     if (CP_CTR_MODE == LCP_TOG){
             tgl_val = tmp_val ^ fnode->ftval1;
             fnode->ftval1 = ~(fnode->ftval1 ^ tgl_val);
-            //printf(" %d: %x %x\n",fnode->line,tmp2_val,fnode->gdval1);
+          //  printf(" Flt: %d: %x %x\n",fnode->line,fnode->ftval1,fnode->gdval1);
     }
     else if (CP_CTR_MODE == LCP_RAN){
       if (tgl_tpi[tpi_cnt][capture] == 1)
@@ -1480,16 +1462,11 @@ ftvalsim(capture) int capture;
     {
       fnode->ftval1 = new_val1;
     }
-    /*if(CP_CTR_MODE==1&& fnode->cp_flag==1){
-if(tgl_val==fnode->ftval1)
-  fnode->ftval1= ~fnode->ftval1;printf(" %d: %x %x\n",fnode->line,fnode->gdval1,fnode->ftval1);
-}*/
 
 #if DEBUG_NODE
     if (fnode->line == 380)
       printf(" Line %d gdval %x ftval %x %d\n", fnode->line, fnode->gdval_slow, fnode->ftval1, count1);
 #endif
   }
-  //printf("%d ",count1);
-  //exit(1);
+
 }

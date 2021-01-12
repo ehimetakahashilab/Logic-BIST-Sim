@@ -30,7 +30,7 @@ char *argv[13];
 if (flt_det_num == NULL)
       printf("memory error @flt_det_num in flt_info \n"), exit(1);
   for (ia = 0; ia <= sum_flt + 1; ia++)	{
-    if(MODE_TOOL==1||MODE_TOOL==2)   {
+    if(MODE_TOOL==1 || MODE_TOOL==2)   {
         flt_det_flag[ia] = (int *)calloc(2, sizeof(int));
       }
     else{
@@ -90,6 +90,7 @@ count_flt(flttag)
 {
   int sumflt = 0, sumTDflt = 0;
   int ia, ib;
+  int cnt=0;
 #if TRANSITIONFAULT
   for (; flttag != NULL; flttag = flttag->next){
     if (!flttag->TranDetTimes)
@@ -104,10 +105,11 @@ count_flt(flttag)
 #endif
 
   for (; flttag != NULL; flttag = flttag->next)
-  {
-    if (!flttag->dtime)
+  {cnt++;
+    if (!flttag->dtime){
       sumflt++;
-  }
+    }
+  }          printf("cnt=%d, sumflt=%d\n",cnt,sumflt);
   if ( MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP){
     for (ia = 0; ia <= sum_flt; ia++) {
       for (ib = 0; ib <= FF_FILE; ib++){
