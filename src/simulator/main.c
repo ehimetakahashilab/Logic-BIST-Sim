@@ -39,7 +39,7 @@ char *argv[13];
   }
 
   for (ia = 0; ia <= sum_flt + 1; ia++) {
-    if (MODE_TOOL == 1 || MODE_TOOL == 2) {
+    if (MODE_TOOL == SCTEST || MODE_TOOL == MULTITEST) {
       flt_det_flag[ia] = (int *)calloc(2, sizeof(int));
     } else {
       flt_det_flag[ia] = (int *)calloc(FF_FILE + 2, sizeof(int));
@@ -97,6 +97,7 @@ count_flt(flttag) FLT_NODE *flttag;
 {
   int sumflt = 0, sumTDflt = 0;
   int ia, ib;
+  int cnt = 0;
 #if TRANSITIONFAULT
   for (; flttag != NULL; flttag = flttag->next) {
     if (!flttag->TranDetTimes) {
@@ -112,10 +113,13 @@ count_flt(flttag) FLT_NODE *flttag;
 #endif
 
   for (; flttag != NULL; flttag = flttag->next) {
+    cnt++;
     if (!flttag->dtime) {
       sumflt++;
     }
   }
+  printf("cnt=%d, sumflt=%d\n",cnt,sumflt);
+  
   if (MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP) {
     for (ia = 0; ia <= sum_flt; ia++) {
       for (ib = 0; ib <= FF_FILE; ib++) {

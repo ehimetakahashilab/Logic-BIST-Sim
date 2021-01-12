@@ -35,13 +35,13 @@ faultsim(argv) char *argv[13];
   for (ia = 0; ia < MAXCAP; ia++) flt_cap[ia] = 0;
   printf("\n==Simulation Parameter Setting for==\n");
   switch (MODE_TOOL) {
-    case 1:
+    case SCTEST:
       printf("\nNormal BIST Testing Mode\n");
       sprintf(outpath, "./OUTPUTS/BIST/%s.csv", basename(argv[1]));
       fout_flt_pat = fopen(outpath, "w+");
 
       break;
-    case 2:
+    case MULTITEST:
       printf("\nBIST Multi-Cycle Testing Mode\n");
       if (SKIP_CAPTURE) printf("skip first %d capture\n", SKIP_CAPTURE);
       sprintf(outpath, "./OUTPUTS/MULTI_BIST/%s_%d.csv", basename(argv[1]),
@@ -51,7 +51,7 @@ faultsim(argv) char *argv[13];
 
       break;
 
-    case 3:
+    case MULTI_OP:
       printf("\nBIST Multi-Cycle Testing With Sequential Observation Mode\n");
       sprintf(outpath, "./OUTPUTS/MULTI_BIST_OB/%s_%d.csv", basename(argv[1]),
               cap_freq);
@@ -104,7 +104,7 @@ faultsim(argv) char *argv[13];
 #endif
 
       break;
-    case 4:
+    case MULTI_CP:
       printf("\nBIST Multi-Cycle Testing under CPI Mode\n");
       /*=======Memorry Assign for Sequential Observation*/
 
@@ -304,19 +304,8 @@ faultsim(argv) char *argv[13];
   printf("fault List initialization over \n");
 
   remain_flt = count_flt(fltlst.next);
+  printf("%d\n\n", remain_flt);
 
-  // 2019/12
-  // FILE *fp;
-  // if ((fp = fopen("test_pat_s27.csv", "w")) == NULL)
-  // {
-  // 	printf("file open error!!\n");
-  // 	exit(EXIT_FAILURE); /* (3)エラーの場合は通常、異常終了する */
-  // }
-  // prn_state_ao2(fp);
-  /*Simulation Start*/
-  // for (time = 1; time <= length && fltlst.next != NULL &&
-  //                ((float)flt_det_num[0] / (float)sum_flt) <= 0.90001;
-  //      time++)
   for (time = 1; time <= length && fltlst.next != NULL; time++)
   //	for (time = 1; time <= length && fltlst.next != NULL && (1 -
   //(float)remain_flt / (float)sum_flt) <= 0.90001; time++)
@@ -397,52 +386,34 @@ faultsim(argv) char *argv[13];
             case CP_JST:
               onetimesim_cp_jst(ia);
               break;
-            default:
-              onetimesim(ia);
-              break;
           }
-          break;
-        default:
-          onetimesim(ia);
           break;
       }
 
-      switch (MODE_TOOL) {
-        case MULTI_OP:
-        case MULTI_CP:
-          finnode = ffnode.next;
-          for (ib = 0; ib < ffnum; finnode = finnode->next, ib++) {
-            fnode = finnode->node;
-            // ff_observe[ib][ia-1].gdval1 = fnode->gdval1;
-            ff_observe[ib][ia - 1].gdval1 = fnode->finlst->node->gdval1;
-          }
-      }
+      if (MODE_TOOL == MULTI_CP || MODE_TOOL == MULTI_OP) {
+        finnode = ffnode.next;
+        for (ib = 0; finnode != NULL; finnode = finnode->next, ib++) {
+          fnode = finnode->node;
+          // ff_observe[ib][ia-1].gdval1 = fnode->gdval1;
+          ff_observe[ib][ia - 1].gdval1 = fnode->finlst->node->gdval1;
+        }
 
 #if PO_OBSERVE
-      finnode = ponode.next;
-      for (ib = 0; finnode != NULL; finnode = finnode->next, ib++) {
-        fnode = finnode->node;
-        po_observe[ib][ia - 1].gdval1 = fnode->gdval1;
-        // po_observe[ib][ia-1].gdval1 =  fnode->finlst->node->gdval1;
-      }
+        finnode = ponode.next;
+        for (ib = 0; finnode != NULL; finnode = finnode->next, ib++) {
+          fnode = finnode->node;
+          po_observe[ib][ia - 1].gdval1 = fnode->gdval1;
+          // po_observe[ib][ia-1].gdval1 =  fnode->finlst->node->gdval1;
+        }
 #endif
-
+      }
       if (MODE_TOOL == MULTI_CP && CP_CTR_MODE == FCP_RAN &&
           ia >= SKIP_CYCLE - 1 && ia < cap_freq) {
-        // printf("%d,%d,%d\n", MODE_TOOL, CP_CTR_MODE, ia);
         update_nextstate_ff_inv_cp(ia);
         tpi_ff_state_load(ia);
-        // printf("+++++++++++++%d\n", fnode->line);
       } else {
         update_nextstate(ia);
       }
-      //	prn_state_ao(fp, ia); //2019/12
-
-#if DEBUG1 || PRNT_FF
-      // prn_state(ffnode.next);
-      // prn_out_value(ponode.next, ia);
-#endif
-      // printf(" %d: %d\n", fnode->line, ia);
     }
     scan_out(ffnode.next);
 
@@ -459,7 +430,6 @@ faultsim(argv) char *argv[13];
     while (inj_flst.next != NULL) {
       initial_state_ft(ff_state);
       num_injgate = fault_inject(&inj_flst, injarray);
-      cop + typey_state();  // last slow capture value loading
       for (ia = SLOW_CK + 1; ia <= cap_freq; ia++) {
         ftvalsim(ia);
         if (MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP) {
@@ -510,8 +480,8 @@ faultsim(argv) char *argv[13];
       initial_state_ft(ff_state);
       num_injgate = fault_inject(&inj_flst, injarray);
 
-      //	fprintf(fp, "fault value -%d %d-\n", injarray[0]->line,
-      // injarray[0]->saval); //2019/12
+      // printf("injfault=%d, fault value -%d %d-\n",
+      // num_injgate,injarray[0]->line, injarray[0]->saval);
 
       for (ia = 1; ia <= cap_freq; ia++) {
         switch (MODE_TOOL) {
@@ -531,35 +501,27 @@ faultsim(argv) char *argv[13];
               case CP_JST:
                 ftvalsim_cp_jst(ia);
                 break;
-              default:
-                ftvalsim(ia);
-                break;
             }
-            break;
-          default:
-            onetimesim(ia);
             break;
         }
 
-        switch (MODE_TOOL) {
-          case MULTI_OP:
-          case MULTI_CP:
-            finnode = ffnode.next;
-            for (ib = 0; ib < ffnum; finnode = finnode->next, ib++) {
-              fnode = finnode->node;
-              // ff_observe[ib][ia-1].gdval1 = fnode->gdval1;
-              ff_observe[ib][ia - 1].ftval1 = fnode->finlst->node->ftval1;
-            }
-        }
+        if (MODE_TOOL == MULTI_CP || MODE_TOOL == MULTI_OP) {
+          finnode = ffnode.next;
+          for (ib = 0; finnode != NULL; finnode = finnode->next, ib++) {
+            fnode = finnode->node;
+            // ff_observe[ib][ia-1].gdval1 = fnode->gdval1;
+            ff_observe[ib][ia - 1].ftval1 = fnode->finlst->node->ftval1;
+          }
 
 #if PO_OBSERVE
-        finnode = ponode.next;
-        for (ib = 0; finnode != NULL; finnode = finnode->next, ib++) {
-          fnode = finnode->node;
-          po_observe[ib][ia - 1].ftval1 = fnode->ftval1;
-          // po_observe[ib][ia-1].gdval1 =  fnode->finlst->node->gdval1;
-        }
+          finnode = ponode.next;
+          for (ib = 0; finnode != NULL; finnode = finnode->next, ib++) {
+            fnode = finnode->node;
+            po_observe[ib][ia - 1].ftval1 = fnode->ftval1;
+            // po_observe[ib][ia-1].gdval1 =  fnode->finlst->node->gdval1;
+          }
 #endif
+        }
 
         // if (MODE_TOOL == 4 && CP_CTR_MODE == 3 && ia >= SKIP_CYCLE - 1)
         if (MODE_TOOL == MULTI_CP && CP_CTR_MODE == FCP_RAN &&
@@ -574,11 +536,9 @@ faultsim(argv) char *argv[13];
 
 #if FAULTDROP
       drop_flt(num_injgate, injarray, time);
-
 #else
       Full_flt_sim(num_injgate, injarray,
                    time);  // 2014_10_21ここ//修正あり、2015710_王
-
 #endif
       clear_addgate(num_injgate, add_gate, add_pi);
     }
