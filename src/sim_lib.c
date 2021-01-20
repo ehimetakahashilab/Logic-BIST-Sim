@@ -97,12 +97,15 @@ update_nextstate_ff_inv_cp(capture) int capture;
     else  {
       if (capture < SKIP_CYCLE - 1 || capture >= cap_freq) continue;
       if (fnode->cp_flag != 1) continue;
+
           //if (capture >= SKIP_CYCLE - 1)
       if (capture % INTERVAL_CYCLE == 0){
                 //if(fnode->gdval0==fnode->gdval1)
                 fnode->gdval1 = ~fnode->gdval1;
                 //fnode->gdval1= ~fnode->gdval1;
+
             }
+
     }
 
 #if TRANSITIONFAULT
@@ -158,7 +161,7 @@ update_nextstate(capture) int capture;
 //  exit(1);
 }
 
-tpi_ff_state_load(capture) int capture;
+tpi_ff_state_load_rand(capture) int capture;
 {
   FIN_NODE *finnode;
   L_NODE *fnode;
@@ -186,7 +189,7 @@ tpi_ff_state_load(capture) int capture;
   //printf("out%d %d \n",tpi_cnt,capture);
 }
 
-tpi_ff_state_load_ft(capture) int capture;
+tpi_ff_state_load_rand_ft(capture) int capture;
 {
   FIN_NODE *finnode;
   L_NODE *fnode;
@@ -209,6 +212,42 @@ tpi_ff_state_load_ft(capture) int capture;
   }
 }
 
+tpi_ff_state_load_tog(capture) int capture;
+{
+  FIN_NODE *finnode;
+  L_NODE *fnode;
+  int ia, tpi_cnt;
+  //FF_TPI_by LFSR
+  finnode = ffnode.next;
+  for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
+  {
+    fnode = finnode->node;
+    if (fnode->cp_flag == 1)
+    {
+      //  printf(" %d: %x %x\n", fnode->line, fnode->gdval0, fnode->gdval1);
+        fnode->gdval1 = ~fnode->gdval1;
+    }
+    //printf("out%d %d \n",tpi_cnt,capture);
+  }
+
+}
+
+tpi_ff_state_load_tog_ft(capture) int capture;
+{
+  FIN_NODE *finnode;
+  L_NODE *fnode;
+  int ia, tpi_cnt;
+  //FF_TPI_by LFSR
+  finnode = ffnode.next;
+  tpi_cnt = 0;
+  for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
+  {
+    fnode = finnode->node;
+    if (fnode->cp_flag != 1)
+      continue;
+      fnode->ftval1 = ~fnode->ftval1;
+  }
+}
 
 update_nextstate_ft_ff_inv_cp(capture) int capture;
 {
@@ -227,14 +266,14 @@ update_nextstate_ft_ff_inv_cp(capture) int capture;
   for (ia = 0; finnode != NULL; finnode = finnode->next, ia++)
   {
     fnode = finnode->node;
+    tgl_val = fnode->ftval1 ^ tmp[ia];
     fnode->ftval1 = tmp[ia];
     if (capture < SKIP_CYCLE - 1 || capture == cap_freq) continue;
     if (capture % INTERVAL_CYCLE ) continue;
     if (fnode->cp_flag != 1) continue;
-    tgl_val = fnode->ftval1 ^ tmp[ia];
       //if(fnode->gdval0==fnode->gdval1)
     fnode->ftval1 = ~(tmp[ia] ^ tgl_val);
-      //printf(" %d: %x %x\n",fnode->line,fnode->gdval0,fnode->gdval1);
+    //  printf(" %d: %x %x\n",fnode->line,fnode->gdval1,fnode->ftval1);
     }
 }
 

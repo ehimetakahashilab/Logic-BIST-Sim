@@ -49,7 +49,7 @@ int ob_num;
 }
 
 Instance_Get(argc, argv) int argc;
-char *argv[14];
+char *argv[15];
 {
 	int ia, ib, ic;
 	/*External Parameter Setting*/
@@ -159,10 +159,10 @@ char *argv[14];
 			cap_freq = atoi(argv[6]);//read the capture number
 			INTERVAL_CYCLE = atoi(argv[7]);//interval of control,制御の間隔を指定する
 			SKIP_CYCLE = atoi(argv[8]);//制御開始サイクル指定
-			FF_SEL_METHOD = atoi(argv[9]);//
-			FF_FILE = atoi(argv[10]);//specify the number of SEQ-OB methods:評価したい中間観測ＦＦ選定方法の数を読み込む
-			OBSERVE_RATE = atof(argv[11]);
-			length=atoi(argv[12]);
+	   	FF_FILE=atoi(argv[9]);
+		  OBSERVE_RATE = atof(argv[10]);
+			length=atoi(argv[11]);
+
 		}
 		else{
 			//=1: Logic-CPI by toggling,=4:Logic-CPI by random load

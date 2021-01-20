@@ -20,14 +20,14 @@ make_line_list(argv) char *argv[13];
   //printf("herere?\n");exit(1);
   readf(argv);
   //  printf("herere?%d\n", MODE_TOOL);exit(1);
-  if (MODE_TOOL == 4){
+  if (MODE_TOOL == 4 && (CP_CTR_MODE==LCP_TOG||CP_CTR_MODE==LCP_RAN)){
   //printf("herere?\n"); exit(1);
   read_tpi_list(argv);
 }
   int ie;
   int ic = 0;
 
-  for (ie = 1; ie <= lpnt; ie++)
+/*for (ie = 1; ie <= lpnt; ie++)
   {
     if (toggle_gates[ie] == 1 && gate[ie].type == 3)
     //if (gate[ie].type == 3)
@@ -36,7 +36,7 @@ make_line_list(argv) char *argv[13];
       ic++;
     }
     //printf("%d\n", gate[ie].line);
-  }
+  }*/
   //exit(1);
 #else
   readf_ehime(argv);

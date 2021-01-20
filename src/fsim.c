@@ -149,7 +149,6 @@ faultsim(argv) char *argv[13];
 			switch (CP_CTR_MODE)		{
 				case 0: //Non Toggle gate insertion
 				sprintf(cpi_sim_outpath, "./OUTPUTS/CPI/%d_cycles/Non_%s.csv", cap_freq, argv[1]);
-//			sprintf(outpath_in, "./OUTPUTS/CPI/%dcycles/%dSKIP/input_pat/%s_NONTG_FF_TPI_INP_%.2f_%d_%.2f.csv", cap_freq, SKIP_CYCLE, argv[1], OBSERVE_RATE, FF_SEL_METHOD, ff_rate);
 					break;
 			case LCP_TOG: //toggle gate insert by toggling
 
@@ -349,6 +348,10 @@ break;
 						onetimesim(ia);
 			 		break;
 			case MULTI_CP:
+				if(CP_CTR_MODE == FCP_RAN ||CP_CTR_MODE == FCP_TOG){
+						onetimesim(ia);
+					}
+			else{
 				switch (CP_TYPE) {
 					case CP_TDT:
 						onetimesim_cp_tdt(ia);
@@ -360,6 +363,7 @@ break;
 						onetimesim_cp_jst(ia);
 						break;
 						}
+					}
 					break;
 			}
 
@@ -381,10 +385,12 @@ break;
 							}
 			#endif
 			}
-			if (MODE_TOOL == MULTI_CP && CP_CTR_MODE == FCP_RAN && ia >= SKIP_CYCLE - 1 && ia < cap_freq)
+			if (MODE_TOOL == MULTI_CP && (CP_CTR_MODE == FCP_RAN ||CP_CTR_MODE == FCP_TOG) && ia >= SKIP_CYCLE - 1 && ia < cap_freq)
 			{
 				update_nextstate_ff_inv_cp(ia);
-				tpi_ff_state_load(ia);
+	 		if(CP_CTR_MODE == FCP_RAN){
+					tpi_ff_state_load_rand(ia);
+				}
 			}
 			else{
 				update_nextstate(ia);
@@ -474,6 +480,10 @@ break;
 							ftvalsim(ia);
 				 		break;
 				case MULTI_CP:
+					if(CP_CTR_MODE == FCP_RAN ||CP_CTR_MODE == FCP_TOG){
+													ftvalsim(ia);
+					}
+					else {
 					switch (CP_TYPE) {
 						case CP_TDT:
 							ftvalsim_cp_tdt(ia);
@@ -485,6 +495,7 @@ break;
 							ftvalsim_cp_jst(ia);
 							break;
 							}
+						}
 						break;
 				}
 
@@ -508,10 +519,12 @@ break;
 				#endif
 			}
 				//if (MODE_TOOL == 4 && CP_CTR_MODE == 3 && ia >= SKIP_CYCLE - 1)
-				if (MODE_TOOL == MULTI_CP && CP_CTR_MODE == FCP_RAN && ia >= SKIP_CYCLE - 1 && ia < cap_freq)
+				if (MODE_TOOL == MULTI_CP && (CP_CTR_MODE == FCP_RAN ||CP_CTR_MODE == FCP_TOG) && ia >= SKIP_CYCLE - 1 && ia < cap_freq)
 				{
 					update_nextstate_ft_ff_inv_cp(ia);
-					tpi_ff_state_load_ft(ia);
+ 				if(CP_CTR_MODE == FCP_RAN){
+						tpi_ff_state_load_rand_ft(ia);
+					}
 				}
 				else {
 						update_nextstate_ft(ia);
