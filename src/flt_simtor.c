@@ -161,15 +161,15 @@ int time;
 
 		if (signature_mul & mask)
 		{
-			#if TRANSITIONFAULT
+		/*	#if TRANSITIONFAULT
 				fgnode->TranDetTimes++;
-			#else
+			#else*/
 				fgnode->dtime++;
 				if (flt_det_flag[fgnode->num][0] == 0)
 				{
 					flt_det_flag[fgnode->num][0] = 1;
 				}
-			#endif
+		//	#endif
 		 }
 
 			if (MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP)
@@ -323,11 +323,11 @@ int time;
 
 			fgnode = injarray[ia];
 
-#if TRANSITIONFAULT
+/*#if TRANSITIONFAULT
 			fgnode->TranDetTimes++;
-#else
+#else*/
 			fgnode->dtime++;
-#endif
+//#endif
 
 
 #if DEBUG1 || PRNT_DET_FLT

@@ -88,7 +88,15 @@ char *argv[15];
 		else
 			printf("TPG: In House ATPG\n");
 		cap_freq = atoi(argv[4]);//read the capture number
-		SKIP_CAPTURE = atoi(argv[5]);//ＦＦを観測する開始サイクルを指定する
+
+		#if TRANSITIONFAULT
+				printf("Fault Model: Transition Deley Fault \n");
+						SKIP_CAPTURE = L_CK;
+		#else
+				printf("Fault Model: Stuck-at Fault \n");
+		    SKIP_CAPTURE = atoi(argv[5]);//ＦＦを観測する開始サイクルを指定する
+		#endif
+
 
 		if (MODE_TOOL == MULTITEST){
 			printf("Tool: BIST Multi-Cycle Testing Mode\n");
@@ -182,13 +190,15 @@ char *argv[15];
 		printf("CP Insertion Rate : %f\n", Tgl_rate);
 		printf("# of Capture Cycles: %d\n", cap_freq);
 		printf("Control INTERVAL_CYCLE: %d\n", INTERVAL_CYCLE);
-
-		SKIP_CAPTURE = 0;
+		printf("pattern number: %d\n", length);
+		//SKIP_CAPTURE = 0;
 		//OBSERVE_RATE=atof(argv[8]);
 #if TRANSITIONFAULT
 		printf("Fault Model: Transition Deley Fault \n");
+				SKIP_CAPTURE = L_CK;
 #else
 		printf("Fault Model: Stuck-at Fault \n");
+				SKIP_CAPTURE = 0;
 #endif
 #if FAULTSIMULATION
 		printf("Fault Simulation: Enable\n");

@@ -375,7 +375,7 @@ make_Tranfault_list(address)
   /** make fault list **/
   head_flt = &fltlst;
   sum_flt = 0;
-  sum_Tran_flt = 0;
+  //sum_Tran_flt = 0;
 
   for (ni = 1; ni <= lpnt; ni++)
   {
@@ -390,8 +390,8 @@ make_Tranfault_list(address)
       continue;
     if (gate[ni].nfo == 1 && gate[fol].type != FF && gate[fol].type != PO)
     {
-      if (gate[fol].type != NOT)
-        sum_flt++;
+    //  if (gate[fol].type != NOT)
+    //    sum_flt++;
       for (saval = 0; saval < 2; saval++)
       {
         //if(gate[fol].type==NOT)
@@ -420,11 +420,14 @@ make_Tranfault_list(address)
       flttag=(fltlst_tmp+sum_flt);
 
 ***/
-
-        sum_Tran_flt++;
-        flttag->num = sum_Tran_flt;
-        if (sum_Tran_flt >= MAXFLT)
-          printf(" error 19485 sumflt = %d\n", sum_Tran_flt), exit(1);
+        sum_flt++;
+        flttag->num = sum_flt;
+        //sum_Tran_flt++;
+        //flttag->num = sum_Tran_flt;
+        //if (sum_Tran_flt >= MAXFLT)
+        //  printf(" error 19485 sumflt = %d\n", sum_Tran_flt), exit(1);
+        if (sum_flt >= MAXFLT)
+            printf(" error 19485 sumflt = %d\n", sum_flt), exit(1);
 
         if (gate[ni].type == FAN)
           flttag->back = address[gate[ni].fil];
@@ -453,8 +456,9 @@ make_Tranfault_list(address)
 	flttag=(fltlst_tmp+sum_flt);
 ***/
         sum_flt++;
-        sum_Tran_flt++;
-        flttag->num = sum_Tran_flt;
+        flttag->num = sum_flt;
+      //  sum_Tran_flt++;
+      //  flttag->num = sum_Tran_flt;
         if (sum_flt >= MAXFLT)
           printf(" error 19486 sumflt = %d\n", sum_flt), exit(1);
 
@@ -481,8 +485,9 @@ make_Tranfault_list(address)
 	flttag=(fltlst_tmp+sum_flt);
 ***/
         sum_flt++;
-        sum_Tran_flt++;
-        flttag->num = sum_Tran_flt;
+        flttag->num = sum_flt;
+        //sum_Tran_flt++;
+        //flttag->num = sum_Tran_flt;
         if (sum_flt >= MAXFLT)
           printf(" error 19487 sumflt = %d\n", sum_flt), exit(1);
 

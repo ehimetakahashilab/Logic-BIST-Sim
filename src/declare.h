@@ -82,7 +82,8 @@
 
 /*Faultsimulation control*/
 #define FAULTSIMULATION 1 /*for observing scanout: 0: stop fault simulation*/
-#define TRANSITIONFAULT 0 // operate transition faults detection
+#define TRANSITIONFAULT 1 // operate transition faults detection
+#define L_CK 1
 #define FAULTDROP 1       // 1: fault droping simulation 0: Full fault sim
 #define FCOVPERPAT 1
 #define FAULTOB 0   //Observation Fault Detection Infomation
@@ -116,6 +117,7 @@
 #if FLTLIST_PAT
 FILE *FLST_OUT;
 #endif
+
 
 int flt_list[1000000][2];
 int test_val[10][30];

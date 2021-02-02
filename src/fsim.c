@@ -29,9 +29,10 @@ faultsim(argv) char *argv[13];
 
 	sprintf(pt_file1, "%s_lfsr_pi.dat", argv[1]);
 	sprintf(pt_file2, "%s_tgl_ff_tpi.dat", argv[1]);
-
+/*キャプチャ毎に検出できた故障の数を記録する*/
 	for (ia = 0; ia < MAXCAP; ia++)
 		flt_cap[ia] = 0;
+/*----------------------*/
 	printf("\n==Simulation Parameter Setting for==\n");
 	switch (MODE_TOOL)
 	{
@@ -308,7 +309,7 @@ break;
 			if (CP_CTR_MODE == FCP_RAN || CP_CTR_MODE == LCP_RAN)
 			{ //TPI by LFSR
 				//for (ib = 1; ib <= cap_freq - SKIP_CYCLE; ib++)
-				for (ib = SKIP_CYCLE - 1; ib <= cap_freq; ib++)
+				for (ib = SKIP_CYCLE ; ib <= cap_freq; ib++)
 				{
 					for (ia = 0; ia < n_tpi; ia++)
 					{
@@ -367,6 +368,17 @@ break;
 					break;
 			}
 
+			if (MODE_TOOL == MULTI_CP && (CP_CTR_MODE == FCP_RAN ||CP_CTR_MODE == FCP_TOG) && ia > SKIP_CYCLE - 1 && ia < cap_freq)
+			{
+				update_nextstate_ff_inv_cp(ia);
+	 		if(CP_CTR_MODE == FCP_RAN){
+					tpi_ff_state_load_rand(ia);
+				}
+			}
+			else{
+				update_nextstate(ia);
+			}
+
 				if (MODE_TOOL==MULTI_CP||MODE_TOOL==MULTI_OP){
 						finnode = ffnode.next;
 				for (ib = 0;  finnode!=NULL;  finnode = finnode->next, ib++)
@@ -385,16 +397,12 @@ break;
 							}
 			#endif
 			}
-			if (MODE_TOOL == MULTI_CP && (CP_CTR_MODE == FCP_RAN ||CP_CTR_MODE == FCP_TOG) && ia >= SKIP_CYCLE - 1 && ia < cap_freq)
-			{
-				update_nextstate_ff_inv_cp(ia);
-	 		if(CP_CTR_MODE == FCP_RAN){
-					tpi_ff_state_load_rand(ia);
-				}
+
+#if TRANSITIONFAULT
+			if(ia==L_CK){
+				launch_copy();
 			}
-			else{
-				update_nextstate(ia);
-			}
+#endif
 		}
 		scan_out(ffnode.next);
 
@@ -410,46 +418,75 @@ break;
 		inj_flst.next = fltlst.next;
 		while (inj_flst.next != NULL)
 		{
-			initial_state_ft(ff_state);
+		//	initial_state_ft(ff_state);
+					launch_initial();
+			//copy_state();//last slow capture value (Launch cycle) loading
 			num_injgate = fault_inject(&inj_flst, injarray);
-			for (ia = SLOW_CK + 1; ia <= cap_freq; ia++)
-			{
-				ftvalsim(ia);
-				if (MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP)
-				{
-#if SELECT_STATION
-					//ic=0;
-					finnode = ffnode.next;
-					for (ib = 0; finnode != NULL; finnode = finnode->next, ib++)
-					{
-						//if(ff_select[ib] == '1'){
-						fnode = finnode->node;
-						//ff_observe[ic][ia-1].ftval1 = fnode->ftval1;
-						ff_observe[ib][ia - 1].ftval1 = fnode->finlst->node->ftval1;
-						//ff_observe[ic][ia-1].ftval1 =fnode->finlst->node->ftval1;
-						//ic++;
-						// }
-					}
-#else
-					finnode = ffnode.next;
-					for (ib = 0; ib < ffnum; finnode = finnode->next, ib++)
-					{
-						fnode = finnode->node;
-						// ff_observe[ib][ia-1].ftval1 = fnode->ftval1;
-						ff_observe[ib][ia - 1].ftval1 = fnode->finlst->node->ftval1;
-					}
-#endif
 
-#if PO_OBSERVE
-					finnode = ponode.next;
-					for (ib = 0; finnode != NULL; finnode = finnode->next, ib++)
+
+			for (ia = L_CK+1; ia <= cap_freq; ia++)
+		//	for (ia = 1; ia <= cap_freq; ia++)
+			{
+
+				switch (MODE_TOOL)
+				{
+				case SCTEST:
+				case MULTITEST:
+				case MULTI_OP:
+							ftvalsim(ia);
+				 		break;
+				case MULTI_CP:
+					if(CP_CTR_MODE == FCP_RAN ||CP_CTR_MODE == FCP_TOG){
+								ftvalsim(ia);
+					}
+					else {
+					switch (CP_TYPE) {
+						case CP_TDT:
+							ftvalsim_cp_tdt(ia);
+							break;
+						case CP_INV:
+							ftvalsim_cp_inversion(ia);
+							break;
+						case CP_JST:
+							ftvalsim_cp_jst(ia);
+							break;
+							}
+						}
+						break;
+				}
+
+				//if (MODE_TOOL == 4 && CP_CTR_MODE == 3 && ia >= SKIP_CYCLE - 1)
+				if (MODE_TOOL == MULTI_CP && (CP_CTR_MODE == FCP_RAN ||CP_CTR_MODE == FCP_TOG) && ia > SKIP_CYCLE - 1 && ia < cap_freq)
+				{
+					update_nextstate_ft_ff_inv_cp(ia);
+				if(CP_CTR_MODE == FCP_RAN){
+						tpi_ff_state_load_rand_ft(ia);
+					}
+				}
+				else {
+						update_nextstate_ft(ia);
+				}
+				//prn_state_ao_ft(fp, ia); //2019/12
+				if (MODE_TOOL==MULTI_CP||MODE_TOOL==MULTI_OP){
+							finnode = ffnode.next;
+					for (ib = 0; finnode!=NULL; finnode = finnode->next, ib++)
 					{
 						fnode = finnode->node;
-						po_observe[ib][ia - 1].ftval1 = fnode->ftval1;
+						//ff_observe[ib][ia-1].gdval1 = fnode->gdval1;
+						ff_observe[ib][ia - 1].ftval1 = fnode->finlst->node->ftval1;
 					}
-#endif
-				}
-				update_nextstate_ft(ia);
+
+				#if PO_OBSERVE
+								finnode = ponode.next;
+								for (ib = 0; finnode != NULL; finnode = finnode->next, ib++)
+								{
+									fnode = finnode->node;
+									po_observe[ib][ia - 1].ftval1 = fnode->ftval1;
+									//po_observe[ib][ia-1].gdval1 =  fnode->finlst->node->gdval1;
+								}
+				#endif
+			}
+
 			}
 
 			drop_flt(num_injgate, injarray, time);
@@ -481,7 +518,7 @@ break;
 				 		break;
 				case MULTI_CP:
 					if(CP_CTR_MODE == FCP_RAN ||CP_CTR_MODE == FCP_TOG){
-													ftvalsim(ia);
+								ftvalsim(ia);
 					}
 					else {
 					switch (CP_TYPE) {
@@ -499,6 +536,19 @@ break;
 						break;
 				}
 
+				//if (MODE_TOOL == 4 && CP_CTR_MODE == 3 && ia >= SKIP_CYCLE - 1)
+				if (MODE_TOOL == MULTI_CP && (CP_CTR_MODE == FCP_RAN ||CP_CTR_MODE == FCP_TOG) && ia > SKIP_CYCLE - 1 && ia < cap_freq)
+				{
+
+					update_nextstate_ft_ff_inv_cp(ia);
+				if(CP_CTR_MODE == FCP_RAN){
+						tpi_ff_state_load_rand_ft(ia);
+					}
+				}
+				else {
+						update_nextstate_ft(ia);
+				}
+				//prn_state_ao_ft(fp, ia); //2019/12
 				if (MODE_TOOL==MULTI_CP||MODE_TOOL==MULTI_OP){
 							finnode = ffnode.next;
 					for (ib = 0; finnode!=NULL; finnode = finnode->next, ib++)
@@ -518,18 +568,8 @@ break;
 								}
 				#endif
 			}
-				//if (MODE_TOOL == 4 && CP_CTR_MODE == 3 && ia >= SKIP_CYCLE - 1)
-				if (MODE_TOOL == MULTI_CP && (CP_CTR_MODE == FCP_RAN ||CP_CTR_MODE == FCP_TOG) && ia >= SKIP_CYCLE - 1 && ia < cap_freq)
-				{
-					update_nextstate_ft_ff_inv_cp(ia);
- 				if(CP_CTR_MODE == FCP_RAN){
-						tpi_ff_state_load_rand_ft(ia);
-					}
-				}
-				else {
-						update_nextstate_ft(ia);
-				}
-				//prn_state_ao_ft(fp, ia); //2019/12
+
+
 			}
 
 #if FAULTDROP
@@ -545,7 +585,7 @@ break;
 #endif
 
 		/*=== multi-cycle fault simulation end ===*/
-
+	//		printf("CUT= %s,#pattern: %d -> \n", argv[1], time);
 		if (time % PRN_FLT_INT == 0)
 		{
 			//printf("is here?\n");
@@ -553,7 +593,8 @@ break;
 
 			remain_flt = count_flt(fltlst.next);
 #if TRANSITIONFAULT
-			printf("Fault Coverage: %4.6f \n", (1 - (float)remain_flt / (float)sum_Tran_flt) * 100.0);
+			//printf("Transition Fault Coverage: %4.6f \n", (1 - (float)remain_flt / (float)sum_Tran_flt) * 100.0);
+			printf("Transition Fault Coverage: %4.6f \n", (float)(sum_flt-remain_flt)/sum_flt * 100.0);
 #else
 
 			//printf("Fault Coverage: %6.4f \n", (float)flt_det_num[10] / (float)sum_flt * 100.0);

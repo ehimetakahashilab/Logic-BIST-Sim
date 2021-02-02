@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -O3
+CFLAGS = -O3 -Wno-unused-result
 SOURCE_DIR = ./src
 
 DEFFILE = $(SOURCE_DIR)/declare.h $(SOURCE_DIR)/def_flt.h $(SOURCE_DIR)/def_gtype.h

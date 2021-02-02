@@ -1,5 +1,4 @@
 #!/bin/sh
-#######Path Defination###############
 User_DIR=$(cd "$(dirname "$0")";pwd)
 
 OP_LIST_DIR=${User_DIR}/FF_STATION
@@ -14,18 +13,19 @@ if [ ! -e ${CP_LIST_DIR} ]; then
       mkdir -p ${CP_LIST_DIR}/FFCP
 fi
 TPG=0 #=0:LFSR,=1:ATPG
-TEST_VEC=50 #0 00 # Number of Test patterns
+TEST_VEC=10 #0 00 # Number of Test patterns
 TOOLMODE=4 #=1:Normal Scan test, =2:Multi-cycle Test, =3: Multi-cycle test with Seq OB, =4:Toggle Gate TPI
 CP_CTRL=2
 	CAPTURE=10 #the number of capture cycles
   OBRATE=0.2 #ratio of OP FF
-	FFCP_rate=0.1	#the ration of FF-CPs in all FFs
+	FFCP_rate=0.0	#the ration of FF-CPs in all FFs
   SKIP_CAP=3 #SKIP_CAP=3, the CP control starts from the third capture cycle.
   INTERVAL_CYCLE=1 #=1: the number of interval cycles
 
 ulimit -s unlimited
 rm -f *.dat
-for CIRCUIT in  s9234 #s15850 #s13207 #s9234 #s13207 #s15850 s38417 s38584 #b14s.osaka b15s.osaka b20s.osaka  #s9234 s13207 s15850 s38417 s38584  b14s.osaka b15s.osaka b20s.osaka #b20s.osaka #s15850 s35932 s38584 s38417 #s13207 #s1488 s5378 s9234 #s13207 #s9234 #s15850 s38417 #s38584 #b04s.osaka b05s.osaka b06.osaka b14s.osaka b15s.osaka b20s.osaka
+for CIRCUIT in s9234 #s15850
+#s13207 #s9234 #s13207 #s15850 s38417 s38584 #b14s.osaka b15s.osaka b20s.osaka
 
 do
 rm -f lfsr*.dat ATPG.dat
@@ -51,8 +51,6 @@ rm -f ${CIRCUIT}_tgl_ff_tpi.dat
   if [ ! -e ${User_DIR}/OUTPUTS/CPI/${CAPTURE}_cycles/ ]; then
     mkdir -p ${User_DIR}/OUTPUTS/CPI/${CAPTURE}_cycles/
   fi
-
-
 #	  for ff_sta_file in  ./FF_STATION/$CIRCUIT/TOPSIS #./FF_STATION/$CIRCUIT/BRANCH ./FF_STATION/$CIRCUIT/COMPLEX ./FF_STATION/$CIRCUIT/TYPE_1 ./FF_STATION/$CIRCUIT/TYPE_2 ./FF_STATION/$CIRCUIT/TYPE_3 ./FF_STATION/$CIRCUIT/TOPSIS
 # you can evaluate multiple FF OP list in one simulation by specifying the path of OB-FF List
 	 cnt1=0
@@ -75,7 +73,7 @@ rm -f ${CIRCUIT}_tgl_ff_tpi.dat
 
    echo ==Simulation for FF-CPI=== #>> $LOG_FILE
 
-ln -s ${CP_LIST_DIR}/FFCP/${CIRCUIT}/rffcp  ${CIRCUIT}_tgl_FF_input.dat
+ln -s ${CP_LIST_DIR}/FFCP/${CIRCUIT}  ${CIRCUIT}_tgl_FF_input.dat
 
 echo ===$CIRCUIT: Interval capture = $INTERVAL_CYCLE===========
 

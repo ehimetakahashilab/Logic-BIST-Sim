@@ -32,7 +32,7 @@ rm -f lfsr*.dat ATPG.dat
  		 ln -s ./ATPG/SA/Com1Test/"$CIRCUIT".tests ATPG.dat
 	fi
 
-	for CAPTURE in 5 #2 3 4 5 #10 #15 #1 #20 #1 5 10 15 #20 #15 #20 #2 #20 #2 3 4 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+	for CAPTURE in 10 #2 3 4 5 #10 #15 #1 #20 #1 5 10 15 #20 #15 #20 #2 #20 #2 3 4 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
 		do
 	 time ./lbistsim $CIRCUIT $TOOLMODE $TPG $CAPTURE $SKIPCYCLES #>> Switch_ctr.txt
 		done

@@ -19,15 +19,23 @@ struct l_node
   int cp_flag;
   int toggle_cap[MAXCAP];//toggle number for capture power computing
   float toggle_rate[MAXCAP];//toggle rate for power computing
-  unsigned int gdval1_cap[MAXCAP];
+  /*unsigned int gdval1_cap[MAXCAP];
   unsigned int ftval1_cap[MAXCAP];
   unsigned int gdval1_br_cap[MAXCAP];
   unsigned int ftval1_br_cap[MAXCAP];
+  */
   //
   L_NODE *next, *prev;
   FIN_NODE *finlst, *foutlst;
-  unsigned int gdval0, gdval1, ftval0, ftval1;
+  unsigned int gdval0, gdval1, gdval_slow, ftval0, ftval1, ftval_slow;
   unsigned int tff_org_gval, tff_trans_gval,tff_trans_fval;
+
+  #if TRANSITIONFAULT
+  unsigned int la_val;
+  //unsigned int tran_gdval[MAXCAP];
+  //unsigned int tran_ftval[MAXCAP];
+  #endif
+
   char *Name;
   int sel_flag[20]; //FF選択法
 };

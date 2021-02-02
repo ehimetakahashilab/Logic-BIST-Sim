@@ -54,7 +54,7 @@ if (flt_det_num == NULL)
   prn_subnode(ffnode.next);//FFノード
   prn_subnode(ponode.next);//外部出力POノード
   #if TRANSITIONFAULT
-  printf(" === Sum of Transition Faults %d (ko) ===\n", sum_Tran_flt);
+  printf(" === Sum of Transition Faults %d (ko) ===\n", sum_flt);
   #else
   printf(" === Sum of Stuck-at Faults %d (ko) ===\n", sum_flt);
   #endif
@@ -91,13 +91,13 @@ count_flt(flttag)
   int sumflt = 0, sumTDflt = 0;
   int ia, ib;
   int cnt=0;
-#if TRANSITIONFAULT
+/*#if TRANSITIONFAULT
   for (; flttag != NULL; flttag = flttag->next){
     if (!flttag->TranDetTimes)
       sumTDflt++;
   }
   return sumTDflt;
-#else
+#else*/
 #if SELECT_STATION
   for (ia = 0; ia <=FF_FILE+1; ia++){
     flt_det_num[ia] = 0;
@@ -109,7 +109,8 @@ count_flt(flttag)
     if (!flttag->dtime){
       sumflt++;
     }
-  }          printf("cnt=%d, sumflt=%d\n",cnt,sumflt);
+  }
+  printf("cnt=%d, sumflt=%d\n",cnt,sumflt);
   if ( MODE_TOOL == MULTI_OP || MODE_TOOL == MULTI_CP){
     for (ia = 0; ia <= sum_flt; ia++) {
       for (ib = 0; ib <= FF_FILE; ib++){
@@ -119,7 +120,7 @@ count_flt(flttag)
     }
   }
   return sumflt;
-#endif
+//#endif
 }
 
 void prn_flt(flt_table,argv)
@@ -179,11 +180,11 @@ fltlist_print(flttag)
 
 for(; flttag != NULL; flttag = flttag->next){
   printf("%d,", flttag->num);
-#if TRANSITIONFAULT
-  if (!flttag->TranDetTimes) printf("0,");
-  else printf("1,");
+//#if TRANSITIONFAULT
+//  if (!flttag->TranDetTimes) printf("0,");
+//  else printf("1,");
 
-#else
+//#else
   if ( !flttag->dtime ) printf("0,");
   else printf("1,");
 
@@ -199,7 +200,7 @@ for(; flttag != NULL; flttag = flttag->next){
     }
   }
   printf("\n");
-#endif
+//#endif
   }
 }
 

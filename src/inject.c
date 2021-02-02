@@ -298,6 +298,7 @@ int num_injgate;
   }
 }
 
+#if TRANSITIONFAULT
 copy_state()
 {
   L_NODE *ff_node;
@@ -309,3 +310,27 @@ copy_state()
     ff_node->ftval1 = ff_node->gdval1;
   }
 }
+launch_initial()
+{
+  L_NODE *ff_node;
+  FIN_NODE *finnode;
+  finnode = ffnode.next;
+  for (; finnode != NULL; finnode = finnode->next)
+  {
+    ff_node = finnode->node;
+    ff_node->ftval1 = ff_node->la_val;//set ftval to the Launch value(good value)
+  }
+}
+
+launch_copy()
+{
+  L_NODE *ff_node;
+  FIN_NODE *finnode;
+  finnode = ffnode.next;
+  for (; finnode != NULL; finnode = finnode->next)
+  {
+    ff_node = finnode->node;
+    ff_node->la_val = ff_node->gdval1;//set ftval to the Launch value(good value)
+  }
+}
+#endif

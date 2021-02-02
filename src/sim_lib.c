@@ -95,7 +95,7 @@ update_nextstate_ff_inv_cp(capture) int capture;
 #endif
     }
     else  {
-      if (capture < SKIP_CYCLE - 1 || capture >= cap_freq) continue;
+      if (capture < SKIP_CYCLE  || capture >= cap_freq) continue;
       if (fnode->cp_flag != 1) continue;
 
           //if (capture >= SKIP_CYCLE - 1)
@@ -109,7 +109,7 @@ update_nextstate_ff_inv_cp(capture) int capture;
     }
 
 #if TRANSITIONFAULT
-    if (capture == SLOW_CK)
+    if (capture == L_CK)
       fnode->gdval_slow = fnode->gdval1;
 #endif
   }
@@ -152,7 +152,7 @@ update_nextstate(capture) int capture;
 #endif
     }
 #if TRANSITIONFAULT
-    if (capture == SLOW_CK)
+    if (capture == L_CK)
       fnode->gdval_slow = fnode->gdval1;
 #endif
 //if(fnode->line==202 ||fnode->line==201) printf("ff-%d= %x,%x\n",fnode->line,fnode->gdval1,fnode->finlst->node->gdval1);
@@ -268,7 +268,7 @@ update_nextstate_ft_ff_inv_cp(capture) int capture;
     fnode = finnode->node;
     tgl_val = fnode->ftval1 ^ tmp[ia];
     fnode->ftval1 = tmp[ia];
-    if (capture < SKIP_CYCLE - 1 || capture == cap_freq) continue;
+    if (capture < SKIP_CYCLE  || capture == cap_freq) continue;
     if (capture % INTERVAL_CYCLE ) continue;
     if (fnode->cp_flag != 1) continue;
       //if(fnode->gdval0==fnode->gdval1)
@@ -913,7 +913,7 @@ onetimesim_cp_jst(capture) int capture;
       fnode->tff_org_gval=fnode->gdval1;
       fnode->tff_trans_gval=fnode->tff_org_gval;
     }
-    if (capture < SKIP_CYCLE - 1 || fnode->cp_flag != 1 || capture % INTERVAL_CYCLE) continue;
+    if (capture < SKIP_CYCLE || fnode->cp_flag != 1 || capture % INTERVAL_CYCLE) continue;
     if (CP_CTR_MODE == LCP_TOG){
             //tgl_val = tmp2_val ^ fnode->gdval1;
             fnode->gdval1 = ~fnode->tff_trans_gval;
@@ -1009,7 +1009,7 @@ onetimesim_cp_inversion(capture) int capture;
     }
 #endif
 
-    if (capture < SKIP_CYCLE - 1 || fnode->cp_flag != 1 || capture % INTERVAL_CYCLE) continue;
+    if (capture < SKIP_CYCLE || fnode->cp_flag != 1 || capture % INTERVAL_CYCLE) continue;
     if (CP_CTR_MODE == LCP_TOG){
             //tgl_val = tmp2_val ^ fnode->gdval1;
             fnode->gdval1 = ~fnode->gdval1;
@@ -1103,7 +1103,7 @@ onetimesim_cp_tdt(capture) int capture;
     }
 #endif
 
-    if (capture < SKIP_CYCLE - 1 || fnode->cp_flag != 1 || capture % INTERVAL_CYCLE) continue;
+    if (capture < SKIP_CYCLE || fnode->cp_flag != 1 || capture % INTERVAL_CYCLE) continue;
     if (CP_CTR_MODE == LCP_TOG){
             tgl_val = tmp2_val ^ fnode->gdval1;
             fnode->gdval1 = ~(fnode->gdval1 ^ tgl_val);
@@ -1256,7 +1256,7 @@ ftvalsim_cp_jst(capture) int capture;
 
     if(capture == 1 ) fnode->tff_trans_fval=fnode->tff_org_gval;
   //  printf(" %d: %x \n",fnode->line, fnode->tff_trans_fval);
-    if (capture < SKIP_CYCLE - 1 || !fnode->cp_flag  || capture % INTERVAL_CYCLE) continue;
+    if (capture < SKIP_CYCLE  || !fnode->cp_flag  || capture % INTERVAL_CYCLE) continue;
     if (CP_CTR_MODE == LCP_TOG){
             //tgl_val = tmp2_val ^ fnode->gdval1;
             fnode->ftval1 = ~fnode->tff_trans_fval;
@@ -1339,7 +1339,7 @@ ftvalsim_cp_inversion(capture) int capture;
       fnode->ftval1 = new_val1;
     }
 
-    if (capture < SKIP_CYCLE - 1 || fnode->cp_flag != 1 || capture % INTERVAL_CYCLE) continue;
+    if (capture < SKIP_CYCLE  || fnode->cp_flag != 1 || capture % INTERVAL_CYCLE) continue;
     if (CP_CTR_MODE == LCP_TOG){
             fnode->ftval1 = ~fnode->ftval1;
             //printf(" %d: %x %x\n",fnode->line, fnode->ftval1,fnode->gdval1);
@@ -1420,7 +1420,7 @@ ftvalsim_cp_tdt(capture) int capture;
       fnode->ftval1 = new_val1;
     }
 
-    if (capture < SKIP_CYCLE - 1 || fnode->cp_flag != 1 || capture % INTERVAL_CYCLE) continue;
+    if (capture < SKIP_CYCLE  || fnode->cp_flag != 1 || capture % INTERVAL_CYCLE) continue;
     if (CP_CTR_MODE == LCP_TOG){
             tgl_val = tmp_val ^ fnode->ftval1;
             fnode->ftval1 = ~(fnode->ftval1 ^ tgl_val);
